@@ -9,6 +9,13 @@ enum LockState {
     case locked
 }
 
+extension RewardEngine {
+    func lockState(of ticket: Ticket, redemptions: [Redemption]) -> LockState {
+        guard ticket.isLocked(redemptions: redemptions) else { return .open }
+        return available(ticket.category) > 0 ? .affordable : .locked
+    }
+}
+
 /// A ticket styled like a physical stub: neutral card, thin category accent edge,
 /// perforated divider, and the points badge on the stub.
 struct TicketCardView: View {
@@ -36,14 +43,14 @@ struct TicketCardView: View {
         }
         .background {
             ZStack(alignment: .leading) {
-                TicketShape(stubWidth: stubWidth).fill(Color(nsColor: .textBackgroundColor))
+                TicketShape(stubWidth: stubWidth).fill(Color.cardBackground)
                 Rectangle().fill(ticket.category.color).frame(width: 4)
             }
             .clipShape(TicketShape(stubWidth: stubWidth))
         }
         .overlay {
             TicketShape(stubWidth: stubWidth)
-                .stroke(isSelected ? Color.accentColor : Color.primary.opacity(0.1), lineWidth: isSelected ? 2 : 1)
+                .stroke(isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(Color.primary.opacity(0.1)), lineWidth: isSelected ? 2 : 1)
         }
         .compositingGroup()
         .shadow(color: .black.opacity(0.08), radius: 2, y: 1)

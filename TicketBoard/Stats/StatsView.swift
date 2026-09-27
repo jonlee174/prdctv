@@ -100,7 +100,7 @@ struct StatsView: View {
 
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                HStack(spacing: 12) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
                     tile("Current streak", "\(stats.currentStreak())", unit: "days")
                     tile("Longest streak", "\(stats.longestStreak)", unit: "days")
                     tile("This week", "\(weeks.last?.points ?? 0)", unit: "need pts")
@@ -115,7 +115,7 @@ struct StatsView: View {
                             y: .value("Points", week.points)
                         )
                         .foregroundStyle(Category.need.color.gradient)
-                        .cornerRadius(3)
+                        .cornerRadius(Radius.tiny)
                     }
                     .chartXAxis {
                         AxisMarks(values: .stride(by: .weekOfYear, count: 2)) {
@@ -213,6 +213,6 @@ struct StatsView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.primary.opacity(0.05)))
+        .background(RoundedRectangle(cornerRadius: Radius.medium).fill(Color.primary.opacity(0.05)))
     }
 }

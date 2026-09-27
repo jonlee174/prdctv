@@ -30,6 +30,26 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section {
+                CategoryStyleSettings()
+            } header: {
+                Text("Categories")
+            } footer: {
+                Text("Pick an icon and color for Need, Want and Fun tickets. Icons also tell categories apart in the widget when macOS fades it, so distinct shapes work best.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                ThemeColorSettings()
+            } header: {
+                Text("Colors")
+            } footer: {
+                Text("Greens from the logo by default. Click a swatch to choose any color from the color wheel; it applies right away. ↺ puts back the default. Column colors also tint the widget headings.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Quick Add") {
                 KeyboardShortcuts.Recorder("Global shortcut:", name: .quickAdd)
             }
@@ -43,7 +63,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 460)
+        .frame(width: 480, height: 800)
         .onChange(of: wantRatio) { SharedStore.reloadWidgets() }
         .onChange(of: funRatio) { SharedStore.reloadWidgets() }
     }

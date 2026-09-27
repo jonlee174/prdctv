@@ -17,7 +17,7 @@ struct TicketBoardWidget: Widget {
             TicketWidgetView(entry: entry)
                 .containerBackground(.background, for: .widget)
         }
-        .configurationDisplayName("Ticket Board")
+        .configurationDisplayName("prdctv")
         .description("Your reward meter and what's up next.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge])
     }
@@ -26,6 +26,11 @@ struct TicketBoardWidget: Widget {
 struct TicketWidgetView: View {
     let entry: BoardEntry
     @Environment(\.widgetFamily) private var family
+    private var theme = ThemeColors()
+
+    init(entry: BoardEntry) {
+        self.entry = entry
+    }
 
     var body: some View {
         switch family {
@@ -34,28 +39,31 @@ struct TicketWidgetView: View {
                 .widgetURL(entry.engine.availableWant > 0 || entry.engine.availableFun > 0
                            ? DeepLink.redeem.url : nil)
         case .systemMedium:
-            HStack(spacing: 14) {
-                SmallMeter(engine: entry.engine).frame(width: 110)
-                Divider()
-                TicketList(title: "Up Next", tickets: Array(entry.upNextNeed.prefix(3)), emptyText: "No need tickets up next")
-            }
+            // Tasks only: the reward rings live on the small, large and extra-large sizes.
+            TicketList(title: "Up Next", tickets: Array(entry.upNextNeed.prefix(4)), emptyText: "No need tickets up next",
+                       tint: theme.column(.upNext))
+                .frame(maxHeight: .infinity, alignment: .top)
         case .systemLarge:
             VStack(alignment: .leading, spacing: 10) {
                 MeterBar(engine: entry.engine)
                 let inProgress = Array(entry.inProgress.prefix(3))
                 let upNext = Array(entry.upNext.prefix(6 - inProgress.count))
-                TicketList(title: "In Progress", tickets: inProgress, emptyText: "Nothing in progress")
-                TicketList(title: "Up Next", tickets: upNext, emptyText: "Nothing up next")
+                TicketList(title: "In Progress", tickets: inProgress, emptyText: "Nothing in progress",
+                           tint: theme.column(.inProgress))
+                TicketList(title: "Up Next", tickets: upNext, emptyText: "Nothing up next",
+                           tint: theme.column(.upNext))
                 Spacer(minLength: 0)
             }
         default: // .systemExtraLarge
             VStack(alignment: .leading, spacing: 12) {
                 MeterBar(engine: entry.engine)
                 HStack(alignment: .top, spacing: 14) {
-                    TicketList(title: "Up Next", tickets: Array(entry.upNext.prefix(7)), emptyText: "Nothing up next")
-                    TicketList(title: "In Progress", tickets: Array(entry.inProgress.prefix(7)), emptyText: "Nothing in progress")
+                    TicketList(title: "Up Next", tickets: Array(entry.upNext.prefix(7)), emptyText: "Nothing up next",
+                               tint: theme.column(.upNext))
+                    TicketList(title: "In Progress", tickets: Array(entry.inProgress.prefix(7)), emptyText: "Nothing in progress",
+                               tint: theme.column(.inProgress))
                     TicketList(title: "Done this week", tickets: Array(entry.doneThisWeek.prefix(7)),
-                               emptyText: "Nothing done yet", isDone: true)
+                               emptyText: "Nothing done yet", isDone: true, tint: theme.column(.done))
                 }
                 Spacer(minLength: 0)
             }
@@ -102,7 +110,7 @@ private struct MeterBar: View {
                     Label("Redeem", systemImage: "gift.fill")
                         .font(.caption.weight(.semibold))
                         .padding(.horizontal, 10).padding(.vertical, 5)
-                        .background(Capsule().strokeBorder(lineWidth: 1.5))
+                        .background(RoundedRectangle(cornerRadius: Radius.small).strokeBorder(lineWidth: 1.5))
                 }
                 .widgetAccentable()
             }
@@ -137,13 +145,15 @@ private struct TicketList: View {
     let tickets: [TicketSnapshot]
     let emptyText: String
     var isDone = false
+    var tint: Color?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title.uppercased())
                 .font(.system(size: 10, weight: .bold))
                 .tracking(0.5)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(tint ?? .secondary)
+                .widgetAccentable(tint != nil)
             if tickets.isEmpty {
                 Text(emptyText).font(.caption).foregroundStyle(.tertiary)
             }

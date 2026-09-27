@@ -8,47 +8,98 @@
 
 /* Begin PBXBuildFile section */
 		019C2F062CFA63077817D1D9 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6438817F3333C2F49B1C39C /* Models.swift */; };
+		043C4D84F1805E3293270454 /* MonthGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA01AAAD0F477E708FDDD5A /* MonthGrid.swift */; };
 		07E07C555FF7E9B252439F7D /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
+		0825A0146CEDA8B16885219F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222A103F1EA1B35D8B5245E5 /* Theme.swift */; };
 		0DFD7A5D2CDE9D0016FF9FD8 /* ColumnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80ED4A2618E90EEE8DF055EF /* ColumnView.swift */; };
+		0E3FAD6A95B12B8035525ACB /* TicketEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A3D352E6AE7D3D0D503732C /* TicketEditorView.swift */; };
+		109D2D3F776C47664C5CB053 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
 		130F0748745ECD303EA20275 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0092F7B05629C13F82D250E /* SharedStore.swift */; };
+		13DD9031DD4A533693598E36 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
 		1547E9C559CBBEF26D6D3F4C /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
+		1A7E3F72D75B5B3C263213E4 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
+		22E8B246B114905FBB576468 /* TicketCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67184D2A5C85B45A61BA54 /* TicketCardView.swift */; };
 		232D091407AC0B2CC24F7352 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = B85E3E70100AB9B851418DC6 /* KeyboardShortcuts */; };
 		28402AC965123C61B8A70910 /* TicketBoardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4031BF90540CDF472CA741F6 /* TicketBoardApp.swift */; };
 		297CB88C5885873A3FD4FFC2 /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88366E4C005C7CACCA4639C9 /* TicketIntents.swift */; };
+		29C0862E958AAAF0370B0139 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */; };
+		2D496793B525062FD0A468A3 /* TicketCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AECF1AA2E989321F7BED94AC /* TicketCalendarView.swift */; };
+		2E7AD643C1B6060FF4EC2D05 /* TicketWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F44CFD0014C05B6FFB6AE /* TicketWidget.swift */; };
 		3048BB9015F095E9FA6C0568 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6438817F3333C2F49B1C39C /* Models.swift */; };
 		31F06171D1AFF4A707812A5C /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
 		338246B4611815F120DC9BE4 /* TicketWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 22B69A53F2B342A13DB91C57 /* TicketWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		343D323989AF1F6AF22E2FA2 /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88366E4C005C7CACCA4639C9 /* TicketIntents.swift */; };
+		3605146DAB62115CF65AF425 /* MonthGridTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4D177726524F512FE144B65 /* MonthGridTests.swift */; };
 		3735B43D7C5E17C19CB4FBEA /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
+		37A07B380019CAC825F90091 /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
+		38C133C6338ED635784A4C14 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
 		3DC4070CFEA6DDD8BA91CB6C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 374FC29CB61CC18ED7B94250 /* Assets.xcassets */; };
 		3F8F563BEE1C4BA490484614 /* RewardEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B29FF11CC7D967C821CD83 /* RewardEngineTests.swift */; };
 		42AEB2FA71FB52A41E1A4629 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505B077EC3EDF8251C990BD4 /* AppModel.swift */; };
+		4401CA68AAB46BBDF67F13E2 /* PhoneQuickAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6ACE67E641F0815C0916E6E /* PhoneQuickAddSheet.swift */; };
 		458A81A9BD8DC14E3D5A0FF1 /* TicketEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A3D352E6AE7D3D0D503732C /* TicketEditorView.swift */; };
+		4CD9FC754182C28ED3686BE0 /* RewardMeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C11496D607BCEDAD995F4F /* RewardMeterView.swift */; };
+		4D4FC8089E151BCF025C9B81 /* PhoneBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCED6B0F579E68B095A376F5 /* PhoneBoardView.swift */; };
+		4F9B8DFEF85E5787546BC2CF /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6438817F3333C2F49B1C39C /* Models.swift */; };
+		502C7542CA0969964B9F6A74 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */; };
+		50D967A5D2FD593D2F46064E /* BoardProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47DB116614B48873394CB1 /* BoardProvider.swift */; };
+		50E53DA4B1D1CE6EC8A5D1EA /* ThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD87070123E75E5B13949C1 /* ThemeColors.swift */; };
 		5C8550427BCE460F689C0E4F /* QuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD51C4472E76DF5738250CC1 /* QuickAddParser.swift */; };
+		5CBD3FE4B0FA53055EDD0226 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222A103F1EA1B35D8B5245E5 /* Theme.swift */; };
+		5DCA2B3AEC77CCC974AA7E62 /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
 		62630EDD70F62DA89AFC2622 /* QuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD51C4472E76DF5738250CC1 /* QuickAddParser.swift */; };
 		631DCAA92FA701E95B95C86D /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
 		66961E63FBE2C3977324C369 /* QuickAddPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FCFDEBCAC2D0EB7AF47C38 /* QuickAddPanel.swift */; };
-		66CA361E7D24E919637D41B3 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D18DA3748B8044AE69B128 /* DemoData.swift */; };
+		699AD758E365EF70349C2480 /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88366E4C005C7CACCA4639C9 /* TicketIntents.swift */; };
+		69CB08CDD442CABF8B9D52BB /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88366E4C005C7CACCA4639C9 /* TicketIntents.swift */; };
+		6E158949FF655F3D70C1035F /* WhiteboardImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C66E4F6005A9CE314E8DD /* WhiteboardImportView.swift */; };
+		704EA65E63642422D1008F2D /* ThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD87070123E75E5B13949C1 /* ThemeColors.swift */; };
+		7135E2358C50C204CD7D61D8 /* ThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD87070123E75E5B13949C1 /* ThemeColors.swift */; };
 		73495B055AE41D1AC5F6E643 /* TicketCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67184D2A5C85B45A61BA54 /* TicketCardView.swift */; };
+		75737777DC58B4F152847C4F /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0092F7B05629C13F82D250E /* SharedStore.swift */; };
+		7945DB597F03FA7E39161E28 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
+		7A0467A33179AF5435012184 /* RedemptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479E1F6BBFAD9B8CEFF9341 /* RedemptionSheet.swift */; };
 		7C87B54C821CCD5F6ADB266E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222A103F1EA1B35D8B5245E5 /* Theme.swift */; };
 		8057CA89BA02BD99F4C86774 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222A103F1EA1B35D8B5245E5 /* Theme.swift */; };
+		8248EAAE7E2A50AA0A1EA909 /* ThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD87070123E75E5B13949C1 /* ThemeColors.swift */; };
+		82E5C5263091F3752CDD7468 /* BoardSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABC9EFA21D6C990729137BE /* BoardSupport.swift */; };
 		83EF2E82FCDD749EEFFFE258 /* QuickAddParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA2B115B33237FA7D625D0B /* QuickAddParserTests.swift */; };
+		86243E44F23F7DB1BF2019E2 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
+		88AB551CFD271E16CEEB08FB /* BoardSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABC9EFA21D6C990729137BE /* BoardSupport.swift */; };
 		978C945F23E34145D091CB31 /* RewardMeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C11496D607BCEDAD995F4F /* RewardMeterView.swift */; };
 		98064EBF51AFF29A1C5863D2 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
 		9C27FA5A6D925EE0AF71C7CF /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0092F7B05629C13F82D250E /* SharedStore.swift */; };
 		9C7A605F3153FA3103418CE7 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
+		9C9FD50FB6BF207AD61ADF2D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 374FC29CB61CC18ED7B94250 /* Assets.xcassets */; };
+		9F125599E91E4A12B201E99A /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */; };
 		9FB8CA8914DABA24EE694097 /* MenuBarContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA56929BDA0C52C8AE8E2A7 /* MenuBarContent.swift */; };
+		A027C82214359A7E1FDBF793 /* MonthGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA01AAAD0F477E708FDDD5A /* MonthGrid.swift */; };
+		A2B48602554076A6B3368636 /* QuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD51C4472E76DF5738250CC1 /* QuickAddParser.swift */; };
 		A7B890647E9DAC38F49B744C /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
 		A86039D6C46E68FFE54FBB23 /* RedemptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479E1F6BBFAD9B8CEFF9341 /* RedemptionSheet.swift */; };
+		A8DC91B997709AC6BB5333E7 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */; };
 		A9EF15A6F285F6EF6FA4BA6E /* QuickAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE44658D0FBE4724F4C8A25 /* QuickAddView.swift */; };
 		ACC6ECF8A332F2D1413849D6 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23D779C0AD669B7631F6470A /* BoardView.swift */; };
 		AF536739D3C0D2F6C78DFDC5 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6438817F3333C2F49B1C39C /* Models.swift */; };
+		B22F53D3380CED4AC863E3FF /* UndoHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A7618CFC7B1D5A01FDE779 /* UndoHistoryTests.swift */; };
+		B24CBF5283F16D611532181F /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
 		B62D5A7CEAFCCDA106EA6B8A /* BoardProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47DB116614B48873394CB1 /* BoardProvider.swift */; };
+		BC565278ECC820772DEE352D /* MonthGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA01AAAD0F477E708FDDD5A /* MonthGrid.swift */; };
+		C6C28F29E1D90A89CDFB90F0 /* TicketWidgetiOS.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 64D9068492B5384E5335C4F6 /* TicketWidgetiOS.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CA377289209F16EC80F41A01 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
+		CE9AC3A3F1FED7B0208EC1A4 /* PhoneSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AC4AF9A195C16C71F187FE4 /* PhoneSettingsView.swift */; };
 		D36B33ECA67A9C3B5A390CDA /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF3AAC75613EC5F54EC55F8 /* StatsView.swift */; };
+		D66B9E32AD3690BD54CDA4B9 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6438817F3333C2F49B1C39C /* Models.swift */; };
 		D88DE87BFE90EDEC8CF0C538 /* WhiteboardImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C66E4F6005A9CE314E8DD /* WhiteboardImportView.swift */; };
 		D9C649267FB84C4489393241 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29D7C5F276DE0C7131C6800 /* SettingsView.swift */; };
 		DAC9D1739CD25EC869BC6933 /* TicketWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F44CFD0014C05B6FFB6AE /* TicketWidget.swift */; };
 		DD583C9E9FCAC1BCF6669C04 /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
+		E792A0C712A958AA02BD5620 /* TicketCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AECF1AA2E989321F7BED94AC /* TicketCalendarView.swift */; };
+		E8D5FA4EC26691EF218E343D /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF3AAC75613EC5F54EC55F8 /* StatsView.swift */; };
+		F432880097D6B4E6D44C590A /* QuickAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE44658D0FBE4724F4C8A25 /* QuickAddView.swift */; };
+		F4519B6DE8794866095D83E6 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0092F7B05629C13F82D250E /* SharedStore.swift */; };
+		F580BEB0011F8C4FF8E5E917 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
+		FBA0E5A67C26C44336AB1EEA /* PhoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0EED75A2AA7E188BCAFDE8 /* PhoneApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +109,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 0D234F4B70D27B62A17C8A06;
 			remoteInfo = TicketWidget;
+		};
+		95C752E78000C5E115F97901 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 805E9F6EC9425A2A9752286F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A4C856DEE92707D4EF3C2E9B;
+			remoteInfo = TicketWidgetiOS;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -69,6 +127,17 @@
 			dstSubfolderSpec = 13;
 			files = (
 				338246B4611815F120DC9BE4 /* TicketWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E2EAA1D476668181D31EE04D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C6C28F29E1D90A89CDFB90F0 /* TicketWidgetiOS.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,30 +156,45 @@
 		23D779C0AD669B7631F6470A /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		2479E1F6BBFAD9B8CEFF9341 /* RedemptionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedemptionSheet.swift; sourceTree = "<group>"; };
 		24C91589C3C49F63D7610421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		29D18DA3748B8044AE69B128 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
+		2AD87070123E75E5B13949C1 /* ThemeColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColors.swift; sourceTree = "<group>"; };
 		36AF08DF73ADEA4222086B2A /* TicketBoard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TicketBoard.entitlements; sourceTree = "<group>"; };
 		374FC29CB61CC18ED7B94250 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3E3F44CFD0014C05B6FFB6AE /* TicketWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketWidget.swift; sourceTree = "<group>"; };
 		4031BF90540CDF472CA741F6 /* TicketBoardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketBoardApp.swift; sourceTree = "<group>"; };
 		4481FE75A1A6963B92BD340D /* TicketBoard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TicketBoard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		46A7618CFC7B1D5A01FDE779 /* UndoHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoHistoryTests.swift; sourceTree = "<group>"; };
 		46C11496D607BCEDAD995F4F /* RewardMeterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardMeterView.swift; sourceTree = "<group>"; };
 		496DC9661BD6A81DA799A775 /* TicketBoardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TicketBoardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A3D352E6AE7D3D0D503732C /* TicketEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketEditorView.swift; sourceTree = "<group>"; };
+		4EA01AAAD0F477E708FDDD5A /* MonthGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthGrid.swift; sourceTree = "<group>"; };
 		505B077EC3EDF8251C990BD4 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		57324290B45FBF15E3849EC4 /* UndoHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoHistory.swift; sourceTree = "<group>"; };
+		5A0EED75A2AA7E188BCAFDE8 /* PhoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneApp.swift; sourceTree = "<group>"; };
 		5AE44658D0FBE4724F4C8A25 /* QuickAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddView.swift; sourceTree = "<group>"; };
+		64D9068492B5384E5335C4F6 /* TicketWidgetiOS.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TicketWidgetiOS.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		662E4C27C698B07F319773E9 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 		6F67184D2A5C85B45A61BA54 /* TicketCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketCardView.swift; sourceTree = "<group>"; };
+		76A21E615042E163ACD74B88 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7AC4AF9A195C16C71F187FE4 /* PhoneSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneSettingsView.swift; sourceTree = "<group>"; };
 		80ED4A2618E90EEE8DF055EF /* ColumnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColumnView.swift; sourceTree = "<group>"; };
 		88366E4C005C7CACCA4639C9 /* TicketIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketIntents.swift; sourceTree = "<group>"; };
+		8ABC9EFA21D6C990729137BE /* BoardSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardSupport.swift; sourceTree = "<group>"; };
 		971DBBA6C22179DFBF40577D /* RewardSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardSettings.swift; sourceTree = "<group>"; };
+		9F3CDF0AB25EFB6A5A7A6271 /* TicketBoardiOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TicketBoardiOS.entitlements; sourceTree = "<group>"; };
 		A1B29FF11CC7D967C821CD83 /* RewardEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardEngineTests.swift; sourceTree = "<group>"; };
+		A4D177726524F512FE144B65 /* MonthGridTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthGridTests.swift; sourceTree = "<group>"; };
+		A6ACE67E641F0815C0916E6E /* PhoneQuickAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneQuickAddSheet.swift; sourceTree = "<group>"; };
+		AECF1AA2E989321F7BED94AC /* TicketCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketCalendarView.swift; sourceTree = "<group>"; };
 		BB9C66E4F6005A9CE314E8DD /* WhiteboardImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardImportView.swift; sourceTree = "<group>"; };
 		BD51C4472E76DF5738250CC1 /* QuickAddParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddParser.swift; sourceTree = "<group>"; };
 		C0092F7B05629C13F82D250E /* SharedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStore.swift; sourceTree = "<group>"; };
+		CD912E6A14A37B2ADC078B2B /* TicketBoardiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TicketBoardiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDF3AAC75613EC5F54EC55F8 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		D6438817F3333C2F49B1C39C /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		E2137798E0CDE45DC92C77FF /* RewardEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardEngine.swift; sourceTree = "<group>"; };
 		E29D7C5F276DE0C7131C6800 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
+		FCED6B0F579E68B095A376F5 /* PhoneBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneBoardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,10 +239,21 @@
 			isa = PBXGroup;
 			children = (
 				4481FE75A1A6963B92BD340D /* TicketBoard.app */,
+				CD912E6A14A37B2ADC078B2B /* TicketBoardiOS.app */,
 				496DC9661BD6A81DA799A775 /* TicketBoardTests.xctest */,
 				22B69A53F2B342A13DB91C57 /* TicketWidget.appex */,
+				64D9068492B5384E5335C4F6 /* TicketWidgetiOS.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		54714FFCD8FCB7068C985FE2 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				4EA01AAAD0F477E708FDDD5A /* MonthGrid.swift */,
+				AECF1AA2E989321F7BED94AC /* TicketCalendarView.swift */,
+			);
+			path = Calendar;
 			sourceTree = "<group>";
 		};
 		8715692A6298F051C045BC82 /* TicketWidget */ = {
@@ -172,11 +267,23 @@
 			path = TicketWidget;
 			sourceTree = "<group>";
 		};
+		9AE5F4CC09C6C616895F10E4 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				76A21E615042E163ACD74B88 /* Info.plist */,
+				5A0EED75A2AA7E188BCAFDE8 /* PhoneApp.swift */,
+				FCED6B0F579E68B095A376F5 /* PhoneBoardView.swift */,
+				A6ACE67E641F0815C0916E6E /* PhoneQuickAddSheet.swift */,
+				7AC4AF9A195C16C71F187FE4 /* PhoneSettingsView.swift */,
+				9F3CDF0AB25EFB6A5A7A6271 /* TicketBoardiOS.entitlements */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
 		A1CC52E9D20514C0E5B9530B /* App */ = {
 			isa = PBXGroup;
 			children = (
 				505B077EC3EDF8251C990BD4 /* AppModel.swift */,
-				29D18DA3748B8044AE69B128 /* DemoData.swift */,
 				24C91589C3C49F63D7610421 /* Info.plist */,
 				1CA56929BDA0C52C8AE8E2A7 /* MenuBarContent.swift */,
 				E29D7C5F276DE0C7131C6800 /* SettingsView.swift */,
@@ -191,7 +298,9 @@
 			children = (
 				A1CC52E9D20514C0E5B9530B /* App */,
 				EEEA33C0E5753E153ACE6F23 /* Board */,
+				54714FFCD8FCB7068C985FE2 /* Calendar */,
 				F59507E70ECE8341F734934D /* Import */,
+				9AE5F4CC09C6C616895F10E4 /* iOS */,
 				F18A3C1094E72827BE12B36C /* QuickAdd */,
 				17FF9B6FA15D1B61D85F1C8C /* Resources */,
 				CDA16DC4EEBCD3611E4849A3 /* Rewards */,
@@ -213,8 +322,10 @@
 		D50F8F64EDDD2B15F8B9669C /* TicketBoardTests */ = {
 			isa = PBXGroup;
 			children = (
+				A4D177726524F512FE144B65 /* MonthGridTests.swift */,
 				1CA2B115B33237FA7D625D0B /* QuickAddParserTests.swift */,
 				A1B29FF11CC7D967C821CD83 /* RewardEngineTests.swift */,
+				46A7618CFC7B1D5A01FDE779 /* UndoHistoryTests.swift */,
 			);
 			path = TicketBoardTests;
 			sourceTree = "<group>";
@@ -222,6 +333,7 @@
 		EEEA33C0E5753E153ACE6F23 /* Board */ = {
 			isa = PBXGroup;
 			children = (
+				8ABC9EFA21D6C990729137BE /* BoardSupport.swift */,
 				23D779C0AD669B7631F6470A /* BoardView.swift */,
 				80ED4A2618E90EEE8DF055EF /* ColumnView.swift */,
 				6F67184D2A5C85B45A61BA54 /* TicketCardView.swift */,
@@ -244,12 +356,15 @@
 			isa = PBXGroup;
 			children = (
 				662E4C27C698B07F319773E9 /* AppGroup.swift */,
+				E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */,
 				D6438817F3333C2F49B1C39C /* Models.swift */,
 				E2137798E0CDE45DC92C77FF /* RewardEngine.swift */,
 				971DBBA6C22179DFBF40577D /* RewardSettings.swift */,
 				C0092F7B05629C13F82D250E /* SharedStore.swift */,
 				222A103F1EA1B35D8B5245E5 /* Theme.swift */,
+				2AD87070123E75E5B13949C1 /* ThemeColors.swift */,
 				88366E4C005C7CACCA4639C9 /* TicketIntents.swift */,
+				57324290B45FBF15E3849EC4 /* UndoHistory.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -265,6 +380,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0040FA078188425B34167528 /* TicketBoardiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EF7E2F34B38819BA6487422C /* Build configuration list for PBXNativeTarget "TicketBoardiOS" */;
+			buildPhases = (
+				0FADBC394000ED0DC4B41B5B /* Sources */,
+				F5B4ABF0317FC86B306DD961 /* Resources */,
+				E2EAA1D476668181D31EE04D /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3BCB2A55F8C332E6859A0B74 /* PBXTargetDependency */,
+			);
+			name = TicketBoardiOS;
+			packageProductDependencies = (
+			);
+			productName = TicketBoardiOS;
+			productReference = CD912E6A14A37B2ADC078B2B /* TicketBoardiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
 		0D234F4B70D27B62A17C8A06 /* TicketWidget */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FDFD97935A2AD45215299B0E /* Build configuration list for PBXNativeTarget "TicketWidget" */;
@@ -321,6 +456,23 @@
 			productReference = 4481FE75A1A6963B92BD340D /* TicketBoard.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A4C856DEE92707D4EF3C2E9B /* TicketWidgetiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF232AAC4265C472F71D09DA /* Build configuration list for PBXNativeTarget "TicketWidgetiOS" */;
+			buildPhases = (
+				E5E9021D66D3AC57160DF01C /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TicketWidgetiOS;
+			packageProductDependencies = (
+			);
+			productName = TicketWidgetiOS;
+			productReference = 64D9068492B5384E5335C4F6 /* TicketWidgetiOS.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -330,6 +482,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					0040FA078188425B34167528 = {
+						DevelopmentTeam = TTM9BN6M53;
+						ProvisioningStyle = Automatic;
+					};
 					0D234F4B70D27B62A17C8A06 = {
 						DevelopmentTeam = TTM9BN6M53;
 						ProvisioningStyle = Automatic;
@@ -339,6 +495,10 @@
 						ProvisioningStyle = Automatic;
 					};
 					8A72B339C4DF025C8F81FA41 = {
+						DevelopmentTeam = TTM9BN6M53;
+						ProvisioningStyle = Automatic;
+					};
+					A4C856DEE92707D4EF3C2E9B = {
 						DevelopmentTeam = TTM9BN6M53;
 						ProvisioningStyle = Automatic;
 					};
@@ -363,6 +523,8 @@
 			targets = (
 				8A72B339C4DF025C8F81FA41 /* TicketBoard */,
 				0D234F4B70D27B62A17C8A06 /* TicketWidget */,
+				0040FA078188425B34167528 /* TicketBoardiOS */,
+				A4C856DEE92707D4EF3C2E9B /* TicketWidgetiOS */,
 				862661DA0A8F5A10F80E75CE /* TicketBoardTests */,
 			);
 		};
@@ -377,20 +539,64 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F5B4ABF0317FC86B306DD961 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C9FD50FB6BF207AD61ADF2D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0FADBC394000ED0DC4B41B5B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA377289209F16EC80F41A01 /* AppGroup.swift in Sources */,
+				82E5C5263091F3752CDD7468 /* BoardSupport.swift in Sources */,
+				9F125599E91E4A12B201E99A /* DemoData.swift in Sources */,
+				4F9B8DFEF85E5787546BC2CF /* Models.swift in Sources */,
+				A027C82214359A7E1FDBF793 /* MonthGrid.swift in Sources */,
+				FBA0E5A67C26C44336AB1EEA /* PhoneApp.swift in Sources */,
+				4D4FC8089E151BCF025C9B81 /* PhoneBoardView.swift in Sources */,
+				4401CA68AAB46BBDF67F13E2 /* PhoneQuickAddSheet.swift in Sources */,
+				CE9AC3A3F1FED7B0208EC1A4 /* PhoneSettingsView.swift in Sources */,
+				A2B48602554076A6B3368636 /* QuickAddParser.swift in Sources */,
+				F432880097D6B4E6D44C590A /* QuickAddView.swift in Sources */,
+				7A0467A33179AF5435012184 /* RedemptionSheet.swift in Sources */,
+				F580BEB0011F8C4FF8E5E917 /* RewardEngine.swift in Sources */,
+				4CD9FC754182C28ED3686BE0 /* RewardMeterView.swift in Sources */,
+				5DCA2B3AEC77CCC974AA7E62 /* RewardSettings.swift in Sources */,
+				F4519B6DE8794866095D83E6 /* SharedStore.swift in Sources */,
+				E8D5FA4EC26691EF218E343D /* StatsView.swift in Sources */,
+				0825A0146CEDA8B16885219F /* Theme.swift in Sources */,
+				704EA65E63642422D1008F2D /* ThemeColors.swift in Sources */,
+				2D496793B525062FD0A468A3 /* TicketCalendarView.swift in Sources */,
+				22E8B246B114905FBB576468 /* TicketCardView.swift in Sources */,
+				0E3FAD6A95B12B8035525ACB /* TicketEditorView.swift in Sources */,
+				69CB08CDD442CABF8B9D52BB /* TicketIntents.swift in Sources */,
+				7945DB597F03FA7E39161E28 /* UndoHistory.swift in Sources */,
+				6E158949FF655F3D70C1035F /* WhiteboardImportView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		225FF785BE6BB6B4E08E3BF9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				9C7A605F3153FA3103418CE7 /* AppGroup.swift in Sources */,
 				AF536739D3C0D2F6C78DFDC5 /* Models.swift in Sources */,
+				BC565278ECC820772DEE352D /* MonthGrid.swift in Sources */,
+				3605146DAB62115CF65AF425 /* MonthGridTests.swift in Sources */,
 				5C8550427BCE460F689C0E4F /* QuickAddParser.swift in Sources */,
 				83EF2E82FCDD749EEFFFE258 /* QuickAddParserTests.swift in Sources */,
 				1547E9C559CBBEF26D6D3F4C /* RewardEngine.swift in Sources */,
 				3F8F563BEE1C4BA490484614 /* RewardEngineTests.swift in Sources */,
 				631DCAA92FA701E95B95C86D /* RewardSettings.swift in Sources */,
+				109D2D3F776C47664C5CB053 /* UndoHistory.swift in Sources */,
+				B22F53D3380CED4AC863E3FF /* UndoHistoryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,13 +606,16 @@
 			files = (
 				3735B43D7C5E17C19CB4FBEA /* AppGroup.swift in Sources */,
 				B62D5A7CEAFCCDA106EA6B8A /* BoardProvider.swift in Sources */,
+				502C7542CA0969964B9F6A74 /* DemoData.swift in Sources */,
 				3048BB9015F095E9FA6C0568 /* Models.swift in Sources */,
 				98064EBF51AFF29A1C5863D2 /* RewardEngine.swift in Sources */,
 				DD583C9E9FCAC1BCF6669C04 /* RewardSettings.swift in Sources */,
 				9C27FA5A6D925EE0AF71C7CF /* SharedStore.swift in Sources */,
 				7C87B54C821CCD5F6ADB266E /* Theme.swift in Sources */,
+				8248EAAE7E2A50AA0A1EA909 /* ThemeColors.swift in Sources */,
 				297CB88C5885873A3FD4FFC2 /* TicketIntents.swift in Sources */,
 				DAC9D1739CD25EC869BC6933 /* TicketWidget.swift in Sources */,
+				B24CBF5283F16D611532181F /* UndoHistory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,11 +625,13 @@
 			files = (
 				31F06171D1AFF4A707812A5C /* AppGroup.swift in Sources */,
 				42AEB2FA71FB52A41E1A4629 /* AppModel.swift in Sources */,
+				88AB551CFD271E16CEEB08FB /* BoardSupport.swift in Sources */,
 				ACC6ECF8A332F2D1413849D6 /* BoardView.swift in Sources */,
 				0DFD7A5D2CDE9D0016FF9FD8 /* ColumnView.swift in Sources */,
-				66CA361E7D24E919637D41B3 /* DemoData.swift in Sources */,
+				29C0862E958AAAF0370B0139 /* DemoData.swift in Sources */,
 				9FB8CA8914DABA24EE694097 /* MenuBarContent.swift in Sources */,
 				019C2F062CFA63077817D1D9 /* Models.swift in Sources */,
+				043C4D84F1805E3293270454 /* MonthGrid.swift in Sources */,
 				66961E63FBE2C3977324C369 /* QuickAddPanel.swift in Sources */,
 				62630EDD70F62DA89AFC2622 /* QuickAddParser.swift in Sources */,
 				A9EF15A6F285F6EF6FA4BA6E /* QuickAddView.swift in Sources */,
@@ -432,17 +643,44 @@
 				130F0748745ECD303EA20275 /* SharedStore.swift in Sources */,
 				D36B33ECA67A9C3B5A390CDA /* StatsView.swift in Sources */,
 				8057CA89BA02BD99F4C86774 /* Theme.swift in Sources */,
+				7135E2358C50C204CD7D61D8 /* ThemeColors.swift in Sources */,
 				28402AC965123C61B8A70910 /* TicketBoardApp.swift in Sources */,
+				E792A0C712A958AA02BD5620 /* TicketCalendarView.swift in Sources */,
 				73495B055AE41D1AC5F6E643 /* TicketCardView.swift in Sources */,
 				458A81A9BD8DC14E3D5A0FF1 /* TicketEditorView.swift in Sources */,
 				343D323989AF1F6AF22E2FA2 /* TicketIntents.swift in Sources */,
+				13DD9031DD4A533693598E36 /* UndoHistory.swift in Sources */,
 				D88DE87BFE90EDEC8CF0C538 /* WhiteboardImportView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E5E9021D66D3AC57160DF01C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86243E44F23F7DB1BF2019E2 /* AppGroup.swift in Sources */,
+				50D967A5D2FD593D2F46064E /* BoardProvider.swift in Sources */,
+				A8DC91B997709AC6BB5333E7 /* DemoData.swift in Sources */,
+				D66B9E32AD3690BD54CDA4B9 /* Models.swift in Sources */,
+				1A7E3F72D75B5B3C263213E4 /* RewardEngine.swift in Sources */,
+				37A07B380019CAC825F90091 /* RewardSettings.swift in Sources */,
+				75737777DC58B4F152847C4F /* SharedStore.swift in Sources */,
+				5CBD3FE4B0FA53055EDD0226 /* Theme.swift in Sources */,
+				50E53DA4B1D1CE6EC8A5D1EA /* ThemeColors.swift in Sources */,
+				699AD758E365EF70349C2480 /* TicketIntents.swift in Sources */,
+				2E7AD643C1B6060FF4EC2D05 /* TicketWidget.swift in Sources */,
+				38C133C6338ED635784A4C14 /* UndoHistory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3BCB2A55F8C332E6859A0B74 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A4C856DEE92707D4EF3C2E9B /* TicketWidgetiOS */;
+			targetProxy = 95C752E78000C5E115F97901 /* PBXContainerItemProxy */;
+		};
 		97D3186B9A4F506E157477A5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0D234F4B70D27B62A17C8A06 /* TicketWidget */;
@@ -464,8 +702,27 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanlee.TicketBoard;
-				PRODUCT_NAME = TicketBoard;
+				PRODUCT_NAME = prdctv;
 				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		266A852BBC6753D77E54895D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TicketBoard/iOS/TicketBoardiOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = TicketBoard/iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanlee.TicketBoard;
+				PRODUCT_NAME = prdctv;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -488,6 +745,25 @@
 			};
 			name = Debug;
 		};
+		4AE50FE252606811132FA669 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TicketWidgetiOS/TicketWidgetiOS.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = TicketWidgetiOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanlee.TicketBoard.TicketWidget;
+				PRODUCT_NAME = TicketWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		6CEDC15A65B1F5787FDD13C2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -503,6 +779,25 @@
 				SDKROOT = macosx;
 			};
 			name = Release;
+		};
+		6EDA696815B77E359CCCC411 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TicketWidgetiOS/TicketWidgetiOS.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = TicketWidgetiOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanlee.TicketBoard.TicketWidget;
+				PRODUCT_NAME = TicketWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		70339BE26AFB5A22EC14DF94 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -560,13 +855,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICLOUD_CONTAINER_ID = iCloud.com.jonathanlee.TicketBoard;
+				IOS_APP_GROUP_ID = group.com.jonathanlee.TicketBoard;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -623,15 +920,36 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICLOUD_CONTAINER_ID = iCloud.com.jonathanlee.TicketBoard;
+				IOS_APP_GROUP_ID = group.com.jonathanlee.TicketBoard;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		BD21E6DF5A48D50582CCA693 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TicketBoard/iOS/TicketBoardiOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = TicketBoard/iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanlee.TicketBoard;
+				PRODUCT_NAME = prdctv;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -683,7 +1001,7 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanlee.TicketBoard;
-				PRODUCT_NAME = TicketBoard;
+				PRODUCT_NAME = prdctv;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -718,11 +1036,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		EF7E2F34B38819BA6487422C /* Build configuration list for PBXNativeTarget "TicketBoardiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				266A852BBC6753D77E54895D /* Debug */,
+				BD21E6DF5A48D50582CCA693 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		FDFD97935A2AD45215299B0E /* Build configuration list for PBXNativeTarget "TicketWidget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2FEDCB93D0252D231622D5BD /* Debug */,
 				E8F20D0320DCC24C50AD3506 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FF232AAC4265C472F71D09DA /* Build configuration list for PBXNativeTarget "TicketWidgetiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EDA696815B77E359CCCC411 /* Debug */,
+				4AE50FE252606811132FA669 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

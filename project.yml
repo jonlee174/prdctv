@@ -3,6 +3,7 @@ options:
   bundleIdPrefix: com.jonathanlee
   deploymentTarget:
     macOS: "14.0"
+    iOS: "17.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
 
@@ -16,6 +17,8 @@ settings:
     ENABLE_HARDENED_RUNTIME: YES
     # Must match TicketBoard/Shared/AppGroup.swift.
     APP_GROUP_ID: TTM9BN6M53.com.jonathanlee.TicketBoard
+    IOS_APP_GROUP_ID: group.com.jonathanlee.TicketBoard
+    ICLOUD_CONTAINER_ID: iCloud.com.jonathanlee.TicketBoard
 
 packages:
   KeyboardShortcuts:
@@ -32,6 +35,7 @@ targets:
       - path: TicketBoard/QuickAdd
       - path: TicketBoard/Rewards
       - path: TicketBoard/Stats
+      - path: TicketBoard/Calendar
       - path: TicketBoard/Import
       - path: TicketBoard/Shared
       - path: TicketBoard/Resources
@@ -45,10 +49,13 @@ targets:
         com.apple.security.app-sandbox: true
         com.apple.security.application-groups: [$(APP_GROUP_ID)]
         com.apple.security.files.user-selected.read-only: true
+        com.apple.developer.icloud-services: [CloudKit]
+        com.apple.developer.icloud-container-identifiers: [$(ICLOUD_CONTAINER_ID)]
+        com.apple.developer.aps-environment: development
     info:
       path: TicketBoard/App/Info.plist
       properties:
-        CFBundleDisplayName: Ticket Board
+        CFBundleDisplayName: prdctv
         LSApplicationCategoryType: public.app-category.productivity
         NSHumanReadableCopyright: ""
         CFBundleURLTypes:
@@ -57,7 +64,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jonathanlee.TicketBoard
-        PRODUCT_NAME: TicketBoard
+        PRODUCT_NAME: prdctv
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_APP_SANDBOX: YES
 
@@ -75,7 +82,7 @@ targets:
     info:
       path: TicketWidget/Info.plist
       properties:
-        CFBundleDisplayName: Ticket Board
+        CFBundleDisplayName: prdctv
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
@@ -84,6 +91,82 @@ targets:
         PRODUCT_NAME: TicketWidget
         ENABLE_APP_SANDBOX: YES
         SKIP_INSTALL: YES
+
+  # iPhone / iPad app. Shares everything except the Mac-only board, menu bar,
+  # settings and floating quick-add panel.
+  TicketBoardiOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: TicketBoard/iOS
+      - path: TicketBoard/Shared
+      - path: TicketBoard/Board
+        excludes: [BoardView.swift, ColumnView.swift]
+      - path: TicketBoard/QuickAdd
+        excludes: [QuickAddPanel.swift]
+      - path: TicketBoard/Rewards
+      - path: TicketBoard/Stats
+      - path: TicketBoard/Calendar
+      - path: TicketBoard/Import
+      - path: TicketBoard/Resources
+    dependencies:
+      - target: TicketWidgetiOS
+        embed: true
+    entitlements:
+      path: TicketBoard/iOS/TicketBoardiOS.entitlements
+      properties:
+        com.apple.security.application-groups: [$(IOS_APP_GROUP_ID)]
+        com.apple.developer.icloud-services: [CloudKit]
+        com.apple.developer.icloud-container-identifiers: [$(ICLOUD_CONTAINER_ID)]
+        aps-environment: development
+    info:
+      path: TicketBoard/iOS/Info.plist
+      properties:
+        CFBundleDisplayName: prdctv
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        UIBackgroundModes: [remote-notification]
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        CFBundleURLTypes:
+          - CFBundleURLName: com.jonathanlee.TicketBoard
+            CFBundleURLSchemes: [ticketboard]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jonathanlee.TicketBoard
+        PRODUCT_NAME: prdctv
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: NO
+
+  TicketWidgetiOS:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: TicketWidget
+        excludes: [Info.plist, "*.entitlements"]
+      - path: TicketBoard/Shared
+    entitlements:
+      path: TicketWidgetiOS/TicketWidgetiOS.entitlements
+      properties:
+        com.apple.security.application-groups: [$(IOS_APP_GROUP_ID)]
+    info:
+      path: TicketWidgetiOS/Info.plist
+      properties:
+        CFBundleDisplayName: prdctv
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jonathanlee.TicketBoard.TicketWidget
+        PRODUCT_NAME: TicketWidget
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SKIP_INSTALL: YES
+        ENABLE_HARDENED_RUNTIME: NO
 
   TicketBoardTests:
     type: bundle.unit-test
@@ -96,6 +179,8 @@ targets:
       - path: TicketBoard/Shared/RewardSettings.swift
       - path: TicketBoard/Shared/AppGroup.swift
       - path: TicketBoard/QuickAdd/QuickAddParser.swift
+      - path: TicketBoard/Calendar/MonthGrid.swift
+      - path: TicketBoard/Shared/UndoHistory.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jonathanlee.TicketBoardTests
@@ -112,3 +197,10 @@ schemes:
     test:
       targets:
         - TicketBoardTests
+  TicketBoardiOS:
+    build:
+      targets:
+        TicketBoardiOS: all
+        TicketWidgetiOS: all
+    run:
+      config: Debug

@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Floating panel that takes keyboard input over any app without activating Ticket Board.
+/// Floating panel that takes keyboard input over any app without activating prdctv.
 final class QuickAddPanel: NSPanel {
     init() {
         super.init(
@@ -50,6 +50,7 @@ final class QuickAddPanelController {
         // Fresh view each time so the field starts empty.
         let root = QuickAddView(onClose: { [weak self] in self?.close() })
             .modelContainer(AppModel.shared.container)
+            .brandTint()
         let hosting = NSHostingView(rootView: root)
         panel.contentView = hosting
         panel.setContentSize(hosting.fittingSize)
@@ -64,5 +65,10 @@ final class QuickAddPanelController {
 
     func close() {
         panel?.close()
+        // Drop the view (and its container reference) once the current action unwinds,
+        // so a replaced container isn't kept alive by a hidden panel.
+        DispatchQueue.main.async { [weak self] in
+            if self?.isVisible == false { self?.panel?.contentView = nil }
+        }
     }
 }

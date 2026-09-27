@@ -1,20 +1,36 @@
 import SwiftUI
 
 extension Category {
+    /// Current color: the user's choice (Settings → Categories) or the default.
     var color: Color {
+        Color(hex: AppGroup.defaults.string(forKey: colorKey) ?? "") ?? Color(hex: defaultColorHex)!
+    }
+
+    var defaultColorHex: String {
         switch self {
-        case .need: Color(red: 0.22, green: 0.47, blue: 0.93)
-        case .want: Color(red: 0.93, green: 0.55, blue: 0.13)
-        case .fun: Color(red: 0.80, green: 0.27, blue: 0.62)
+        // Shades of the logo green; the shapes (circle / diamond / star) keep them apart.
+        case .need: "#458F32"
+        case .want: "#709929"
+        case .fun: "#2A8463"
         }
     }
+}
+
+/// Corner radii, kept tight so surfaces read as crisp rather than bubbly.
+enum Radius {
+    /// Badges, chips, thin bars.
+    static let tiny: CGFloat = 2
+    /// Cards, calendar cells, inputs, buttons.
+    static let small: CGFloat = 4
+    /// Columns, panels, tiles.
+    static let medium: CGFloat = 6
 }
 
 /// Ticket-stub outline: rounded card with semicircle notches at the perforation line.
 struct TicketShape: Shape {
     var stubWidth: CGFloat = 40
-    var notch: CGFloat = 5
-    var corner: CGFloat = 9
+    var notch: CGFloat = 4
+    var corner: CGFloat = Radius.small
 
     func path(in r: CGRect) -> Path {
         let x = r.maxX - stubWidth
@@ -58,5 +74,40 @@ struct RewardRing: View {
         }
         .accessibilityElement()
         .accessibilityLabel(engine.progressLabel(kind))
+    }
+}
+
+extension Color {
+    /// Neutral card surface that contrasts with the column background on both platforms.
+    static var cardBackground: Color {
+        #if os(macOS)
+        Color(nsColor: .textBackgroundColor)
+        #else
+        Color(uiColor: .secondarySystemGroupedBackground)
+        #endif
+    }
+}
+
+extension View {
+    /// Fixed sheet sizes only make sense on the Mac; iOS sheets size themselves.
+    func macFrame(width: CGFloat? = nil, height: CGFloat? = nil) -> some View {
+        #if os(macOS)
+        frame(width: width, height: height)
+        #else
+        self
+        #endif
+    }
+}
+
+/// The full prdctv logo (mark + Bauhaus 93 wordmark, as vector outlines), in the current text color.
+struct AppLogo: View {
+    var height: CGFloat = 20
+
+    var body: some View {
+        Image("LogoFull")
+            .resizable()
+            .scaledToFit()
+            .frame(height: height)
+            .accessibilityLabel("prdctv")
     }
 }

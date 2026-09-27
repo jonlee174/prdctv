@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import SwiftData
 import WidgetKit
 
@@ -8,17 +9,42 @@ enum SharedStore {
 
     private static let widgetWriteKey = "widgetWroteAt"
 
-    static func makeContainer(inMemory: Bool = false) -> ModelContainer {
-        let config: ModelConfiguration
+    /// - Parameter syncsWithICloud: only the apps sync. The widget reads and writes the same
+    ///   local store, and the app's CloudKit mirroring exports those changes next time it runs.
+    static func makeContainer(inMemory: Bool = false, syncsWithICloud: Bool = false) -> ModelContainer {
         if inMemory {
-            config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-        } else if FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.id) != nil {
-            config = ModelConfiguration(schema: schema, groupContainer: .identifier(AppGroup.id))
-        } else {
-            // Missing App Group entitlement (e.g. unsigned build): fall back to a private store.
-            // The widget won't see this data.
-            config = ModelConfiguration(schema: schema, groupContainer: .none)
+            // cloudKitDatabase must be explicit: the default (.automatic) syncs any store,
+            // even an in-memory one, whenever the app has the iCloud entitlement.
+            return open(ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none))
         }
+        guard FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.id) != nil else {
+            // Missing App Group entitlement (e.g. an unsigned build): use a private store the
+            // widget can't see. It gets its own file name, because the generic default
+            // location (~/Library/Application Support/default.store outside the sandbox)
+            // may belong to another app.
+            return open(ModelConfiguration(schema: schema, url: fallbackStoreURL, cloudKitDatabase: .none))
+        }
+        let group = ModelConfiguration.GroupContainer.identifier(AppGroup.id)
+        if syncsWithICloud {
+            let synced = ModelConfiguration(
+                schema: schema, groupContainer: group,
+                cloudKitDatabase: .private(AppGroup.cloudKitContainer)
+            )
+            if let container = try? ModelContainer(for: schema, configurations: synced) {
+                return container
+            }
+            // e.g. no iCloud entitlement in this build: keep working locally.
+        }
+        return open(ModelConfiguration(schema: schema, groupContainer: group, cloudKitDatabase: .none))
+    }
+
+    private static var fallbackStoreURL: URL {
+        let dir = URL.applicationSupportDirectory.appending(path: "TicketBoard", directoryHint: .isDirectory)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appending(path: "TicketBoard.store")
+    }
+
+    private static func open(_ config: ModelConfiguration) -> ModelContainer {
         do {
             return try ModelContainer(for: schema, configurations: config)
         } catch {
@@ -38,6 +64,34 @@ enum SharedStore {
 
     static func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
+    }
+}
+
+/// Owns the app's container. SwiftData contexts don't see writes from the widget process,
+/// so the container is swapped for a fresh one whenever the widget has written since it
+/// was opened; views key off `generation` to rebuild their queries.
+@MainActor
+@Observable
+final class StoreController {
+    private(set) var container: ModelContainer
+    private(set) var generation = 0
+    let isDemo: Bool
+    private var loadedAt = Date()
+
+    init(demo: Bool) {
+        LegacySettingsMigration.run()
+        isDemo = demo
+        container = SharedStore.makeContainer(inMemory: demo, syncsWithICloud: true)
+        if demo { DemoData.seed(container.mainContext) } else { LeakedDemoCleanup.run(container.mainContext) }
+        TicketOps.migrateBacklog(context: container.mainContext)
+    }
+
+    func refreshIfNeeded() {
+        guard !isDemo, SharedStore.lastWidgetWrite > loadedAt else { return }
+        container = SharedStore.makeContainer(syncsWithICloud: true)
+        TicketOps.migrateBacklog(context: container.mainContext)
+        loadedAt = Date()
+        generation += 1
     }
 }
 
@@ -68,7 +122,7 @@ enum TicketOps {
         title: String,
         category: Category = .need,
         points: Int = 1,
-        status: Status = .backlog,
+        status: Status = .upNext,
         dueDate: Date? = nil,
         tags: [String] = [],
         notes: String = "",
@@ -133,6 +187,23 @@ enum TicketOps {
             }
         }
         context.delete(ticket)
+        save(context)
+    }
+
+    /// Moves tickets left in the removed Backlog column into Up Next, after the existing ones.
+    static func migrateBacklog(context: ModelContext) {
+        let legacy = Status.legacyBacklogRaw
+        let descriptor = FetchDescriptor<Ticket>(
+            predicate: #Predicate { $0.statusRaw == legacy },
+            sortBy: [SortDescriptor(\.sortIndex)]
+        )
+        guard let old = try? context.fetch(descriptor), !old.isEmpty else { return }
+        var next = (tickets(in: .upNext, context: context).last?.sortIndex ?? 0) + 1
+        for ticket in old {
+            ticket.statusRaw = Status.upNext.rawValue
+            ticket.sortIndex = next
+            next += 1
+        }
         save(context)
     }
 

@@ -20,7 +20,7 @@ struct MenuBarLabel: View {
 
     var body: some View {
         HStack(spacing: 3) {
-            Image(systemName: "ticket")
+            Image("LogoMark")
             Text(live.engine.menuBarLabel)
         }
     }
@@ -116,7 +116,7 @@ struct MenuBarContent: View {
                     NSApp.terminate(nil)
                 } label: { Image(systemName: "power") }
                 .buttonStyle(.borderless)
-                .help("Quit Ticket Board")
+                .help("Quit prdctv")
             }
         }
         .padding(14)
@@ -127,7 +127,7 @@ struct MenuBarContent: View {
     private func add() {
         let r = QuickAddParser().parse(text)
         guard !r.isEmpty else { return }
-        TicketOps.add(title: r.title, category: r.category, points: r.points, status: .backlog,
+        TicketOps.add(title: r.title, category: r.category, points: r.points, status: .upNext,
                       dueDate: r.dueDate, tags: r.tags, context: context)
         text = ""
     }

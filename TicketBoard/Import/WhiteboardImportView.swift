@@ -3,7 +3,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import Vision
 
-/// One-time whiteboard import: photo → on-device OCR → review → tickets in Backlog.
+/// One-time whiteboard import: photo → on-device OCR → review → tickets in Up Next.
 /// Each recognized line goes through the quick-add parser, so writing "w: movie 2" on the board works.
 struct WhiteboardImportView: View {
     @Environment(\.modelContext) private var context
@@ -74,7 +74,7 @@ struct WhiteboardImportView: View {
             }
         }
         .padding(20)
-        .frame(width: 560, height: 520)
+        .macFrame(width: 560, height: 520)
         .fileImporter(isPresented: $picking, allowedContentTypes: [.image]) { result in
             switch result {
             case .success(let url): Task { await recognize(url) }
@@ -133,7 +133,7 @@ struct WhiteboardImportView: View {
         for row in rows where row.include {
             let title = row.title.trimmingCharacters(in: .whitespaces)
             guard !title.isEmpty else { continue }
-            TicketOps.add(title: title, category: row.category, points: row.points, status: .backlog, context: context)
+            TicketOps.add(title: title, category: row.category, points: row.points, status: .upNext, context: context)
         }
         dismiss()
     }

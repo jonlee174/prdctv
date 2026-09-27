@@ -15,6 +15,7 @@ struct BoardView: View {
     @AppStorage("doneShowsAll") private var doneShowsAll = false
 
     @State private var filter: Set<Category> = Set(Category.allCases)
+    private var theme = ThemeColors()
     @State private var editTarget: EditTarget?
     @State private var pendingUnlock: PendingMove?
     @State private var blocked: Ticket?
@@ -29,13 +30,18 @@ struct BoardView: View {
     var body: some View {
         VStack(spacing: 0) {
             RewardMeterView(engine: engine) { app.redeemKind = $0 }
-            FilterBar(filter: $filter, swimlanes: $swimlanes)
+            FilterBar(filter: $filter, swimlanes: $swimlanes, showsSwimlanes: app.boardMode == .board)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
-            HStack(alignment: .top, spacing: 12) {
-                ForEach(Status.allCases) { column($0) }
+            switch app.boardMode {
+            case .board:
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(Status.allCases) { column($0) }
+                }
+                .padding([.horizontal, .bottom], 16)
+            case .calendar:
+                TicketCalendarView(filter: filter)
             }
-            .padding([.horizontal, .bottom], 16)
         }
         .background(Color(nsColor: .windowBackgroundColor))
         .focusable()
@@ -60,6 +66,7 @@ struct BoardView: View {
             status: status,
             tickets: visible(status),
             swimlanes: swimlanes,
+            tint: theme.column(status),
             selectedID: app.selectedTicketID,
             lockState: lockState,
             onSelect: select,
@@ -80,12 +87,13 @@ struct BoardView: View {
     }
 
     private var dialogs: BoardDialogs {
-        BoardDialogs(
-            app: app,
+        @Bindable var app = app
+        return BoardDialogs(
+            showRedeemPicker: $app.showRedeemPicker,
+            redeemKind: $app.redeemKind,
             engine: engine,
             pendingUnlock: $pendingUnlock,
             blocked: $blocked,
-            lockedMessage: lockedMessage,
             confirmUnlock: { move in
                 withAnimation(.snappy) {
                     _ = TicketOps.unlockAndMove(move.ticket, to: move.status, before: move.before, context: context)
@@ -123,21 +131,14 @@ struct BoardView: View {
     }
 
     private func lockState(_ ticket: Ticket) -> LockState {
-        guard ticket.isLocked(redemptions: redemptions) else { return .open }
-        return engine.available(ticket.category) > 0 ? .affordable : .locked
-    }
-
-    private func lockedMessage(for kind: Category) -> String {
-        let e = engine
-        let ratio = e.settings.ratio(for: kind)
-        let needed = (e.redeemed(kind) + 1) * ratio - e.needPointsDone
-        return "Complete \(needed) more need point\(needed == 1 ? "" : "s") to earn a \(kind.label) reward."
+        engine.lockState(of: ticket, redemptions: redemptions)
     }
 
     @ViewBuilder private var historyFooter: some View {
         if !doneShowsAll, olderDoneCount > 0 {
             Button("\(olderDoneCount) older in History") { showHistory = true }
-                .buttonStyle(.link)
+                .buttonStyle(.plain)
+                .foregroundStyle(.tint)
                 .font(.caption)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 4)
@@ -152,16 +153,15 @@ struct BoardView: View {
     }
 
     private func requestMove(_ ticket: Ticket, to status: Status, before: Ticket? = nil) {
-        if status.requiresUnlock, ticket.isLocked(redemptions: redemptions) {
-            if engine.available(ticket.category) > 0 {
-                pendingUnlock = PendingMove(ticket: ticket, status: status, before: before)
-            } else {
-                blocked = ticket
+        switch engine.check(moving: ticket, to: status, redemptions: redemptions) {
+        case .needsConfirm:
+            pendingUnlock = PendingMove(ticket: ticket, status: status, before: before)
+        case .blocked:
+            blocked = ticket
+        case .allowed:
+            withAnimation(.snappy) {
+                TicketOps.move(ticket, to: status, before: before, context: context)
             }
-            return
-        }
-        withAnimation(.snappy) {
-            TicketOps.move(ticket, to: status, before: before, context: context)
         }
     }
 
@@ -185,6 +185,7 @@ struct BoardView: View {
     // MARK: - Keyboard
 
     private func handleKey(_ press: KeyPress) -> KeyPress.Result {
+        guard app.boardMode == .board else { return .ignored }
         let selected = tickets.first { $0.id == app.selectedTicketID }
 
         if press.modifiers.contains(.command) {
@@ -194,7 +195,7 @@ struct BoardView: View {
             }
             return .ignored
         }
-        guard press.modifiers.subtracting([.numericPad, .function]).isEmpty else { return .ignored }
+        guard press.modifiers.isDisjoint(with: [.option, .control, .shift]) else { return .ignored }
 
         switch press.key {
         case .upArrow: navigate(dx: 0, dy: -1); return .handled
@@ -215,7 +216,7 @@ struct BoardView: View {
 
         switch press.characters.lowercased() {
         case "n":
-            editTarget = .new(.backlog)
+            editTarget = .new(.upNext)
             return .handled
         case "1", "2", "3", "4", "5":
             guard let selected, let n = Int(press.characters) else { return .ignored }
@@ -249,8 +250,23 @@ struct BoardView: View {
     // MARK: - Toolbar
 
     @ToolbarContentBuilder private var toolbar: some ToolbarContent {
+        // The logo is a title, not a button: no Liquid Glass capsule behind it on macOS 26+.
+        if #available(macOS 26.0, *) {
+            ToolbarItem(placement: .navigation) { AppLogo(height: 20) }
+                .sharedBackgroundVisibility(.hidden)
+        } else {
+            ToolbarItem(placement: .navigation) { AppLogo(height: 20) }
+        }
+        ToolbarItem(placement: .principal) {
+            Picker("View", selection: Binding(get: { app.boardMode }, set: { app.boardMode = $0 })) {
+                Label("Board", systemImage: "rectangle.split.3x1").tag(BoardMode.board)
+                Label("Calendar", systemImage: "calendar").tag(BoardMode.calendar)
+            }
+            .pickerStyle(.segmented)
+            .help("Switch between board and calendar (⌘1 / ⌘2)")
+        }
         ToolbarItemGroup {
-            Button { editTarget = .new(.backlog) } label: {
+            Button { editTarget = .new(.upNext) } label: {
                 Label("New Ticket", systemImage: "plus")
             }
             .help("New ticket (N)")
@@ -283,97 +299,5 @@ private struct BoardSheets: ViewModifier {
             .sheet(item: $app.redeemKind) { RedemptionSheet(kind: $0) }
             .sheet(isPresented: $showHistory) { HistoryView() }
             .sheet(isPresented: $app.showImport) { WhiteboardImportView() }
-    }
-}
-
-private struct BoardDialogs: ViewModifier {
-    @Bindable var app: AppModel
-    let engine: RewardEngine
-    @Binding var pendingUnlock: PendingMove?
-    @Binding var blocked: Ticket?
-    let lockedMessage: (Category) -> String
-    let confirmUnlock: (PendingMove) -> Void
-
-    func body(content: Content) -> some View {
-        content
-            .confirmationDialog("Redeem which reward?", isPresented: $app.showRedeemPicker) {
-                Button("Want (\(engine.availableWant) available)") { app.redeemKind = .want }
-                Button("Fun (\(engine.availableFun) available)") { app.redeemKind = .fun }
-            }
-            .confirmationDialog(
-                unlockTitle,
-                isPresented: Binding(get: { pendingUnlock != nil }, set: { if !$0 { pendingUnlock = nil } }),
-                presenting: pendingUnlock
-            ) { move in
-                Button("Spend 1 \(move.ticket.category.label) Reward") { confirmUnlock(move) }
-                Button("Cancel", role: .cancel) {}
-            } message: { move in
-                Text("This spends one \(move.ticket.category.label) reward. You have \(engine.available(move.ticket.category)) available.")
-            }
-            .alert(
-                blockedTitle,
-                isPresented: Binding(get: { blocked != nil }, set: { if !$0 { blocked = nil } }),
-                presenting: blocked
-            ) { _ in
-                Button("OK") {}
-            } message: { ticket in
-                Text(lockedMessage(ticket.category))
-            }
-    }
-
-    private var unlockTitle: String {
-        pendingUnlock.map { "Start “\($0.ticket.title)”?" } ?? ""
-    }
-
-    private var blockedTitle: String {
-        blocked.map { "“\($0.title)” is locked" } ?? ""
-    }
-}
-
-enum EditTarget: Identifiable {
-    case new(Status)
-    case existing(Ticket)
-
-    var id: String {
-        switch self {
-        case .new(let status): "new-\(status.rawValue)"
-        case .existing(let ticket): ticket.id.uuidString
-        }
-    }
-}
-
-struct PendingMove: Identifiable {
-    let id = UUID()
-    let ticket: Ticket
-    let status: Status
-    let before: Ticket?
-}
-
-struct FilterBar: View {
-    @Binding var filter: Set<Category>
-    @Binding var swimlanes: Bool
-
-    var body: some View {
-        HStack(spacing: 8) {
-            ForEach(Category.allCases) { category in
-                let on = filter.contains(category)
-                Button {
-                    if on, filter.count > 1 { filter.remove(category) } else { filter.insert(category) }
-                } label: {
-                    Label(category.label, systemImage: category.symbol)
-                        .font(.callout.weight(.medium))
-                        .padding(.horizontal, 10).padding(.vertical, 4)
-                        .background(Capsule().fill(on ? category.color.opacity(0.18) : Color.primary.opacity(0.05)))
-                        .overlay(Capsule().stroke(on ? category.color.opacity(0.6) : .clear))
-                        .foregroundStyle(on ? category.color : .secondary)
-                }
-                .buttonStyle(.plain)
-                .help(on ? "Hide \(category.label) tickets" : "Show \(category.label) tickets")
-            }
-            Spacer()
-            Toggle("Swimlanes", isOn: $swimlanes)
-                .toggleStyle(.switch)
-                .controlSize(.small)
-        }
     }
 }

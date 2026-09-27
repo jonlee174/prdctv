@@ -57,6 +57,16 @@ struct RewardEngine: Equatable {
         "\(progress(kind))/\(settings.ratio(for: kind)) toward \(kind.label)"
     }
 
+    /// Need points still required before one reward of `kind` is available.
+    func pointsToUnlock(_ kind: Category) -> Int {
+        max(0, (redeemed(kind) + 1) * settings.ratio(for: kind) - needPointsDone)
+    }
+
+    func lockedMessage(_ kind: Category) -> String {
+        let needed = pointsToUnlock(kind)
+        return "Complete \(needed) more need point\(needed == 1 ? "" : "s") to earn a \(kind.label) reward."
+    }
+
     var menuBarLabel: String {
         "\(available(.want))W · \(available(.fun))F"
     }

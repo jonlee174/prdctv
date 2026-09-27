@@ -4,6 +4,8 @@ import SwiftUI
 /// Completing need points floats a "+N" into the meter; earning a reward pulses it.
 struct RewardMeterView: View {
     let engine: RewardEngine
+    /// Hidden on iPhone, where width is tight.
+    var showsTotal = true
     let onRedeem: (Category) -> Void
 
     @State private var gain: Int?
@@ -14,26 +16,8 @@ struct RewardMeterView: View {
         HStack(spacing: 28) {
             meter(.want)
             meter(.fun)
-            Spacer()
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("\(engine.needPointsDone)")
-                    .font(.system(size: 22, weight: .bold, design: .rounded).monospacedDigit())
-                    .contentTransition(.numericText(value: Double(engine.needPointsDone)))
-                Text("need points done").font(.caption).foregroundStyle(.secondary)
-            }
-            .overlay(alignment: .topLeading) {
-                if let gain {
-                    Text("+\(gain)")
-                        .font(.system(size: 15, weight: .heavy, design: .rounded))
-                        .foregroundStyle(Category.need.color)
-                        .id(gainID)
-                        .transition(.asymmetric(
-                            insertion: .offset(y: 24).combined(with: .opacity),
-                            removal: .offset(x: -60, y: -6).combined(with: .opacity).combined(with: .scale(scale: 0.5))
-                        ))
-                        .offset(x: -36)
-                }
-            }
+            Spacer(minLength: 0)
+            if showsTotal { total }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -51,6 +35,28 @@ struct RewardMeterView: View {
         }
         .onChange(of: engine.earnedWant) { old, new in if new > old { pulse(.want) } }
         .onChange(of: engine.earnedFun) { old, new in if new > old { pulse(.fun) } }
+    }
+
+    private var total: some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            Text("\(engine.needPointsDone)")
+                .font(.system(size: 22, weight: .bold, design: .rounded).monospacedDigit())
+                .contentTransition(.numericText(value: Double(engine.needPointsDone)))
+            Text("need points done").font(.caption).foregroundStyle(.secondary)
+        }
+        .overlay(alignment: .topLeading) {
+            if let gain {
+                Text("+\(gain)")
+                    .font(.system(size: 15, weight: .heavy, design: .rounded))
+                    .foregroundStyle(Category.need.color)
+                    .id(gainID)
+                    .transition(.asymmetric(
+                        insertion: .offset(y: 24).combined(with: .opacity),
+                        removal: .offset(x: -60, y: -6).combined(with: .opacity).combined(with: .scale(scale: 0.5))
+                    ))
+                    .offset(x: -36)
+            }
+        }
     }
 
     private func meter(_ kind: Category) -> some View {

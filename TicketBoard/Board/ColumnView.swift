@@ -9,6 +9,8 @@ struct ColumnView: View {
     /// Already filtered and ordered for display.
     let tickets: [Ticket]
     let swimlanes: Bool
+    /// Optional user-chosen column color (Settings → Colors).
+    var tint: Color?
     let selectedID: UUID?
     let lockState: (Ticket) -> LockState
     let onSelect: (Ticket) -> Void
@@ -54,9 +56,16 @@ struct ColumnView: View {
         .padding(10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(isTargeted ? Color.accentColor.opacity(0.10) : Color.primary.opacity(0.045))
+            RoundedRectangle(cornerRadius: Radius.medium)
+                .fill(isTargeted ? AnyShapeStyle(.tint.opacity(0.10)) : AnyShapeStyle(tint?.opacity(0.10) ?? Color.primary.opacity(0.045)))
         )
+        .overlay(alignment: .top) {
+            if let tint {
+                UnevenRoundedRectangle(topLeadingRadius: Radius.medium, topTrailingRadius: Radius.medium)
+                    .fill(tint)
+                    .frame(height: 3)
+            }
+        }
         .dropDestination(for: String.self) { items, _ in
             drop(items, before: nil)
         } isTargeted: { isTargeted = $0 }
@@ -64,11 +73,13 @@ struct ColumnView: View {
 
     private var header: some View {
         HStack(spacing: 6) {
-            Text(status.label).font(.headline)
+            Text(status.label)
+                .font(.headline)
+                .foregroundStyle(tint ?? .primary)
             Text("\(tickets.count)")
                 .font(.caption.monospacedDigit())
                 .padding(.horizontal, 6).padding(.vertical, 1)
-                .background(Capsule().fill(Color.primary.opacity(0.08)))
+                .background(RoundedRectangle(cornerRadius: Radius.tiny).fill(Color.primary.opacity(0.08)))
             Spacer()
             let points = tickets.filter { $0.category == .need }.reduce(0) { $0 + $1.points }
             if points > 0 {
@@ -119,7 +130,7 @@ private struct CardRow: View {
         TicketCardView(ticket: ticket, lock: lock, isSelected: isSelected)
             .overlay(alignment: .top) {
                 if isTargeted {
-                    Capsule().fill(Color.accentColor).frame(height: 3).offset(y: -5)
+                    Rectangle().fill(.tint).frame(height: 2).offset(y: -5)
                 }
             }
             .onTapGesture(count: 2) { onAction(.edit) }

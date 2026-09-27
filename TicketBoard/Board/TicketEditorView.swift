@@ -65,7 +65,7 @@ struct TicketEditorView: View {
             }
             .padding()
         }
-        .frame(width: 440)
+        .macFrame(width: 440)
         .onAppear(perform: load)
     }
 
@@ -75,6 +75,10 @@ struct TicketEditorView: View {
     }
 
     private func load() {
+        if case .new(_, let due?) = target {
+            hasDue = true
+            dueDate = Calendar.current.startOfDay(for: due)
+        }
         if case .existing(let ticket) = target {
             title = ticket.title
             notes = ticket.notes
@@ -96,7 +100,7 @@ struct TicketEditorView: View {
         let due = hasDue ? dueDate : nil
 
         switch target {
-        case .new(let status):
+        case .new(let status, _):
             // Reward tickets can't be created already started; they begin in Up Next at most.
             let start: Status = category.isReward && status.requiresUnlock ? .upNext : status
             TicketOps.add(title: cleanTitle, category: category, points: points, status: start,
@@ -173,6 +177,6 @@ struct HistoryView: View {
                 }
             }
         }
-        .frame(width: 520, height: 520)
+        .macFrame(width: 520, height: 520)
     }
 }

@@ -15,8 +15,9 @@ struct QuickAddView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
-                Image(systemName: "ticket")
-                    .font(.title2)
+                Image("LogoMark")
+                    .resizable()
+                    .frame(width: 24, height: 24)
                     .foregroundStyle(parsed.category.color)
                 TextField("finish lattice writeup 5   ·   w: rewatch Arrival 2   ·   #tag !fri", text: $text)
                     .textFieldStyle(.plain)
@@ -27,9 +28,9 @@ struct QuickAddView: View {
             QuickAddPreview(result: parsed, added: added)
         }
         .padding(16)
-        .frame(width: 560)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.primary.opacity(0.1)))
+        .macFrame(width: 560)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.medium))
+        .overlay(RoundedRectangle(cornerRadius: Radius.medium).stroke(Color.primary.opacity(0.1)))
         .background {
             // ⌘Return: key equivalents are handled before the text field sees the key.
             Button("") { save(keepOpen: true) }
@@ -45,7 +46,7 @@ struct QuickAddView: View {
             if !keepOpen { onClose() }
             return
         }
-        TicketOps.add(title: r.title, category: r.category, points: r.points, status: .backlog,
+        TicketOps.add(title: r.title, category: r.category, points: r.points, status: .upNext,
                       dueDate: r.dueDate, tags: r.tags, context: context)
         added += 1
         text = ""
@@ -71,9 +72,11 @@ struct QuickAddPreview: View {
             if added > 0 {
                 Text("\(added) added").font(.caption).foregroundStyle(.secondary)
             }
+            #if os(macOS)
             Text("⏎ save · ⌘⏎ save & next · esc")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
+            #endif
         }
         .opacity(result.isEmpty ? 0.5 : 1)
     }
@@ -86,6 +89,6 @@ struct QuickAddPreview: View {
         .font(.caption.weight(.medium))
         .foregroundStyle(color)
         .padding(.horizontal, 7).padding(.vertical, 2)
-        .background(Capsule().fill(color.opacity(0.12)))
+        .background(RoundedRectangle(cornerRadius: Radius.tiny).fill(color.opacity(0.12)))
     }
 }

@@ -26,8 +26,10 @@ struct TicketBoardApp: App {
     @State private var model = AppModel.shared
 
     var body: some Scene {
-        Window("Ticket Board", id: WindowID.board) {
+        Window("prdctv", id: WindowID.board) {
             BoardView()
+                .refreshesOnCategoryStyle()
+                .brandTint()
                 .id(model.generation)
                 .environment(model)
                 .modelContainer(model.container)
@@ -35,10 +37,13 @@ struct TicketBoardApp: App {
                 .frame(minWidth: 900, minHeight: 520)
         }
         .defaultSize(width: 1180, height: 720)
+        .windowToolbarStyle(.unified(showsTitle: false))
         .commands { TicketCommands(model: model) }
 
         Window("Stats", id: WindowID.stats) {
             StatsView()
+                .refreshesOnCategoryStyle()
+                .brandTint()
                 .id(model.generation)
                 .modelContainer(model.container)
                 .frame(minWidth: 620, minHeight: 520)
@@ -47,6 +52,8 @@ struct TicketBoardApp: App {
 
         MenuBarExtra {
             MenuBarContent()
+                .refreshesOnCategoryStyle()
+                .brandTint()
                 .id(model.generation)
                 .environment(model)
                 .modelContainer(model.container)
@@ -59,6 +66,7 @@ struct TicketBoardApp: App {
 
         Settings {
             SettingsView()
+                .brandTint()
         }
     }
 }
@@ -76,7 +84,7 @@ struct TicketCommands: Commands {
         CommandGroup(replacing: .newItem) {
             Button("New Ticket") {
                 openWindow(id: WindowID.board)
-                model.newTicketRequest = .backlog
+                model.newTicketRequest = .upNext
             }
             .keyboardShortcut("n")
 
@@ -90,6 +98,14 @@ struct TicketCommands: Commands {
                 model.showImport = true
             }
             .keyboardShortcut("i", modifiers: [.command, .shift])
+        }
+
+        CommandGroup(before: .toolbar) {
+            Button("Board") { model.boardMode = .board }
+                .keyboardShortcut("1")
+            Button("Calendar") { model.boardMode = .calendar }
+                .keyboardShortcut("2")
+            Divider()
         }
 
         CommandMenu("Rewards") {

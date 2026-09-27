@@ -37,7 +37,7 @@ struct RedemptionSheet: View {
             }
 
             if available <= 0 {
-                let needed = (engine.redeemed(kind) + 1) * engine.settings.ratio(for: kind) - engine.needPointsDone
+                let needed = engine.pointsToUnlock(kind)
                 Label("No \(kind.label) rewards yet. Complete \(needed) more need point\(needed == 1 ? "" : "s").",
                       systemImage: "lock.fill")
                     .foregroundStyle(.secondary)
@@ -92,7 +92,7 @@ struct RedemptionSheet: View {
             }
         }
         .padding(20)
-        .frame(width: 420)
+        .macFrame(width: 420)
     }
 
     private var history: [Redemption] {

@@ -1,8 +1,16 @@
 import Foundation
 
 enum AppGroup {
-    /// Team-prefixed macOS App Group. Must match `APP_GROUP_ID` in project.yml.
+    /// Must match `APP_GROUP_ID` / `IOS_APP_GROUP_ID` in project.yml.
+    /// macOS uses a team-prefixed group; iOS requires the registered "group." form.
+    #if os(macOS)
     static let id = "TTM9BN6M53.com.jonathanlee.TicketBoard"
+    #else
+    static let id = "group.com.jonathanlee.TicketBoard"
+    #endif
+
+    /// Shared by the Mac and iPhone apps so both sync the same private database.
+    static let cloudKitContainer = "iCloud.com.jonathanlee.TicketBoard"
 
     static var defaults: UserDefaults {
         UserDefaults(suiteName: id) ?? .standard

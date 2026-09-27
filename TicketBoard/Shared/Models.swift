@@ -16,7 +16,15 @@ enum Category: String, Codable, CaseIterable, Identifiable {
 
     /// Glyph used alongside color so categories stay distinguishable in
     /// desaturated widget rendering modes.
+    /// Current icon: the user's choice (Settings → Categories) or the default.
     var symbol: String {
+        if let chosen = AppGroup.defaults.string(forKey: symbolKey), Self.symbolChoices.contains(chosen) {
+            return chosen
+        }
+        return defaultSymbol
+    }
+
+    var defaultSymbol: String {
         switch self {
         case .need: "circle.fill"
         case .want: "diamond.fill"
@@ -24,17 +32,34 @@ enum Category: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    // No dots in key names: SwiftUI can't observe dotted keys (see ThemeColorKey).
+    var symbolKey: String { "category\(label)Symbol" }
+    var colorKey: String { "category\(label)Color" }
+
+    /// Icons offered in Settings. Solid shapes read best at glyph size and in the
+    /// widget's desaturated modes.
+    static let symbolChoices = [
+        "circle.fill", "square.fill", "diamond.fill", "triangle.fill", "hexagon.fill", "seal.fill",
+        "star.fill", "heart.fill", "bolt.fill", "flame.fill", "sparkles", "moon.fill",
+        "sun.max.fill", "leaf.fill", "drop.fill", "flag.fill", "bookmark.fill", "tag.fill",
+        "checkmark.seal.fill", "briefcase.fill", "book.fill", "graduationcap.fill", "hammer.fill", "house.fill",
+        "cart.fill", "gift.fill", "gamecontroller.fill", "film.fill", "music.note", "paintpalette.fill",
+        "cup.and.saucer.fill", "fork.knife", "sportscourt.fill", "figure.run", "airplane", "pawprint.fill",
+    ]
+
     var isReward: Bool { self != .need }
 }
 
 enum Status: String, Codable, CaseIterable, Identifiable {
-    case backlog, upNext, inProgress, done
+    case upNext, inProgress, done
+
+    /// Stored by older versions, which had a Backlog column. Read as Up Next.
+    static let legacyBacklogRaw = "backlog"
 
     var id: String { rawValue }
 
     var label: String {
         switch self {
-        case .backlog: "Backlog"
         case .upNext: "Up Next"
         case .inProgress: "In Progress"
         case .done: "Done"
@@ -43,7 +68,6 @@ enum Status: String, Codable, CaseIterable, Identifiable {
 
     var next: Status? {
         switch self {
-        case .backlog: .upNext
         case .upNext: .inProgress
         case .inProgress: .done
         case .done: nil
@@ -70,7 +94,7 @@ final class Ticket {
     var notes: String = ""
     var categoryRaw: String = Category.need.rawValue
     var points: Int = 1
-    var statusRaw: String = Status.backlog.rawValue
+    var statusRaw: String = Status.upNext.rawValue
     var sortIndex: Double = 0
     var createdAt: Date = Date()
     var completedAt: Date?
@@ -82,7 +106,7 @@ final class Ticket {
         notes: String = "",
         category: Category = .need,
         points: Int = 1,
-        status: Status = .backlog,
+        status: Status = .upNext,
         sortIndex: Double = 0,
         dueDate: Date? = nil,
         tags: [String] = []
@@ -107,7 +131,7 @@ final class Ticket {
 
     /// Setting status keeps `completedAt` in sync.
     var status: Status {
-        get { Status(rawValue: statusRaw) ?? .backlog }
+        get { Status(rawValue: statusRaw) ?? .upNext }
         set {
             let old = status
             statusRaw = newValue.rawValue

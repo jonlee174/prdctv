@@ -3,17 +3,23 @@ import Observation
 import SwiftData
 import SwiftUI
 
+enum BoardMode: String, Hashable {
+    case board, calendar
+}
+
 /// App-wide state: owns the SwiftData container and routes deep links and commands.
 @MainActor
 @Observable
 final class AppModel {
     static let shared = AppModel()
 
-    private(set) var container: ModelContainer
-    /// Bumped when the container is replaced, so views re-create their queries.
-    private(set) var generation = 0
-    private var loadedAt = Date()
+    /// `--demo`: in-memory store with sample tickets, for trying the app without touching real data.
+    let store = StoreController(demo: CommandLine.arguments.contains("--demo"))
     private var pollTimer: Timer?
+
+    var container: ModelContainer { store.container }
+    /// Bumped when the container is replaced, so views re-create their queries.
+    var generation: Int { store.generation }
 
     var selectedTicketID: UUID?
     /// Set to open the redemption sheet for a reward kind.
@@ -21,25 +27,15 @@ final class AppModel {
     /// Set to show the "which reward?" picker (from the widget's Redeem button).
     var showRedeemPicker = false
     var newTicketRequest: Status?
+    var boardMode = BoardMode.board
     var showImport = false
 
     let quickAdd = QuickAddPanelController()
 
-    /// `--demo`: in-memory store with sample tickets, for trying the app without touching real data.
-    let isDemo = CommandLine.arguments.contains("--demo")
+    private init() {}
 
-    private init() {
-        container = SharedStore.makeContainer(inMemory: isDemo)
-        if isDemo { DemoData.seed(container.mainContext) }
-    }
-
-    /// SwiftData contexts don't see writes from the widget process, so swap in a
-    /// fresh container whenever the widget has written since we last loaded.
     func refreshIfNeeded() {
-        guard !isDemo, SharedStore.lastWidgetWrite > loadedAt else { return }
-        container = SharedStore.makeContainer()
-        loadedAt = Date()
-        generation += 1
+        store.refreshIfNeeded()
     }
 
     func startWatchingWidgetWrites() {

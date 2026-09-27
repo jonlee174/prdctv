@@ -33,6 +33,14 @@ struct RewardEngineTests {
         #expect(engine.availableWant == -1)
     }
 
+    @Test func pointsToUnlockAccountsForSpentRewards() {
+        let engine = RewardEngine(needPointsDone: 5, redeemedWant: 1, redeemedFun: 0)
+        #expect(engine.pointsToUnlock(.want) == 3)  // needs 8 for a second Want
+        #expect(engine.pointsToUnlock(.fun) == 2)
+        #expect(RewardEngine(needPointsDone: 9, redeemedWant: 0, redeemedFun: 0).pointsToUnlock(.want) == 0)
+        #expect(engine.lockedMessage(.want) == "Complete 3 more need points to earn a Want reward.")
+    }
+
     @Test func customRatios() {
         let settings = RewardSettings(wantRatio: 3, funRatio: 10)
         let engine = RewardEngine(needPointsDone: 20, redeemedWant: 0, redeemedFun: 1, settings: settings)
@@ -50,7 +58,7 @@ struct RewardEngineTests {
     @Test func computesFromTicketsAndRedemptions() throws {
         let container = try ModelContainer(
             for: Ticket.self, Redemption.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
         let context = container.mainContext
         let wantTicket = Ticket(title: "Movie", category: .want, points: 2)
@@ -72,6 +80,15 @@ struct RewardEngineTests {
         #expect(wantTicket.isLocked(redemptions: redemptions) == false)
         #expect(tickets[3].isLocked(redemptions: redemptions) == true)
         #expect(tickets[0].isLocked(redemptions: redemptions) == false)
+    }
+
+    /// SwiftUI observes settings via key-value observing, which can't see keys containing dots.
+    @Test func categorySettingKeysAreObservable() {
+        for category in Category.allCases {
+            #expect(!category.colorKey.contains("."))
+            #expect(!category.symbolKey.contains("."))
+        }
+        #expect(Category.need.colorKey == "categoryNeedColor")
     }
 
     @Test func statusKeepsCompletedAtInSync() {
