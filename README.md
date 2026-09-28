@@ -71,7 +71,7 @@ Skipping this breaks sync for every customer on the new version. Production sche
 
 1. In App Store Connect, create one app record with both iOS and macOS selected, bundle ID `com.jonathanlee.prdctv` and SKU `prdctv`. The widget ships inside the app and needs no record.
 2. Paste the listing text from `release/AppStore.md`.
-3. Publish `docs/` with GitHub Pages (repository Settings → Pages → deploy from the main branch, folder `/docs`), after replacing `support@example.com` in `docs/index.html` with a real address. Enter the site root as the Support URL and `privacy/` as the Privacy Policy URL.
+3. Publish `docs/` with GitHub Pages (repository Settings → Pages → deploy from the main branch, folder `/docs`). Enter `https://jonlee174.github.io/prdctv/` as the Support URL and `https://jonlee174.github.io/prdctv/privacy/` as the Privacy Policy URL.
 
 ### Each release
 

@@ -74,11 +74,15 @@ Choose Data Not Collected. Tasks are stored on the device and in the user's priv
 
 ## Copyright (200)
 
-2026 Jonathan Caleb Lee
+2026 Jonathan Lee
 
 ## URLs
 
-The site in docs/ has both required pages. Once it is on GitHub Pages, use the site root as the Support URL and the privacy/ page as the Privacy Policy URL, for example https://USERNAME.github.io/prdctv/ and https://USERNAME.github.io/prdctv/privacy/. The Marketing URL is optional and can stay empty.
+The site in docs/ is published with GitHub Pages from the jonlee174/prdctv repository.
+
+- Support URL https://jonlee174.github.io/prdctv/
+- Privacy Policy URL https://jonlee174.github.io/prdctv/privacy/
+- Marketing URL left empty
 
 ## Notes for App Review
 
