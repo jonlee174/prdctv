@@ -24,7 +24,7 @@ struct RewardEngine: Equatable {
         self.init(
             needPointsDone: tickets
                 .filter { $0.category == .need && $0.status == .done }
-                .reduce(0) { $0 + max(0, $1.points) },
+                .reduce(0) { $0 + settings.value(ofPoints: $1.points) },
             redeemedWant: redemptions.filter { $0.kind == .want }.count,
             redeemedFun: redemptions.filter { $0.kind == .fun }.count,
             settings: settings
@@ -64,7 +64,7 @@ struct RewardEngine: Equatable {
 
     func lockedMessage(_ kind: Category) -> String {
         let needed = pointsToUnlock(kind)
-        return "Complete \(needed) more need point\(needed == 1 ? "" : "s") to earn a \(kind.label) reward."
+        return "Complete \(needed) more \(settings.needUnit(needed)) to earn a \(kind.label) reward."
     }
 
     var menuBarLabel: String {

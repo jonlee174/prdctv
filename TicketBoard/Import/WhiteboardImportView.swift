@@ -47,15 +47,17 @@ struct WhiteboardImportView: View {
                         Toggle("", isOn: $row.include).labelsHidden()
                         TextField("Title", text: $row.title)
                         Picker("", selection: $row.category) {
-                            ForEach(Category.allCases) { Text($0.label).tag($0) }
+                            ForEach(Category.shown()) { Text($0.label).tag($0) }
                         }
                         .labelsHidden()
                         .frame(width: 80)
-                        Picker("", selection: $row.points) {
-                            ForEach(PointScale.values, id: \.self) { Text("\($0)").tag($0) }
+                        if RewardSettings.pointsEnabled() {
+                            Picker("", selection: $row.points) {
+                                ForEach(PointScale.values, id: \.self) { Text("\($0)").tag($0) }
+                            }
+                            .labelsHidden()
+                            .frame(width: 56)
                         }
-                        .labelsHidden()
-                        .frame(width: 56)
                     }
                     .opacity(row.include ? 1 : 0.45)
                 }
@@ -100,7 +102,7 @@ struct WhiteboardImportView: View {
             let parser = QuickAddParser()
             rows = lines.map { line in
                 let r = parser.parse(Self.stripBullet(line))
-                return Row(title: r.title, category: r.category, points: r.points)
+                return Row(title: r.title, category: RewardSettings.isEnabled() ? r.category : .need, points: r.points)
             }
             .filter { !$0.title.isEmpty }
             if rows.isEmpty { error = "No text found in that photo." }

@@ -15,14 +15,17 @@ DEVICE    ?= $(shell xcrun devicectl list devices 2>/dev/null | grep 'available 
 MAC_APP     := $(DERIVED)/Build/Products/Debug/prdctv.app
 SIM_APP     := $(DERIVED)/Build/Products/Debug-iphonesimulator/prdctv.app
 DEVICE_APP  := $(DERIVED)/Build/Products/Debug-iphoneos/prdctv.app
-XCODEBUILD  := xcodebuild -project $(PROJECT) -derivedDataPath $(DERIVED) -allowProvisioningUpdates -quiet
+# A new build number each build so macOS rereads the widget after every install.
+BUILD_NUMBER := $(shell date +%s)
+XCODEBUILD  := xcodebuild -project $(PROJECT) -derivedDataPath $(DERIVED) -allowProvisioningUpdates -quiet \
+               CURRENT_PROJECT_VERSION=$(BUILD_NUMBER)
 
 # pipefail so a failing xcodebuild isn't masked by the output filter in `make test`.
 SHELL       := /bin/bash
 .SHELLFLAGS := -o pipefail -c
 
 .DEFAULT_GOAL := help
-.PHONY: icons help project mac mac-demo mac-build ios ios-demo ios-build device device-demo device-build \
+.PHONY: icons help project widgets mac mac-demo mac-build ios ios-demo ios-build device device-demo device-build \
         test sims devices clean
 
 help:
@@ -34,6 +37,7 @@ help:
 	@echo "  make ios-demo       ...with sample data"
 	@echo "  make device         Build, install and launch on your iPhone"
 	@echo "  make device-demo    ...with sample data"
+	@echo "  make widgets        Restart the Mac widgets so they load the latest build"
 	@echo "  make test           Run unit tests"
 	@echo "  make sims           List simulators (use SIM=\"<name>\")"
 	@echo "  make devices        List connected devices (use DEVICE=<identifier>)"
@@ -53,10 +57,22 @@ mac-build: project
 mac: mac-build
 	@pkill -x prdctv || true
 	open $(MAC_APP)
+	@$(MAKE) --no-print-directory widgets
 
 mac-demo: mac-build
 	@pkill -x prdctv || true
 	open $(MAC_APP) --args --demo
+	@$(MAKE) --no-print-directory widgets
+
+# A running widget process keeps its old code, so restart it and chronod, which launchd brings back.
+widgets:
+	@/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R $(MAC_APP)
+	@pkill -f 'TicketWidget.appex/Contents/MacOS/TicketWidget' || true
+	@killall chronod 2>/dev/null || true
+	@echo "Widgets restarted"
+	@/bin/sleep 5; if /usr/bin/log show --last 10s --style compact --predicate 'process == "TicketWidget"' 2>/dev/null \
+		| grep -q "Request ended.*error"; then \
+		echo "A widget reload failed. See /usr/bin/log show --last 1m --predicate 'process == \"TicketWidget\"'"; fi
 
 # MARK: iOS Simulator
 

@@ -6,24 +6,36 @@ struct SettingsView: View {
     @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
     @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
     @AppStorage("doneShowsAll") private var doneShowsAll = false
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
+    @AppStorage(RewardSettings.pointsEnabledKey, store: AppGroup.defaults) private var pointsEnabled = true
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var loginError: String?
 
     var body: some View {
         Form {
             Section("Rewards") {
+                Toggle("Want and Fun rewards", isOn: $rewardsEnabled)
                 Stepper(value: $wantRatio, in: 1...50) {
-                    LabeledContent("Need points per Want", value: "\(wantRatio)")
+                    LabeledContent(pointsEnabled ? "Need points per Want" : "Need tickets per Want", value: "\(wantRatio)")
                 }
+                .disabled(!rewardsEnabled)
                 Stepper(value: $funRatio, in: 1...50) {
-                    LabeledContent("Need points per Fun", value: "\(funRatio)")
+                    LabeledContent(pointsEnabled ? "Need points per Fun" : "Need tickets per Fun", value: "\(funRatio)")
                 }
+                .disabled(!rewardsEnabled)
+                Text("When off, the reward meter and Want and Fun tickets are hidden. The tickets are kept and come back when you turn rewards on.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Text("Want and Fun counters are independent: both accumulate from the same need points. Balances are recomputed from history, so changes apply retroactively.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
             Section("Board") {
+                Toggle("Points", isOn: $pointsEnabled)
+                Text("When off, point values are hidden and each finished Need ticket counts as 1 toward rewards. Point values are kept.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Toggle("Keep all completed tickets in Done", isOn: $doneShowsAll)
                 Text("When off, Done shows this week and older tickets move to History.")
                     .font(.caption)
@@ -35,7 +47,7 @@ struct SettingsView: View {
             } header: {
                 Text("Categories")
             } footer: {
-                Text("Pick an icon and color for Need, Want and Fun tickets. Icons also tell categories apart in the widget when macOS fades it, so distinct shapes work best.")
+                Text("Pick an icon and color for Need, Want and Fun tickets.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -50,11 +62,32 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section {
+                TagColorSettings()
+            } header: {
+                Text("Tags")
+            } footer: {
+                Text("Each tag gets a color from its name. Click a swatch to choose another, and ↺ puts back the default.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                WidgetSettings()
+            } header: {
+                Text("Widget")
+            } footer: {
+                Text("List by tag shows open tickets under bold tag titles instead of by column. Applies to every prdctv widget.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Quick Add") {
                 KeyboardShortcuts.Recorder("Global shortcut:", name: .quickAdd)
             }
 
             Section("General") {
+                AppearancePicker()
                 Toggle("Launch at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in setLaunchAtLogin(enabled) }
                 if let loginError {
@@ -64,6 +97,8 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .frame(width: 480, height: 800)
+        .onChange(of: rewardsEnabled) { SharedStore.reloadWidgets() }
+        .onChange(of: pointsEnabled) { SharedStore.reloadWidgets() }
         .onChange(of: wantRatio) { SharedStore.reloadWidgets() }
         .onChange(of: funRatio) { SharedStore.reloadWidgets() }
     }

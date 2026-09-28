@@ -9,6 +9,7 @@ extension KeyboardShortcuts.Name {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         MainActor.assumeIsolated {
+            AppAppearance.current.apply()
             AppModel.shared.startWatchingWidgetWrites()
             KeyboardShortcuts.onKeyUp(for: .quickAdd) {
                 AppModel.shared.quickAdd.toggle()
@@ -67,6 +68,8 @@ struct TicketBoardApp: App {
         Settings {
             SettingsView()
                 .brandTint()
+                .id(model.generation)
+                .modelContainer(model.container)
         }
     }
 }
@@ -79,6 +82,7 @@ enum WindowID {
 struct TicketCommands: Commands {
     let model: AppModel
     @Environment(\.openWindow) private var openWindow
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
 
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
@@ -105,17 +109,18 @@ struct TicketCommands: Commands {
                 .keyboardShortcut("1")
             Button("Calendar") { model.boardMode = .calendar }
                 .keyboardShortcut("2")
+            Button("Stats") { openWindow(id: WindowID.stats) }
+                .keyboardShortcut("s", modifiers: [.command, .shift])
             Divider()
         }
 
-        CommandMenu("Rewards") {
-            Button("Redeem Want…") { model.redeemKind = .want }
-                .keyboardShortcut("w", modifiers: [.command, .shift])
-            Button("Redeem Fun…") { model.redeemKind = .fun }
-                .keyboardShortcut("f", modifiers: [.command, .shift])
-            Divider()
-            Button("Stats") { openWindow(id: WindowID.stats) }
-                .keyboardShortcut("s", modifiers: [.command, .shift])
+        if rewardsEnabled {
+            CommandMenu("Rewards") {
+                Button("Redeem Want…") { model.redeemKind = .want }
+                    .keyboardShortcut("w", modifiers: [.command, .shift])
+                Button("Redeem Fun…") { model.redeemKind = .fun }
+                    .keyboardShortcut("f", modifiers: [.command, .shift])
+            }
         }
     }
 }

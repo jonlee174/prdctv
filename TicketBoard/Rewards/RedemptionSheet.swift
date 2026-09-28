@@ -10,12 +10,11 @@ struct RedemptionSheet: View {
     @Query(sort: \Ticket.sortIndex) private var tickets: [Ticket]
     @Query(sort: \Redemption.redeemedAt, order: .reverse) private var redemptions: [Redemption]
 
-    @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
-    @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
+    var rewardSettings = StoredRewardSettings()
 
     private var engine: RewardEngine {
         RewardEngine(tickets: tickets, redemptions: redemptions,
-                     settings: RewardSettings(wantRatio: wantRatio, funRatio: funRatio))
+                     settings: rewardSettings.value)
     }
 
     private var candidates: [Ticket] {
@@ -38,7 +37,7 @@ struct RedemptionSheet: View {
 
             if available <= 0 {
                 let needed = engine.pointsToUnlock(kind)
-                Label("No \(kind.label) rewards yet. Complete \(needed) more need point\(needed == 1 ? "" : "s").",
+                Label("No \(kind.label) rewards yet. Complete \(needed) more \(rewardSettings.value.needUnit(needed)).",
                       systemImage: "lock.fill")
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 8)

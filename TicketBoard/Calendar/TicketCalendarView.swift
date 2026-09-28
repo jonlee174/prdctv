@@ -6,20 +6,28 @@ import SwiftUI
 struct TicketCalendarView: View {
     /// Categories to show; the Mac board passes its filter chips.
     var filter: Set<Category> = Set(Category.allCases)
+    /// Only tickets with this tag, or all when nil.
+    var tag: String?
 
     @Environment(\.modelContext) private var context
     @Query(sort: \Ticket.sortIndex) private var tickets: [Ticket]
     @Query private var redemptions: [Redemption]
-    @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
-    @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
+    var rewardSettings = StoredRewardSettings()
     private var theme = ThemeColors()
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
 
     @State private var grid = MonthGrid(containing: Date())
     @State private var selectedDay = Calendar.current.startOfDay(for: Date())
     @State private var editTarget: EditTarget?
 
-    init(filter: Set<Category> = Set(Category.allCases)) {
+    init(filter: Set<Category> = Set(Category.allCases), tag: String? = nil) {
         self.filter = filter
+        self.tag = tag
+    }
+
+    private func shows(_ ticket: Ticket) -> Bool {
+        filter.contains(ticket.category) && (rewardsEnabled || !ticket.category.isReward)
+            && TicketTags.matches(ticket.tags, tag)
     }
 
     private var calendar: Calendar { .current }
@@ -27,18 +35,18 @@ struct TicketCalendarView: View {
 
     private var engine: RewardEngine {
         RewardEngine(tickets: tickets, redemptions: redemptions,
-                     settings: RewardSettings(wantRatio: wantRatio, funRatio: funRatio))
+                     settings: rewardSettings.value)
     }
 
     private var byDay: [Date: [Ticket]] {
-        Dictionary(grouping: tickets.filter { $0.dueDate != nil && filter.contains($0.category) }) {
+        Dictionary(grouping: tickets.filter { $0.dueDate != nil && shows($0) }) {
             calendar.startOfDay(for: $0.dueDate!)
         }
         .mapValues { $0.sorted { ($0.status == .done ? 1 : 0, $0.sortIndex) < ($1.status == .done ? 1 : 0, $1.sortIndex) } }
     }
 
     private var unscheduled: [Ticket] {
-        tickets.filter { $0.dueDate == nil && $0.status != .done && filter.contains($0.category) }
+        tickets.filter { $0.dueDate == nil && $0.status != .done && shows($0) }
     }
 
     var body: some View {

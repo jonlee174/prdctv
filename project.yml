@@ -56,6 +56,8 @@ targets:
       path: TicketBoard/App/Info.plist
       properties:
         CFBundleDisplayName: prdctv
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.productivity
         NSHumanReadableCopyright: ""
         CFBundleURLTypes:
@@ -83,6 +85,8 @@ targets:
       path: TicketWidget/Info.plist
       properties:
         CFBundleDisplayName: prdctv
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
@@ -123,6 +127,8 @@ targets:
       path: TicketBoard/iOS/Info.plist
       properties:
         CFBundleDisplayName: prdctv
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
         UIApplicationSupportsIndirectInputEvents: true
         UIBackgroundModes: [remote-notification]
@@ -158,6 +164,8 @@ targets:
       path: TicketWidgetiOS/Info.plist
       properties:
         CFBundleDisplayName: prdctv
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
@@ -178,6 +186,7 @@ targets:
       - path: TicketBoard/Shared/RewardEngine.swift
       - path: TicketBoard/Shared/RewardSettings.swift
       - path: TicketBoard/Shared/AppGroup.swift
+      - path: TicketBoard/Shared/Tags.swift
       - path: TicketBoard/QuickAdd/QuickAddParser.swift
       - path: TicketBoard/Calendar/MonthGrid.swift
       - path: TicketBoard/Shared/UndoHistory.swift

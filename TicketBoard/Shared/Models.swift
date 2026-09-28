@@ -48,6 +48,11 @@ enum Category: String, Codable, CaseIterable, Identifiable {
     ]
 
     var isReward: Bool { self != .need }
+
+    /// Categories in use, just Need while rewards are off.
+    static func shown(rewardsEnabled: Bool = RewardSettings.isEnabled()) -> [Category] {
+        rewardsEnabled ? allCases : [.need]
+    }
 }
 
 enum Status: String, Codable, CaseIterable, Identifiable {

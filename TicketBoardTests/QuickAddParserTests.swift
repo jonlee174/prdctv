@@ -71,6 +71,14 @@ struct QuickAddParserTests {
         #expect(parser.parseDue("banana") == nil)
     }
 
+    @Test func trailingNumberStaysInTitleWithoutPoints() {
+        var parser = parser
+        parser.parsesPoints = false
+        let r = parser.parse("read chapter 3")
+        #expect(r.title == "read chapter 3")
+        #expect(r.points == 1)
+    }
+
     @Test func unknownBangStaysInTitle() {
         let r = parser.parse("ship it !now")
         #expect(r.title == "ship it !now")

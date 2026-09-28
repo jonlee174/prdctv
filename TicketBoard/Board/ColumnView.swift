@@ -8,7 +8,7 @@ struct ColumnView: View {
     let status: Status
     /// Already filtered and ordered for display.
     let tickets: [Ticket]
-    let swimlanes: Bool
+    let grouping: LaneGrouping
     /// Optional user-chosen column color (Settings → Colors).
     var tint: Color?
     let selectedID: UUID?
@@ -21,6 +21,7 @@ struct ColumnView: View {
     var footer: AnyView?
 
     @State private var isTargeted = false
+    @AppStorage(RewardSettings.pointsEnabledKey, store: AppGroup.defaults) private var pointsEnabled = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -28,19 +29,11 @@ struct ColumnView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 8) {
-                        if swimlanes {
-                            ForEach(Category.allCases) { category in
-                                let lane = tickets.filter { $0.category == category }
-                                if !lane.isEmpty {
-                                    Label(category.label, systemImage: category.symbol)
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(category.color)
-                                        .padding(.top, 4)
-                                    cards(lane)
-                                }
+                        ForEach(grouping.lanes(tickets)) { lane in
+                            if grouping != .none {
+                                LaneHeadingView(heading: lane.heading).padding(.top, 4)
                             }
-                        } else {
-                            cards(tickets)
+                            cards(lane.tickets, hiding: lane.tag)
                         }
                         if let footer { footer }
                     }
@@ -82,7 +75,7 @@ struct ColumnView: View {
                 .background(RoundedRectangle(cornerRadius: Radius.tiny).fill(Color.primary.opacity(0.08)))
             Spacer()
             let points = tickets.filter { $0.category == .need }.reduce(0) { $0 + $1.points }
-            if points > 0 {
+            if pointsEnabled, points > 0 {
                 Text("\(points) pts").font(.caption).foregroundStyle(.secondary)
             }
             if let onAdd {
@@ -94,10 +87,11 @@ struct ColumnView: View {
         .padding(.horizontal, 2)
     }
 
-    private func cards(_ list: [Ticket]) -> some View {
+    private func cards(_ list: [Ticket], hiding tag: String?) -> some View {
         ForEach(list) { ticket in
             CardRow(
                 ticket: ticket,
+                hiddenTag: tag,
                 lock: lockState(ticket),
                 isSelected: ticket.id == selectedID,
                 onSelect: { onSelect(ticket) },
@@ -118,6 +112,7 @@ struct ColumnView: View {
 
 private struct CardRow: View {
     let ticket: Ticket
+    let hiddenTag: String?
     let lock: LockState
     let isSelected: Bool
     let onSelect: () -> Void
@@ -127,14 +122,15 @@ private struct CardRow: View {
     @State private var isTargeted = false
 
     var body: some View {
-        TicketCardView(ticket: ticket, lock: lock, isSelected: isSelected)
+        TicketCardView(ticket: ticket, lock: lock, isSelected: isSelected, hiddenTag: hiddenTag)
             .overlay(alignment: .top) {
                 if isTargeted {
                     Rectangle().fill(.tint).frame(height: 2).offset(y: -5)
                 }
             }
-            .onTapGesture(count: 2) { onAction(.edit) }
+            // Simultaneous so a single click selects at once instead of waiting out the double-click window.
             .onTapGesture { onSelect() }
+            .simultaneousGesture(TapGesture(count: 2).onEnded { onAction(.edit) })
             .draggable(ticket.id.uuidString) {
                 TicketCardView(ticket: ticket, lock: lock).frame(width: 240)
             }
@@ -154,12 +150,14 @@ private struct CardRow: View {
                 Button(status.label) { onAction(.move(status)) }
             }
         }
-        Menu("Points") {
-            ForEach(PointScale.values, id: \.self) { value in
-                Button {
-                    onAction(.points(value))
-                } label: {
-                    if value == ticket.points { Label("\(value)", systemImage: "checkmark") } else { Text("\(value)") }
+        if RewardSettings.pointsEnabled() {
+            Menu("Points") {
+                ForEach(PointScale.values, id: \.self) { value in
+                    Button {
+                        onAction(.points(value))
+                    } label: {
+                        if value == ticket.points { Label("\(value)", systemImage: "checkmark") } else { Text("\(value)") }
+                    }
                 }
             }
         }

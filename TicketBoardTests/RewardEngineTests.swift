@@ -91,6 +91,26 @@ struct RewardEngineTests {
         #expect(Category.need.colorKey == "categoryNeedColor")
     }
 
+    @Test func withoutPointsEachNeedTicketCountsOnce() {
+        let tickets = [Ticket(title: "a", points: 5, status: .done), Ticket(title: "b", points: 8, status: .done),
+                       Ticket(title: "c", category: .want, points: 3, status: .done)]
+        let engine = RewardEngine(tickets: tickets, redemptions: [], settings: RewardSettings(wantRatio: 3, countsPoints: false))
+        #expect(engine.needPointsDone == 2)
+        #expect(engine.available(.want) == 0)
+        #expect(engine.lockedMessage(.want) == "Complete 1 more need ticket to earn a Want reward.")
+    }
+
+    @Test func rewardsDefaultOnAndOffLeavesOnlyNeed() {
+        let defaults = UserDefaults(suiteName: "RewardSettingsTest")!
+        defaults.removePersistentDomain(forName: "RewardSettingsTest")
+        #expect(RewardSettings.isEnabled(defaults))
+        defaults.set(false, forKey: RewardSettings.enabledKey)
+        #expect(!RewardSettings.isEnabled(defaults))
+        #expect(Category.shown(rewardsEnabled: false) == [.need])
+        #expect(Category.shown(rewardsEnabled: true) == Category.allCases)
+        #expect(!RewardSettings.enabledKey.contains(".") && !RewardSettings.largeWidgetShowsMeterKey.contains("."))
+    }
+
     @Test func statusKeepsCompletedAtInSync() {
         let ticket = Ticket(title: "x")
         #expect(ticket.completedAt == nil)

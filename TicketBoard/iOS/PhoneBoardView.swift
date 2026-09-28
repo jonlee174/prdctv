@@ -10,13 +10,15 @@ struct PhoneBoardView: View {
     @Query(sort: \Ticket.sortIndex) private var tickets: [Ticket]
     @Query(sort: \Redemption.redeemedAt) private var redemptions: [Redemption]
 
-    @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
-    @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
+    var rewardSettings = StoredRewardSettings()
     @AppStorage("doneShowsAll") private var doneShowsAll = false
+    @AppStorage(LaneGrouping.storageKey) private var grouping = LaneGrouping.none
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
 
     @State private var column = Status.upNext
     private var theme = ThemeColors()
     @State private var filter: Set<Category> = Set(Category.allCases)
+    @State private var tagFilter: String?
     @State private var editTarget: EditTarget?
     @State private var pendingUnlock: PendingMove?
     @State private var blocked: Ticket?
@@ -25,7 +27,7 @@ struct PhoneBoardView: View {
 
     private var engine: RewardEngine {
         RewardEngine(tickets: tickets, redemptions: redemptions,
-                     settings: RewardSettings(wantRatio: wantRatio, funRatio: funRatio))
+                     settings: rewardSettings.value)
     }
 
     var body: some View {
@@ -34,8 +36,17 @@ struct PhoneBoardView: View {
         NavigationStack {
             List {
                 Section {
-                    ForEach(visible(column)) { ticket in
-                        row(ticket)
+                    ForEach(grouping.lanes(visible(column))) { lane in
+                        if grouping != .none {
+                            LaneHeadingView(heading: lane.heading)
+                                .padding(.top, 6)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 0, trailing: 16))
+                        }
+                        ForEach(lane.tickets) { ticket in
+                            row(ticket, hiding: lane.tag)
+                        }
                     }
                     if column == .done, !doneShowsAll, olderDoneCount > 0 {
                         Button("\(olderDoneCount) older in History") { showHistory = true }
@@ -46,8 +57,10 @@ struct PhoneBoardView: View {
                     }
                 } header: {
                     VStack(spacing: 8) {
-                        RewardMeterView(engine: engine, showsTotal: false) { model.redeemKind = $0 }
-                            .padding(.horizontal, -8)
+                        if rewardsEnabled {
+                            RewardMeterView(engine: engine, showsTotal: false) { model.redeemKind = $0 }
+                                .padding(.horizontal, -8)
+                        }
                         Picker("Column", selection: $column) {
                             ForEach(Status.allCases) { status in
                                 Text(status.label).tag(status)
@@ -108,8 +121,8 @@ struct PhoneBoardView: View {
         }
     }
 
-    private func row(_ ticket: Ticket) -> some View {
-        TicketCardView(ticket: ticket, lock: engine.lockState(of: ticket, redemptions: redemptions))
+    private func row(_ ticket: Ticket, hiding tag: String?) -> some View {
+        TicketCardView(ticket: ticket, lock: engine.lockState(of: ticket, redemptions: redemptions), hiddenTag: tag)
             .contentShape(Rectangle())
             .onTapGesture { editTarget = .existing(ticket) }
             .listRowSeparator(.hidden)
@@ -139,15 +152,17 @@ struct PhoneBoardView: View {
                 } label: {
                     Label("Move To", systemImage: "arrow.right.square")
                 }
-                Menu {
-                    ForEach(PointScale.values, id: \.self) { value in
-                        Button("\(value)") {
-                            ticket.points = value
-                            TicketOps.save(context)
+                if rewardSettings.value.countsPoints {
+                    Menu {
+                        ForEach(PointScale.values, id: \.self) { value in
+                            Button("\(value)") {
+                                ticket.points = value
+                                TicketOps.save(context)
+                            }
                         }
+                    } label: {
+                        Label("Points", systemImage: "number")
                     }
-                } label: {
-                    Label("Points", systemImage: "number")
                 }
                 Divider()
                 Button(role: .destructive) {
@@ -168,7 +183,7 @@ struct PhoneBoardView: View {
         }
         ToolbarItem(placement: .topBarLeading) {
             Menu {
-                ForEach(Category.allCases) { category in
+                ForEach(rewardsEnabled ? Category.allCases : []) { category in
                     Toggle(isOn: Binding(
                         get: { filter.contains(category) },
                         set: { on in
@@ -178,8 +193,11 @@ struct PhoneBoardView: View {
                         Label(category.label, systemImage: category.symbol)
                     }
                 }
+                if rewardsEnabled { Divider() }
+                TagFilterPicker(tag: $tagFilter, tags: tags)
+                LaneMenu(grouping: $grouping)
             } label: {
-                Image(systemName: filter.count == Category.allCases.count
+                Image(systemName: filter.count == Category.allCases.count && activeTag == nil
                       ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
             }
         }
@@ -200,11 +218,24 @@ struct PhoneBoardView: View {
     // MARK: - Data
 
     private func visible(_ status: Status) -> [Ticket] {
-        let list = tickets.filter { $0.status == status && filter.contains($0.category) }
+        let list = tickets.filter {
+            $0.status == status && filter.contains($0.category) && (rewardsEnabled || !$0.category.isReward)
+                && TicketTags.matches($0.tags, activeTag)
+        }
         guard status == .done else { return list }
         return list
             .filter { doneShowsAll || isThisWeek($0.completedAt) }
             .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
+    }
+
+    /// Tags in use, alphabetical.
+    private var tags: [String] {
+        TicketTags.sortedTags(in: tickets.map(\.tags))
+    }
+
+    /// The tag filter, dropped once no ticket carries that tag.
+    private var activeTag: String? {
+        tagFilter.flatMap { tag in tags.contains(tag) ? tag : nil }
     }
 
     private var olderDoneCount: Int {

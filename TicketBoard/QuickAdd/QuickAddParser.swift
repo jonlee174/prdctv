@@ -24,6 +24,8 @@ struct QuickAddParser {
 
     var now: Date = Date()
     var calendar: Calendar = .current
+    /// Off while points are hidden, so a trailing number stays in the title.
+    var parsesPoints = RewardSettings.pointsEnabled()
 
     func parse(_ input: String) -> Result {
         var text = input.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -41,7 +43,7 @@ struct QuickAddParser {
 
         for token in text.split(whereSeparator: \.isWhitespace).map(String.init) {
             if token.count > 1, token.hasPrefix("#") {
-                tags.append(String(token.dropFirst()).lowercased())
+                tags.append(TicketTags.normalize(token))
             } else if token.count > 1, token.hasPrefix("!"), let date = parseDue(String(token.dropFirst())) {
                 dueDate = date
             } else {
@@ -50,7 +52,7 @@ struct QuickAddParser {
         }
 
         var points = 1
-        if let last = words.last, let value = Int(last), PointScale.values.contains(value), words.count > 1 {
+        if parsesPoints, let last = words.last, let value = Int(last), PointScale.values.contains(value), words.count > 1 {
             points = value
             words.removeLast()
         }
@@ -59,7 +61,7 @@ struct QuickAddParser {
             title: words.joined(separator: " "),
             category: category,
             points: points,
-            tags: tags,
+            tags: TicketTags.canonical(tags),
             dueDate: dueDate
         )
     }

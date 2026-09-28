@@ -62,8 +62,10 @@ struct QuickAddPreview: View {
     var body: some View {
         HStack(spacing: 6) {
             chip(result.category.label, systemImage: result.category.symbol, color: result.category.color)
-            chip("\(result.points) pt\(result.points == 1 ? "" : "s")", systemImage: "number", color: .secondary)
-            ForEach(result.tags, id: \.self) { chip("#\($0)", systemImage: nil, color: .secondary) }
+            if RewardSettings.pointsEnabled() {
+                chip("\(result.points) pt\(result.points == 1 ? "" : "s")", systemImage: "number", color: .secondary)
+            }
+            ForEach(result.tags, id: \.self) { TagChip(tag: $0, size: 12) }
             if let due = result.dueDate {
                 chip(due.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()),
                      systemImage: "calendar", color: .secondary)

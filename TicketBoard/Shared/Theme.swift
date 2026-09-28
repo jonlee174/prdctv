@@ -111,3 +111,14 @@ struct AppLogo: View {
             .accessibilityLabel("prdctv")
     }
 }
+
+/// Reward settings read live from the App Group, so views redraw when any of them change.
+struct StoredRewardSettings: DynamicProperty {
+    @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
+    @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
+    @AppStorage(RewardSettings.pointsEnabledKey, store: AppGroup.defaults) private var pointsEnabled = true
+
+    var value: RewardSettings {
+        RewardSettings(wantRatio: wantRatio, funRatio: funRatio, countsPoints: pointsEnabled)
+    }
+}

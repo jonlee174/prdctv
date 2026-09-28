@@ -8,10 +8,10 @@ enum DemoData {
         func daysAgo(_ n: Int) -> Date { cal.date(byAdding: .day, value: -n, to: Date())! }
 
         let rows: [(String, Category, Int, Status, [String])] = [
-            ("Grade CS 212 quizzes", .need, 3, .upNext, ["ta"]),
+            ("Grade CS 212 quizzes", .need, 3, .upNext, ["CS 212", "ta"]),
             ("Finish lattice writeup", .need, 5, .inProgress, ["research"]),
             ("Email advisor about defense date", .need, 1, .upNext, []),
-            ("Problem set 4", .need, 8, .upNext, []),
+            ("Problem set 4", .need, 8, .upNext, ["MATH 340"]),
             ("Renew passport", .need, 2, .upNext, ["errand"]),
             ("Rewatch Arrival", .want, 2, .upNext, []),
             ("New climbing shoes", .want, 3, .upNext, []),

@@ -23,7 +23,7 @@ final class PhoneModel {
             openTicketID = id
         case .redeem:
             tab = .board
-            showRedeemPicker = true
+            showRedeemPicker = RewardSettings.isEnabled()
         case .quickAdd:
             tab = .board
             showQuickAdd = true
@@ -66,6 +66,7 @@ struct TicketBoardPhoneApp: App {
                     // Pick up completions made from the widget while we were in the background.
                     if phase == .active { model.store.refreshIfNeeded() }
                 }
+                .onAppear { AppAppearance.current.apply() }
         }
     }
 }

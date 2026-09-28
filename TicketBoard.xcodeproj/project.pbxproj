@@ -18,8 +18,11 @@
 		13DD9031DD4A533693598E36 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
 		1547E9C559CBBEF26D6D3F4C /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
 		1A7E3F72D75B5B3C263213E4 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
+		1F7A27F1AD27E7A403663B0B /* TagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D16D35D76D956F53D347C3B /* TagTests.swift */; };
 		22E8B246B114905FBB576468 /* TicketCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67184D2A5C85B45A61BA54 /* TicketCardView.swift */; };
 		232D091407AC0B2CC24F7352 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = B85E3E70100AB9B851418DC6 /* KeyboardShortcuts */; };
+		243CBDACEBD594FD141DDA4C /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58A3365624919A3FEEDB34A /* Tags.swift */; };
+		27C38BC69D96684406C1D41A /* TagSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EAAC3B5D46FCB5FC620A6E /* TagSettings.swift */; };
 		28402AC965123C61B8A70910 /* TicketBoardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4031BF90540CDF472CA741F6 /* TicketBoardApp.swift */; };
 		297CB88C5885873A3FD4FFC2 /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88366E4C005C7CACCA4639C9 /* TicketIntents.swift */; };
 		29C0862E958AAAF0370B0139 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */; };
@@ -33,6 +36,7 @@
 		3735B43D7C5E17C19CB4FBEA /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
 		37A07B380019CAC825F90091 /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
 		38C133C6338ED635784A4C14 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
+		396EE3FB713ED8A8CCF71D5A /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58A3365624919A3FEEDB34A /* Tags.swift */; };
 		3DC4070CFEA6DDD8BA91CB6C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 374FC29CB61CC18ED7B94250 /* Assets.xcassets */; };
 		3F8F563BEE1C4BA490484614 /* RewardEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B29FF11CC7D967C821CD83 /* RewardEngineTests.swift */; };
 		42AEB2FA71FB52A41E1A4629 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505B077EC3EDF8251C990BD4 /* AppModel.swift */; };
@@ -49,9 +53,11 @@
 		5DCA2B3AEC77CCC974AA7E62 /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
 		62630EDD70F62DA89AFC2622 /* QuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD51C4472E76DF5738250CC1 /* QuickAddParser.swift */; };
 		631DCAA92FA701E95B95C86D /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 971DBBA6C22179DFBF40577D /* RewardSettings.swift */; };
+		63DDAC200581B702138834B3 /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42696921E6618294AB8F2839 /* TagChip.swift */; };
 		66961E63FBE2C3977324C369 /* QuickAddPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FCFDEBCAC2D0EB7AF47C38 /* QuickAddPanel.swift */; };
 		699AD758E365EF70349C2480 /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88366E4C005C7CACCA4639C9 /* TicketIntents.swift */; };
 		69CB08CDD442CABF8B9D52BB /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88366E4C005C7CACCA4639C9 /* TicketIntents.swift */; };
+		6CADC3F539CEA348569AFAD1 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3624C6D67D5522AD164EA4B /* Appearance.swift */; };
 		6E158949FF655F3D70C1035F /* WhiteboardImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C66E4F6005A9CE314E8DD /* WhiteboardImportView.swift */; };
 		704EA65E63642422D1008F2D /* ThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD87070123E75E5B13949C1 /* ThemeColors.swift */; };
 		7135E2358C50C204CD7D61D8 /* ThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD87070123E75E5B13949C1 /* ThemeColors.swift */; };
@@ -60,12 +66,15 @@
 		7945DB597F03FA7E39161E28 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
 		7A0467A33179AF5435012184 /* RedemptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479E1F6BBFAD9B8CEFF9341 /* RedemptionSheet.swift */; };
 		7C87B54C821CCD5F6ADB266E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222A103F1EA1B35D8B5245E5 /* Theme.swift */; };
+		7E056D7CCFE7EDB9603E491D /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58A3365624919A3FEEDB34A /* Tags.swift */; };
+		8032739CC36DD408EE305D29 /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42696921E6618294AB8F2839 /* TagChip.swift */; };
 		8057CA89BA02BD99F4C86774 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222A103F1EA1B35D8B5245E5 /* Theme.swift */; };
 		8248EAAE7E2A50AA0A1EA909 /* ThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD87070123E75E5B13949C1 /* ThemeColors.swift */; };
 		82E5C5263091F3752CDD7468 /* BoardSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABC9EFA21D6C990729137BE /* BoardSupport.swift */; };
 		83EF2E82FCDD749EEFFFE258 /* QuickAddParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA2B115B33237FA7D625D0B /* QuickAddParserTests.swift */; };
 		86243E44F23F7DB1BF2019E2 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
 		88AB551CFD271E16CEEB08FB /* BoardSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABC9EFA21D6C990729137BE /* BoardSupport.swift */; };
+		95E23D4F5E58564A0551E100 /* TagSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EAAC3B5D46FCB5FC620A6E /* TagSettings.swift */; };
 		978C945F23E34145D091CB31 /* RewardMeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C11496D607BCEDAD995F4F /* RewardMeterView.swift */; };
 		98064EBF51AFF29A1C5863D2 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
 		9C27FA5A6D925EE0AF71C7CF /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0092F7B05629C13F82D250E /* SharedStore.swift */; };
@@ -74,6 +83,7 @@
 		9F125599E91E4A12B201E99A /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90BDD0D921B5879EB5BB1B5 /* DemoData.swift */; };
 		9FB8CA8914DABA24EE694097 /* MenuBarContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA56929BDA0C52C8AE8E2A7 /* MenuBarContent.swift */; };
 		A027C82214359A7E1FDBF793 /* MonthGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA01AAAD0F477E708FDDD5A /* MonthGrid.swift */; };
+		A17734C04CA6F2CD033E6C50 /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58A3365624919A3FEEDB34A /* Tags.swift */; };
 		A2B48602554076A6B3368636 /* QuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD51C4472E76DF5738250CC1 /* QuickAddParser.swift */; };
 		A7B890647E9DAC38F49B744C /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
 		A86039D6C46E68FFE54FBB23 /* RedemptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479E1F6BBFAD9B8CEFF9341 /* RedemptionSheet.swift */; };
@@ -85,6 +95,8 @@
 		B24CBF5283F16D611532181F /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57324290B45FBF15E3849EC4 /* UndoHistory.swift */; };
 		B62D5A7CEAFCCDA106EA6B8A /* BoardProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47DB116614B48873394CB1 /* BoardProvider.swift */; };
 		BC565278ECC820772DEE352D /* MonthGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA01AAAD0F477E708FDDD5A /* MonthGrid.swift */; };
+		BC5B7D680242A55F83B8385D /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42696921E6618294AB8F2839 /* TagChip.swift */; };
+		BEFED7AD5527CFEFAD506849 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3624C6D67D5522AD164EA4B /* Appearance.swift */; };
 		C6C28F29E1D90A89CDFB90F0 /* TicketWidgetiOS.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 64D9068492B5384E5335C4F6 /* TicketWidgetiOS.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CA377289209F16EC80F41A01 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662E4C27C698B07F319773E9 /* AppGroup.swift */; };
 		CE9AC3A3F1FED7B0208EC1A4 /* PhoneSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AC4AF9A195C16C71F187FE4 /* PhoneSettingsView.swift */; };
@@ -99,6 +111,8 @@
 		F432880097D6B4E6D44C590A /* QuickAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE44658D0FBE4724F4C8A25 /* QuickAddView.swift */; };
 		F4519B6DE8794866095D83E6 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0092F7B05629C13F82D250E /* SharedStore.swift */; };
 		F580BEB0011F8C4FF8E5E917 /* RewardEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2137798E0CDE45DC92C77FF /* RewardEngine.swift */; };
+		F77891AB25980ABE9A612BD9 /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58A3365624919A3FEEDB34A /* Tags.swift */; };
+		FAD3C045A9DCFA65ADA1A76A /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42696921E6618294AB8F2839 /* TagChip.swift */; };
 		FBA0E5A67C26C44336AB1EEA /* PhoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0EED75A2AA7E188BCAFDE8 /* PhoneApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -157,10 +171,12 @@
 		2479E1F6BBFAD9B8CEFF9341 /* RedemptionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedemptionSheet.swift; sourceTree = "<group>"; };
 		24C91589C3C49F63D7610421 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2AD87070123E75E5B13949C1 /* ThemeColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColors.swift; sourceTree = "<group>"; };
+		31EAAC3B5D46FCB5FC620A6E /* TagSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagSettings.swift; sourceTree = "<group>"; };
 		36AF08DF73ADEA4222086B2A /* TicketBoard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TicketBoard.entitlements; sourceTree = "<group>"; };
 		374FC29CB61CC18ED7B94250 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3E3F44CFD0014C05B6FFB6AE /* TicketWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketWidget.swift; sourceTree = "<group>"; };
 		4031BF90540CDF472CA741F6 /* TicketBoardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketBoardApp.swift; sourceTree = "<group>"; };
+		42696921E6618294AB8F2839 /* TagChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChip.swift; sourceTree = "<group>"; };
 		4481FE75A1A6963B92BD340D /* TicketBoard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TicketBoard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46A7618CFC7B1D5A01FDE779 /* UndoHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoHistoryTests.swift; sourceTree = "<group>"; };
 		46C11496D607BCEDAD995F4F /* RewardMeterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardMeterView.swift; sourceTree = "<group>"; };
@@ -180,6 +196,7 @@
 		88366E4C005C7CACCA4639C9 /* TicketIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketIntents.swift; sourceTree = "<group>"; };
 		8ABC9EFA21D6C990729137BE /* BoardSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardSupport.swift; sourceTree = "<group>"; };
 		971DBBA6C22179DFBF40577D /* RewardSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardSettings.swift; sourceTree = "<group>"; };
+		9D16D35D76D956F53D347C3B /* TagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTests.swift; sourceTree = "<group>"; };
 		9F3CDF0AB25EFB6A5A7A6271 /* TicketBoardiOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TicketBoardiOS.entitlements; sourceTree = "<group>"; };
 		A1B29FF11CC7D967C821CD83 /* RewardEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardEngineTests.swift; sourceTree = "<group>"; };
 		A4D177726524F512FE144B65 /* MonthGridTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthGridTests.swift; sourceTree = "<group>"; };
@@ -188,6 +205,8 @@
 		BB9C66E4F6005A9CE314E8DD /* WhiteboardImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardImportView.swift; sourceTree = "<group>"; };
 		BD51C4472E76DF5738250CC1 /* QuickAddParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddParser.swift; sourceTree = "<group>"; };
 		C0092F7B05629C13F82D250E /* SharedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStore.swift; sourceTree = "<group>"; };
+		C3624C6D67D5522AD164EA4B /* Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
+		C58A3365624919A3FEEDB34A /* Tags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tags.swift; sourceTree = "<group>"; };
 		CD912E6A14A37B2ADC078B2B /* TicketBoardiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TicketBoardiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDF3AAC75613EC5F54EC55F8 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		D6438817F3333C2F49B1C39C /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -325,6 +344,7 @@
 				A4D177726524F512FE144B65 /* MonthGridTests.swift */,
 				1CA2B115B33237FA7D625D0B /* QuickAddParserTests.swift */,
 				A1B29FF11CC7D967C821CD83 /* RewardEngineTests.swift */,
+				9D16D35D76D956F53D347C3B /* TagTests.swift */,
 				46A7618CFC7B1D5A01FDE779 /* UndoHistoryTests.swift */,
 			);
 			path = TicketBoardTests;
@@ -333,9 +353,11 @@
 		EEEA33C0E5753E153ACE6F23 /* Board */ = {
 			isa = PBXGroup;
 			children = (
+				C3624C6D67D5522AD164EA4B /* Appearance.swift */,
 				8ABC9EFA21D6C990729137BE /* BoardSupport.swift */,
 				23D779C0AD669B7631F6470A /* BoardView.swift */,
 				80ED4A2618E90EEE8DF055EF /* ColumnView.swift */,
+				31EAAC3B5D46FCB5FC620A6E /* TagSettings.swift */,
 				6F67184D2A5C85B45A61BA54 /* TicketCardView.swift */,
 				4A3D352E6AE7D3D0D503732C /* TicketEditorView.swift */,
 			);
@@ -361,6 +383,8 @@
 				E2137798E0CDE45DC92C77FF /* RewardEngine.swift */,
 				971DBBA6C22179DFBF40577D /* RewardSettings.swift */,
 				C0092F7B05629C13F82D250E /* SharedStore.swift */,
+				42696921E6618294AB8F2839 /* TagChip.swift */,
+				C58A3365624919A3FEEDB34A /* Tags.swift */,
 				222A103F1EA1B35D8B5245E5 /* Theme.swift */,
 				2AD87070123E75E5B13949C1 /* ThemeColors.swift */,
 				88366E4C005C7CACCA4639C9 /* TicketIntents.swift */,
@@ -555,6 +579,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA377289209F16EC80F41A01 /* AppGroup.swift in Sources */,
+				6CADC3F539CEA348569AFAD1 /* Appearance.swift in Sources */,
 				82E5C5263091F3752CDD7468 /* BoardSupport.swift in Sources */,
 				9F125599E91E4A12B201E99A /* DemoData.swift in Sources */,
 				4F9B8DFEF85E5787546BC2CF /* Models.swift in Sources */,
@@ -571,6 +596,9 @@
 				5DCA2B3AEC77CCC974AA7E62 /* RewardSettings.swift in Sources */,
 				F4519B6DE8794866095D83E6 /* SharedStore.swift in Sources */,
 				E8D5FA4EC26691EF218E343D /* StatsView.swift in Sources */,
+				BC5B7D680242A55F83B8385D /* TagChip.swift in Sources */,
+				27C38BC69D96684406C1D41A /* TagSettings.swift in Sources */,
+				243CBDACEBD594FD141DDA4C /* Tags.swift in Sources */,
 				0825A0146CEDA8B16885219F /* Theme.swift in Sources */,
 				704EA65E63642422D1008F2D /* ThemeColors.swift in Sources */,
 				2D496793B525062FD0A468A3 /* TicketCalendarView.swift in Sources */,
@@ -595,6 +623,8 @@
 				1547E9C559CBBEF26D6D3F4C /* RewardEngine.swift in Sources */,
 				3F8F563BEE1C4BA490484614 /* RewardEngineTests.swift in Sources */,
 				631DCAA92FA701E95B95C86D /* RewardSettings.swift in Sources */,
+				1F7A27F1AD27E7A403663B0B /* TagTests.swift in Sources */,
+				396EE3FB713ED8A8CCF71D5A /* Tags.swift in Sources */,
 				109D2D3F776C47664C5CB053 /* UndoHistory.swift in Sources */,
 				B22F53D3380CED4AC863E3FF /* UndoHistoryTests.swift in Sources */,
 			);
@@ -611,6 +641,8 @@
 				98064EBF51AFF29A1C5863D2 /* RewardEngine.swift in Sources */,
 				DD583C9E9FCAC1BCF6669C04 /* RewardSettings.swift in Sources */,
 				9C27FA5A6D925EE0AF71C7CF /* SharedStore.swift in Sources */,
+				8032739CC36DD408EE305D29 /* TagChip.swift in Sources */,
+				A17734C04CA6F2CD033E6C50 /* Tags.swift in Sources */,
 				7C87B54C821CCD5F6ADB266E /* Theme.swift in Sources */,
 				8248EAAE7E2A50AA0A1EA909 /* ThemeColors.swift in Sources */,
 				297CB88C5885873A3FD4FFC2 /* TicketIntents.swift in Sources */,
@@ -625,6 +657,7 @@
 			files = (
 				31F06171D1AFF4A707812A5C /* AppGroup.swift in Sources */,
 				42AEB2FA71FB52A41E1A4629 /* AppModel.swift in Sources */,
+				BEFED7AD5527CFEFAD506849 /* Appearance.swift in Sources */,
 				88AB551CFD271E16CEEB08FB /* BoardSupport.swift in Sources */,
 				ACC6ECF8A332F2D1413849D6 /* BoardView.swift in Sources */,
 				0DFD7A5D2CDE9D0016FF9FD8 /* ColumnView.swift in Sources */,
@@ -642,6 +675,9 @@
 				D9C649267FB84C4489393241 /* SettingsView.swift in Sources */,
 				130F0748745ECD303EA20275 /* SharedStore.swift in Sources */,
 				D36B33ECA67A9C3B5A390CDA /* StatsView.swift in Sources */,
+				FAD3C045A9DCFA65ADA1A76A /* TagChip.swift in Sources */,
+				95E23D4F5E58564A0551E100 /* TagSettings.swift in Sources */,
+				7E056D7CCFE7EDB9603E491D /* Tags.swift in Sources */,
 				8057CA89BA02BD99F4C86774 /* Theme.swift in Sources */,
 				7135E2358C50C204CD7D61D8 /* ThemeColors.swift in Sources */,
 				28402AC965123C61B8A70910 /* TicketBoardApp.swift in Sources */,
@@ -665,6 +701,8 @@
 				1A7E3F72D75B5B3C263213E4 /* RewardEngine.swift in Sources */,
 				37A07B380019CAC825F90091 /* RewardSettings.swift in Sources */,
 				75737777DC58B4F152847C4F /* SharedStore.swift in Sources */,
+				63DDAC200581B702138834B3 /* TagChip.swift in Sources */,
+				F77891AB25980ABE9A612BD9 /* Tags.swift in Sources */,
 				5CBD3FE4B0FA53055EDD0226 /* Theme.swift in Sources */,
 				50E53DA4B1D1CE6EC8A5D1EA /* ThemeColors.swift in Sources */,
 				699AD758E365EF70349C2480 /* TicketIntents.swift in Sources */,

@@ -9,12 +9,13 @@ struct BoardView: View {
     @Query(sort: \Ticket.sortIndex) private var tickets: [Ticket]
     @Query(sort: \Redemption.redeemedAt) private var redemptions: [Redemption]
 
-    @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
-    @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
-    @AppStorage("swimlanes") private var swimlanes = false
+    var rewardSettings = StoredRewardSettings()
+    @AppStorage(LaneGrouping.storageKey) private var grouping = LaneGrouping.initial
     @AppStorage("doneShowsAll") private var doneShowsAll = false
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
 
     @State private var filter: Set<Category> = Set(Category.allCases)
+    @State private var tagFilter: String?
     private var theme = ThemeColors()
     @State private var editTarget: EditTarget?
     @State private var pendingUnlock: PendingMove?
@@ -24,13 +25,18 @@ struct BoardView: View {
 
     private var engine: RewardEngine {
         RewardEngine(tickets: tickets, redemptions: redemptions,
-                     settings: RewardSettings(wantRatio: wantRatio, funRatio: funRatio))
+                     settings: rewardSettings.value)
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            RewardMeterView(engine: engine) { app.redeemKind = $0 }
-            FilterBar(filter: $filter, swimlanes: $swimlanes, showsSwimlanes: app.boardMode == .board)
+            if rewardsEnabled {
+                RewardMeterView(engine: engine) { app.redeemKind = $0 }
+            }
+            FilterBar(filter: $filter, grouping: $grouping, tag: $tagFilter, tags: tags,
+                      categories: Category.shown(rewardsEnabled: rewardsEnabled),
+                      showsGrouping: app.boardMode == .board)
+                .padding(.top, rewardsEnabled ? 0 : 12)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
             switch app.boardMode {
@@ -40,7 +46,7 @@ struct BoardView: View {
                 }
                 .padding([.horizontal, .bottom], 16)
             case .calendar:
-                TicketCalendarView(filter: filter)
+                TicketCalendarView(filter: shownCategories, tag: activeTag)
             }
         }
         .background(Color(nsColor: .windowBackgroundColor))
@@ -65,7 +71,7 @@ struct BoardView: View {
         return ColumnView(
             status: status,
             tickets: visible(status),
-            swimlanes: swimlanes,
+            grouping: grouping,
             tint: theme.column(status),
             selectedID: app.selectedTicketID,
             lockState: lockState,
@@ -105,20 +111,33 @@ struct BoardView: View {
     // MARK: - Data
 
     private func visible(_ status: Status) -> [Ticket] {
-        let list = tickets.filter { $0.status == status && filter.contains($0.category) }
+        let list = tickets.filter {
+            $0.status == status && shownCategories.contains($0.category) && TicketTags.matches($0.tags, activeTag)
+        }
         guard status == .done else { return list }
         return list
             .filter { doneShowsAll || isThisWeek($0.completedAt) }
             .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
     }
 
-    /// Tickets in on-screen order per column (swimlanes regroup by category).
+    /// Tickets in on-screen order per column, after lanes regroup them.
     private var grid: [[Ticket]] {
-        Status.allCases.map { status in
-            let list = visible(status)
-            guard swimlanes else { return list }
-            return Category.allCases.flatMap { cat in list.filter { $0.category == cat } }
-        }
+        Status.allCases.map { grouping.lanes(visible($0)).flatMap(\.tickets) }
+    }
+
+    /// The category filter, minus Want and Fun while rewards are off.
+    private var shownCategories: Set<Category> {
+        filter.intersection(Category.shown(rewardsEnabled: rewardsEnabled))
+    }
+
+    /// Tags in use, alphabetical.
+    private var tags: [String] {
+        TicketTags.sortedTags(in: tickets.map(\.tags))
+    }
+
+    /// The tag filter, dropped once no ticket carries that tag.
+    private var activeTag: String? {
+        tagFilter.flatMap { tag in tags.contains(tag) ? tag : nil }
     }
 
     private var olderDoneCount: Int {
@@ -219,7 +238,7 @@ struct BoardView: View {
             editTarget = .new(.upNext)
             return .handled
         case "1", "2", "3", "4", "5":
-            guard let selected, let n = Int(press.characters) else { return .ignored }
+            guard rewardSettings.value.countsPoints, let selected, let n = Int(press.characters) else { return .ignored }
             perform(.points(PointScale.values[n - 1]), on: selected)
             return .handled
         default:

@@ -108,6 +108,11 @@ enum TicketOps {
         return (try? context.fetch(descriptor)) ?? []
     }
 
+    /// Every tag in use, most used first.
+    static func allTags(context: ModelContext) -> [String] {
+        TicketTags.allTags(in: ((try? context.fetch(FetchDescriptor<Ticket>())) ?? []).map(\.tags))
+    }
+
     static func allRedemptions(context: ModelContext) -> [Redemption] {
         (try? context.fetch(FetchDescriptor<Redemption>())) ?? []
     }
@@ -129,9 +134,12 @@ enum TicketOps {
         context: ModelContext
     ) -> Ticket {
         let last = tickets(in: status, context: context).last?.sortIndex ?? 0
+        // With rewards off, quick add prefixes like "w:" still make a Need ticket.
+        let category = RewardSettings.isEnabled() ? category : .need
         let ticket = Ticket(
             title: title, notes: notes, category: category, points: points,
-            status: status, sortIndex: last + 1, dueDate: dueDate, tags: tags
+            status: status, sortIndex: last + 1, dueDate: dueDate,
+            tags: TicketTags.canonical(tags, known: allTags(context: context))
         )
         context.insert(ticket)
         save(context)

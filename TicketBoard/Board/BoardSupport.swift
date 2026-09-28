@@ -79,14 +79,119 @@ struct PendingMove: Identifiable {
     let before: Ticket?
 }
 
+/// How each column splits into lanes.
+enum LaneGrouping: String, CaseIterable, Identifiable {
+    case none, category, tag
+
+    static let storageKey = "laneGrouping"
+    /// Older versions stored an on or off "swimlanes" flag, which meant category lanes.
+    static var initial: LaneGrouping { UserDefaults.standard.bool(forKey: "swimlanes") ? .category : .none }
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .none: "None"
+        case .category: "Category"
+        case .tag: "Tag"
+        }
+    }
+
+    var menuTitle: String {
+        switch self {
+        case .none: "No Lanes"
+        case .category: "Lanes by Category"
+        case .tag: "Lanes by Tag"
+        }
+    }
+
+    /// Splits tickets into lanes, keeping their order inside each lane.
+    func lanes(_ tickets: [Ticket]) -> [Lane] {
+        switch self {
+        case .none:
+            return [Lane(heading: .none, tickets: tickets)]
+        case .category:
+            return Category.allCases.compactMap { category in
+                let list = tickets.filter { $0.category == category }
+                return list.isEmpty ? nil : Lane(heading: .category(category), tickets: list)
+            }
+        case .tag:
+            // A ticket with several tags goes in its first tag's lane, like the widget.
+            return TicketTags.lanes(tickets, tags: \.tags).map { lane in
+                Lane(heading: lane.tag.map { .tag($0) } ?? .untagged, tickets: lane.items)
+            }
+        }
+    }
+}
+
+/// A run of tickets under one heading inside a column.
+struct Lane: Identifiable {
+    enum Heading {
+        case none, category(Category), tag(String), untagged
+    }
+
+    let heading: Heading
+    let tickets: [Ticket]
+
+    /// The lane's tag, which cards in it leave out since the heading already shows it.
+    var tag: String? {
+        if case .tag(let tag) = heading { return tag }
+        return nil
+    }
+
+    var id: String {
+        switch heading {
+        case .none: "all"
+        case .category(let category): "category-\(category.rawValue)"
+        case .tag(let tag): "tag-\(tag.lowercased())"
+        case .untagged: "untagged"
+        }
+    }
+}
+
+/// The heading drawn above a lane.
+struct LaneHeadingView: View {
+    let heading: Lane.Heading
+    @AppStorage(TicketTags.plainLaneTitlesKey, store: AppGroup.defaults) private var plainTagTitles = false
+
+    init(heading: Lane.Heading) {
+        self.heading = heading
+    }
+
+    var body: some View {
+        switch heading {
+        case .none:
+            EmptyView()
+        case .category(let category):
+            Label(category.label, systemImage: category.symbol)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(category.color)
+        case .tag(let tag):
+            if plainTagTitles {
+                Text(tag).font(.subheadline.weight(.bold))
+            } else {
+                TagChip(tag: tag, size: 11)
+            }
+        case .untagged:
+            Text("No tag")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
 struct FilterBar: View {
     @Binding var filter: Set<Category>
-    @Binding var swimlanes: Bool
-    var showsSwimlanes = true
+    @Binding var grouping: LaneGrouping
+    @Binding var tag: String?
+    let tags: [String]
+    var categories: [Category] = Category.allCases
+    var showsGrouping = true
 
     var body: some View {
         HStack(spacing: 8) {
-            ForEach(Category.allCases) { category in
+            // A lone Need chip filters nothing, so chips only show with rewards on.
+            ForEach(categories.count > 1 ? categories : []) { category in
                 let on = filter.contains(category)
                 Button {
                     if on, filter.count > 1 { filter.remove(category) } else { filter.insert(category) }
@@ -101,12 +206,58 @@ struct FilterBar: View {
                 .buttonStyle(.plain)
                 .help(on ? "Hide \(category.label) tickets" : "Show \(category.label) tickets")
             }
+            TagFilterPicker(tag: $tag, tags: tags)
+                .fixedSize()
             Spacer()
-            if showsSwimlanes {
-                Toggle("Swimlanes", isOn: $swimlanes)
-                    .toggleStyle(.switch)
-                    .controlSize(.small)
+            if showsGrouping {
+                LaneMenu(grouping: $grouping)
+                    .fixedSize()
+                    .help("Group each column by category or tag")
             }
         }
+    }
+}
+
+/// Picks the lane grouping, plus plain titles when grouping by tag.
+struct LaneMenu: View {
+    @Binding var grouping: LaneGrouping
+    @AppStorage(TicketTags.plainLaneTitlesKey, store: AppGroup.defaults) private var plainTagTitles = false
+
+    init(grouping: Binding<LaneGrouping>) {
+        _grouping = grouping
+    }
+
+    var body: some View {
+        Menu {
+            Picker("Lanes", selection: $grouping) {
+                ForEach(LaneGrouping.allCases) { Text($0.label).tag($0) }
+            }
+            .pickerStyle(.inline)
+            if grouping == .tag {
+                Divider()
+                Toggle("Plain Tag Titles", isOn: $plainTagTitles)
+            }
+        } label: {
+            Label(grouping.menuTitle, systemImage: "rectangle.grid.1x2")
+        }
+    }
+}
+
+/// Picks one tag to show, or all tickets.
+struct TagFilterPicker: View {
+    @Binding var tag: String?
+    let tags: [String]
+
+    var body: some View {
+        Picker(selection: $tag) {
+            Label("All Tags", systemImage: "tag").tag(String?.none)
+            if !tags.isEmpty { Divider() }
+            ForEach(tags, id: \.self) { Text($0).tag(Optional($0)) }
+        } label: {
+            Label("Tag", systemImage: "tag")
+        }
+        .pickerStyle(.menu)
+        .disabled(tags.isEmpty)
+        .help("Show only tickets with one tag")
     }
 }

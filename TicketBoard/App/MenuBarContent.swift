@@ -4,24 +4,27 @@ import SwiftUI
 private struct LiveEngine: DynamicProperty {
     @Query private var tickets: [Ticket]
     @Query private var redemptions: [Redemption]
-    @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
-    @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
+    var rewardSettings = StoredRewardSettings()
 
     var engine: RewardEngine {
         RewardEngine(tickets: tickets, redemptions: redemptions,
-                     settings: RewardSettings(wantRatio: wantRatio, funRatio: funRatio))
+                     settings: rewardSettings.value)
     }
     var allRedemptions: [Redemption] { redemptions }
+    var settings: RewardSettings { rewardSettings.value }
 }
 
 /// Menu bar icon showing available rewards, e.g. "2W · 1F".
 struct MenuBarLabel: View {
     private var live = LiveEngine()
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
 
     var body: some View {
         HStack(spacing: 3) {
             Image("LogoMark")
-            Text(live.engine.menuBarLabel)
+            if rewardsEnabled {
+                Text(live.engine.menuBarLabel)
+            }
         }
     }
 }
@@ -33,8 +36,13 @@ struct MenuBarContent: View {
     @Environment(\.openSettings) private var openSettings
 
     @Query(filter: #Predicate<Ticket> { $0.statusRaw == "upNext" }, sort: \Ticket.sortIndex)
-    private var upNext: [Ticket]
+    private var allUpNext: [Ticket]
     private var live = LiveEngine()
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
+
+    private var upNext: [Ticket] {
+        rewardsEnabled ? allUpNext : allUpNext.filter { !$0.category.isReward }
+    }
 
     @State private var text = ""
 
@@ -42,22 +50,24 @@ struct MenuBarContent: View {
         let engine = live.engine
 
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 14) {
-                ForEach([Category.want, .fun]) { kind in
-                    HStack(spacing: 8) {
-                        RewardRing(kind: kind, engine: engine, lineWidth: 4).frame(width: 34, height: 34)
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(kind.label).font(.caption.weight(.semibold))
-                            Text("\(engine.available(kind)) available")
-                                .font(.caption2)
-                                .foregroundStyle(engine.available(kind) > 0 ? kind.color : .secondary)
+            if rewardsEnabled {
+                HStack(spacing: 14) {
+                    ForEach([Category.want, .fun]) { kind in
+                        HStack(spacing: 8) {
+                            RewardRing(kind: kind, engine: engine, lineWidth: 4).frame(width: 34, height: 34)
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(kind.label).font(.caption.weight(.semibold))
+                                Text("\(engine.available(kind)) available")
+                                    .font(.caption2)
+                                    .foregroundStyle(engine.available(kind) > 0 ? kind.color : .secondary)
+                            }
                         }
                     }
+                    Spacer()
                 }
-                Spacer()
-            }
 
-            Divider()
+                Divider()
+            }
 
             Text("Up Next").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             if upNext.isEmpty {
@@ -85,9 +95,11 @@ struct MenuBarContent: View {
                         .foregroundStyle(ticket.category.color)
                     Text(ticket.title).lineLimit(1)
                     Spacer()
-                    Text("\(ticket.points)")
-                        .font(.caption.monospacedDigit().weight(.semibold))
-                        .foregroundStyle(.secondary)
+                    if live.settings.countsPoints {
+                        Text("\(ticket.points)")
+                            .font(.caption.monospacedDigit().weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
 

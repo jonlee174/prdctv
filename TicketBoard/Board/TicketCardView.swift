@@ -17,13 +17,27 @@ extension RewardEngine {
 }
 
 /// A ticket styled like a physical stub: neutral card, thin category accent edge,
-/// perforated divider, and the points badge on the stub.
+/// perforated divider, and the points badge on the stub. Without points it's a plain card.
 struct TicketCardView: View {
     let ticket: Ticket
-    var lock: LockState = .open
-    var isSelected = false
+    var lock: LockState
+    var isSelected: Bool
+    /// A tag left off the card because its lane heading already shows it.
+    var hiddenTag: String?
+    @AppStorage(RewardSettings.pointsEnabledKey, store: AppGroup.defaults) private var pointsEnabled = true
 
     private let stubWidth: CGFloat = 44
+
+    init(ticket: Ticket, lock: LockState = .open, isSelected: Bool = false, hiddenTag: String? = nil) {
+        self.ticket = ticket
+        self.lock = lock
+        self.isSelected = isSelected
+        self.hiddenTag = hiddenTag
+    }
+
+    private var shape: AnyShape {
+        pointsEnabled ? AnyShape(TicketShape(stubWidth: stubWidth)) : AnyShape(RoundedRectangle(cornerRadius: Radius.small))
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -33,30 +47,32 @@ struct TicketCardView: View {
                 .padding(.trailing, 8)
                 .padding(.vertical, 9)
 
-            Perforation()
-                .stroke(style: StrokeStyle(lineWidth: 1, dash: [2, 3]))
-                .foregroundStyle(.separator)
-                .frame(width: 1)
-                .padding(.vertical, 6)
+            if pointsEnabled {
+                Perforation()
+                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [2, 3]))
+                    .foregroundStyle(.separator)
+                    .frame(width: 1)
+                    .padding(.vertical, 6)
 
-            stub.frame(width: stubWidth)
+                stub.frame(width: stubWidth)
+            }
         }
         .background {
             ZStack(alignment: .leading) {
-                TicketShape(stubWidth: stubWidth).fill(Color.cardBackground)
+                shape.fill(Color.cardBackground)
                 Rectangle().fill(ticket.category.color).frame(width: 4)
             }
-            .clipShape(TicketShape(stubWidth: stubWidth))
+            .clipShape(shape)
         }
         .overlay {
-            TicketShape(stubWidth: stubWidth)
+            shape
                 .stroke(isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(Color.primary.opacity(0.1)), lineWidth: isSelected ? 2 : 1)
         }
         .compositingGroup()
         .shadow(color: .black.opacity(0.08), radius: 2, y: 1)
         .opacity(lock == .locked ? 0.55 : 1)
         .saturation(lock == .locked ? 0.3 : 1)
-        .contentShape(TicketShape(stubWidth: stubWidth))
+        .contentShape(shape)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityText)
     }
@@ -86,13 +102,13 @@ struct TicketCardView: View {
                 .strikethrough(ticket.status == .done, color: .secondary)
 
             if hasMeta {
-                HStack(spacing: 6) {
+                FlowLayout(spacing: 6) {
+                    ForEach(shownTags, id: \.self) { tag in
+                        TagChip(tag: tag)
+                    }
                     if let due = ticket.dueDate {
                         Label(due.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()), systemImage: "calendar")
                             .foregroundStyle(isOverdue ? .red : .secondary)
-                    }
-                    ForEach(ticket.tags, id: \.self) { tag in
-                        Text("#\(tag)").foregroundStyle(.secondary)
                     }
                     if !ticket.notes.isEmpty {
                         Image(systemName: "text.alignleft").foregroundStyle(.tertiary)
@@ -117,7 +133,12 @@ struct TicketCardView: View {
     }
 
     private var hasMeta: Bool {
-        ticket.dueDate != nil || !ticket.tags.isEmpty || !ticket.notes.isEmpty
+        ticket.dueDate != nil || !shownTags.isEmpty || !ticket.notes.isEmpty
+    }
+
+    private var shownTags: [String] {
+        guard let hiddenTag else { return ticket.tags }
+        return ticket.tags.filter { $0.caseInsensitiveCompare(hiddenTag) != .orderedSame }
     }
 
     private var isOverdue: Bool {
@@ -126,7 +147,9 @@ struct TicketCardView: View {
     }
 
     private var accessibilityText: String {
-        var parts = ["\(ticket.category.label) ticket", ticket.title, "\(ticket.points) points"]
+        var parts = ["\(ticket.category.label) ticket", ticket.title]
+        if pointsEnabled { parts.append("\(ticket.points) points") }
+        parts += ticket.tags.map { "tag \($0)" }
         switch lock {
         case .locked: parts.append("locked")
         case .affordable: parts.append("locked, reward available")

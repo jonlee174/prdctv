@@ -20,11 +20,12 @@ struct BoardStats {
     let completions: [(date: Date, points: Int)]
     let calendar: Calendar
 
-    init(tickets: [Ticket], calendar: Calendar = .current) {
+    /// With `settings.countsPoints` off, each completion is worth 1.
+    init(tickets: [Ticket], settings: RewardSettings = RewardSettings(), calendar: Calendar = .current) {
         self.calendar = calendar
         completions = tickets
             .filter { $0.category == .need && $0.status == .done }
-            .compactMap { t in t.completedAt.map { ($0, t.points) } }
+            .compactMap { t in t.completedAt.map { ($0, settings.value(ofPoints: t.points)) } }
             .sorted { $0.date < $1.date }
     }
 
@@ -87,14 +88,15 @@ struct BoardStats {
 struct StatsView: View {
     @Query private var tickets: [Ticket]
     @Query(sort: \Redemption.redeemedAt) private var redemptions: [Redemption]
-    @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
-    @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
+    var rewardSettings = StoredRewardSettings()
     @State private var rewardKind = Category.want
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
 
-    private var settings: RewardSettings { RewardSettings(wantRatio: wantRatio, funRatio: funRatio) }
+    private var settings: RewardSettings { rewardSettings.value }
 
     var body: some View {
-        let stats = BoardStats(tickets: tickets)
+        let stats = BoardStats(tickets: tickets, settings: settings)
+        let unit = settings.countsPoints ? "need pts" : "need tickets"
         let weeks = stats.weeks(count: 12)
         let engine = RewardEngine(tickets: tickets, redemptions: redemptions, settings: settings)
 
@@ -103,12 +105,12 @@ struct StatsView: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
                     tile("Current streak", "\(stats.currentStreak())", unit: "days")
                     tile("Longest streak", "\(stats.longestStreak)", unit: "days")
-                    tile("This week", "\(weeks.last?.points ?? 0)", unit: "need pts")
-                    tile("All time", "\(engine.needPointsDone)", unit: "need pts")
+                    tile("This week", "\(weeks.last?.points ?? 0)", unit: unit)
+                    tile("All time", "\(engine.needPointsDone)", unit: unit)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Need points per week").font(.headline)
+                    Text(settings.countsPoints ? "Need points per week" : "Need tickets per week").font(.headline)
                     Chart(weeks) { week in
                         BarMark(
                             x: .value("Week", week.start, unit: .weekOfYear),
@@ -126,55 +128,57 @@ struct StatsView: View {
                     .frame(height: 180)
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Rewards earned vs. redeemed").font(.headline)
-                        Spacer()
-                        Picker("Reward", selection: $rewardKind) {
-                            Text("Want").tag(Category.want)
-                            Text("Fun").tag(Category.fun)
-                        }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
-                        .frame(width: 140)
-                    }
-                    let series = rewardSeries(stats: stats)
-                    if series.isEmpty {
-                        Text("No rewards yet.").foregroundStyle(.secondary).frame(height: 160)
-                    } else {
-                        Chart(series) { point in
-                            LineMark(
-                                x: .value("Date", point.date),
-                                y: .value("Count", point.count)
-                            )
-                            .interpolationMethod(.stepEnd)
-                            .foregroundStyle(by: .value("Series", point.series))
-                        }
-                        .chartForegroundStyleScale([
-                            "Earned": rewardKind.color,
-                            "Redeemed": Color.secondary,
-                        ])
-                        .frame(height: 180)
-                    }
-                    Text("\(engine.earned(rewardKind)) earned · \(engine.redeemed(rewardKind)) redeemed · \(engine.available(rewardKind)) available")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Redemption history").font(.headline)
-                    if redemptions.isEmpty {
-                        Text("Nothing redeemed yet.").foregroundStyle(.secondary)
-                    }
-                    ForEach(redemptions.reversed().prefix(20)) { r in
+                if rewardsEnabled {
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Image(systemName: r.kind.symbol).foregroundStyle(r.kind.color).font(.caption)
-                            Text(title(for: r))
+                            Text("Rewards earned vs. redeemed").font(.headline)
                             Spacer()
-                            Text(r.redeemedAt.formatted(date: .abbreviated, time: .shortened))
-                                .foregroundStyle(.secondary)
+                            Picker("Reward", selection: $rewardKind) {
+                                Text("Want").tag(Category.want)
+                                Text("Fun").tag(Category.fun)
+                            }
+                            .pickerStyle(.segmented)
+                            .labelsHidden()
+                            .frame(width: 140)
                         }
-                        .font(.callout)
+                        let series = rewardSeries(stats: stats)
+                        if series.isEmpty {
+                            Text("No rewards yet.").foregroundStyle(.secondary).frame(height: 160)
+                        } else {
+                            Chart(series) { point in
+                                LineMark(
+                                    x: .value("Date", point.date),
+                                    y: .value("Count", point.count)
+                                )
+                                .interpolationMethod(.stepEnd)
+                                .foregroundStyle(by: .value("Series", point.series))
+                            }
+                            .chartForegroundStyleScale([
+                                "Earned": rewardKind.color,
+                                "Redeemed": Color.secondary,
+                            ])
+                            .frame(height: 180)
+                        }
+                        Text("\(engine.earned(rewardKind)) earned · \(engine.redeemed(rewardKind)) redeemed · \(engine.available(rewardKind)) available")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Redemption history").font(.headline)
+                        if redemptions.isEmpty {
+                            Text("Nothing redeemed yet.").foregroundStyle(.secondary)
+                        }
+                        ForEach(redemptions.reversed().prefix(20)) { r in
+                            HStack {
+                                Image(systemName: r.kind.symbol).foregroundStyle(r.kind.color).font(.caption)
+                                Text(title(for: r))
+                                Spacer()
+                                Text(r.redeemedAt.formatted(date: .abbreviated, time: .shortened))
+                                    .foregroundStyle(.secondary)
+                            }
+                            .font(.callout)
+                        }
                     }
                 }
             }

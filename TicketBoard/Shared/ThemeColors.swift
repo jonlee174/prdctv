@@ -130,8 +130,6 @@ private struct ThemeColorRow: View {
         _historyRaw = AppStorage(wrappedValue: "", key.defaultsKey + "History", store: AppGroup.defaults)
     }
 
-    private var color: Color { Color(hex: hex) ?? Color(hex: key.suggestedHex)! }
-
     var body: some View {
         HStack(spacing: 12) {
             Text(key.label)
@@ -139,12 +137,9 @@ private struct ThemeColorRow: View {
             if UndoHistory(raw: historyRaw).canUndo {
                 UndoButton(label: key.label, action: undo)
             }
-            ColorPicker(
-                "\(key.label) color",
-                selection: Binding(get: { color }, set: { change(to: $0.hexString) }),
-                supportsOpacity: false
-            )
-            .labelsHidden()
+            HexColorPicker(title: "\(key.label) color", hex: hex.isEmpty ? key.suggestedHex : hex) {
+                change(to: $0)
+            }
             .help("Choose the \(key.label) color")
         }
         .contextMenu {
@@ -172,6 +167,43 @@ private struct ThemeColorRow: View {
     }
 }
 
+/// A ColorPicker that saves "#RRGGBB" but keeps its own color while in use.
+/// Feeding the rounded hex back mid-drag moves the panel's sliders under the mouse.
+struct HexColorPicker: View {
+    let title: String
+    /// The current color, including the default when nothing is chosen.
+    let hex: String
+    let onChange: (String) -> Void
+
+    @State private var color: Color
+    @State private var lastHex: String
+
+    init(title: String, hex: String, onChange: @escaping (String) -> Void) {
+        self.title = title
+        self.hex = hex
+        self.onChange = onChange
+        _color = State(initialValue: Color(hex: hex) ?? .gray)
+        _lastHex = State(initialValue: hex)
+    }
+
+    var body: some View {
+        ColorPicker(title, selection: $color, supportsOpacity: false)
+            .labelsHidden()
+            .onChange(of: color) { _, new in
+                let newHex = new.hexString
+                guard newHex != lastHex else { return }
+                lastHex = newHex
+                onChange(newHex)
+            }
+            .onChange(of: hex) { _, new in
+                // Only outside changes like reset or undo move the picker.
+                guard new.caseInsensitiveCompare(lastHex) != .orderedSame else { return }
+                lastHex = new
+                color = Color(hex: new) ?? color
+            }
+    }
+}
+
 /// The ↺ shown when a setting has changes to undo.
 private struct UndoButton: View {
     let label: String
@@ -191,8 +223,10 @@ private struct UndoButton: View {
 
 /// Settings rows for each category: icon (grid of symbols), color (system color picker), and reset.
 struct CategoryStyleSettings: View {
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
+
     var body: some View {
-        ForEach(Category.allCases) { category in
+        ForEach(Category.shown(rewardsEnabled: rewardsEnabled)) { category in
             CategoryStyleRow(category: category)
         }
     }
@@ -248,16 +282,10 @@ private struct CategoryStyleRow: View {
                 .presentationCompactAdaptation(.popover)
                 #endif
             }
-            ColorPicker(
-                "\(category.label) color",
-                selection: Binding(get: { color }, set: { picked in
-                    let new = picked.hexString
-                    guard new != hex, !(hex.isEmpty && new == category.defaultColorHex) else { return }
-                    apply(color: new, symbol: symbol, continuing: true)
-                }),
-                supportsOpacity: false
-            )
-            .labelsHidden()
+            HexColorPicker(title: "\(category.label) color", hex: hex.isEmpty ? category.defaultColorHex : hex) { new in
+                guard new != hex, !(hex.isEmpty && new == category.defaultColorHex) else { return }
+                apply(color: new, symbol: symbol, continuing: true)
+            }
             .help("Choose the \(category.label) color")
         }
         .contextMenu {

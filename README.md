@@ -12,6 +12,7 @@ Run `make` to list the shortcuts:
 | `make ios` | Build and launch in the iOS Simulator (`SIM="iPhone 17 Pro"` by default) |
 | `make device` | Build, install and launch on your connected iPhone (the first paired device, or `DEVICE=<id>`) |
 | `make mac-demo`, `make ios-demo`, `make device-demo` | The same, but with sample data in an in-memory store. Nothing is saved or synced. |
+| `make widgets` | Restart the Mac widgets so they load the latest build, and warn if a reload fails. `make mac` does this for you. |
 | `make test` | Run the unit tests (built unsigned into `build/test`, so it never replaces the signed app) |
 | `make sims`, `make devices` | List the simulators and devices you can target |
 | `make icons` | Regenerate the app icons and logo mark from `scripts/make_icons.py` |
@@ -73,13 +74,21 @@ Quick-add syntax: `w: rewatch Arrival 2 #movies !sat`. The prefix is `n:`, `w:`,
 
 - Rewards are computed, never stored: `available = floor(needPointsDone / ratio) - redeemed`. The ratios default to 4 for Want and 7 for Fun and can be changed in Settings.
 - Want and Fun counters are independent.
+- Rewards can be turned off in Settings → Rewards (on by default). Off hides the meter, the Redeem commands, reward stats, and Want and Fun tickets, which are kept and come back when rewards are turned on. New tickets are always Need, and the small widget lists Up Next instead of the meter.
+- Settings → Widget → Rewards in the large widget hides the meter on the large size only.
 - Points use the Fibonacci scale: 1, 2, 3, 5, 8.
+- Points can be turned off in Settings → Board (on by default). Off hides point values everywhere, the 1–5 keys do nothing, quick add keeps a trailing number in the title, and each finished Need ticket counts as 1 toward rewards and stats. Stored point values are kept for when points come back on.
 - A Want or Fun ticket stays locked until a reward is spent on it. Moving it into In Progress or Done asks you to confirm first. Deleting an unlocked ticket that isn't done refunds its reward.
+- Tags mark a class or topic. Each tag keeps one color everywhere, picked from its name until you choose one in Settings → Tags. Tag colors are stored per device. The widget shows a ticket's first tag, and the editor suggests tags already in use.
+- The board can show one tag at a time (the Tag menu), and Lanes groups each column by category or by tag. On iPhone both are in the filter menu. With tag lanes, Plain Tag Titles shows headings as bold text, and cards leave out the tag their heading already shows.
+- Settings → Widget → List by tag lists open tickets (In Progress, then Up Next) under bold tag titles instead of by column. Show Miscellaneous adds untagged tickets at the end. The extra-large widget spreads tags across three columns, and a tag that doesn't fit shows its first tickets.
+- The widget shows only open tickets, never Done ones, and no category icons.
 - The board has three columns: Up Next, In Progress, and Done. Older versions had a Backlog column; tickets left there move to the end of Up Next on first launch.
 - The calendar shows tickets on their due dates. Pick a day to see its tickets or add one due that day. Drag a ticket to another day to reschedule it, or drag it in from the Unscheduled list; the + button schedules on the selected day. On iPhone it's the Calendar tab.
 - **Look:** corners use three tight radii (2, 4 and 6 pt, in `Radius` in `Shared/Theme.swift`). The default palette is shades of the logo green, darkened where needed so text stays readable in light and dark mode.
-- Settings → Categories: Need, Want and Fun each get a color (system color picker) and an icon (a grid of 36 symbols), with a reset to the defaults (`#458F32`, `#709929`, `#2A8463`). Open screens redraw when these change, and the widget reloads. Distinct icons keep categories distinguishable when macOS desaturates the widget.
+- Settings → Categories: Need, Want and Fun each get a color (system color picker) and an icon (a grid of 36 symbols), with a reset to the defaults (`#458F32`, `#709929`, `#2A8463`). Open screens redraw when these change, and the widget reloads.
 - Settings → Colors: Up Next, In Progress, Done, Calendar and Accent (buttons, switches, selection, links) are green by default. Every color setting, here and under Categories, works the same way: picking a color applies it immediately, and ↺ returns to the default. Colors are stored per device and also tint the widget's column headings.
+- Appearance is System by default, or Light or Dark (Settings → General on Mac, Settings → Appearance on iPhone). It's stored per device. Widgets always follow the system, since macOS and iOS draw them.
 - Setting keys must not contain dots (e.g. `colorUpNext`, `categoryNeedColor`). SwiftUI watches settings with key-value observing, which treats a dot as a path separator, so a dotted key never tells other views it changed. `LegacySettingsMigration` moves values saved under the old dotted names.
 - `--demo` stores never sync. Before this was fixed, one Mac demo run on 2026-09-26 uploaded its sample records to iCloud; `LeakedDemoCleanup` in `Shared/DemoData.swift` removes exactly those records on launch and can be deleted once every device has run it.
 - The Done column shows the current week, and older tickets move to History. Settings has a toggle to keep them all in Done.

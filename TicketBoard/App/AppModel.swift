@@ -54,7 +54,7 @@ final class AppModel {
         refreshIfNeeded()
         switch DeepLink(url: url) {
         case .ticket(let id): selectedTicketID = id
-        case .redeem: showRedeemPicker = true
+        case .redeem: showRedeemPicker = RewardSettings.isEnabled()
         case .quickAdd:
             // Opening a URL activates the app and makes the board key, which would
             // immediately dismiss the panel; show it once activation settles.
