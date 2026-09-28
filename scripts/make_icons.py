@@ -36,7 +36,7 @@ OUTER = [(0, 0), (81, 0), (93, 12), (93, 93), (12, 93), (0, 81)]
 HOLE = (6, 7, 74, 74)
 SS = 4  # supersampling factor for antialiasing
 
-ASSETS = Path("TicketBoard/Resources/Assets.xcassets")
+ASSETS = Path("prdctv/Resources/Assets.xcassets")
 ICONSET = ASSETS / "AppIcon.appiconset"
 MARKSET = ASSETS / "LogoMark.imageset"
 FULLSET = ASSETS / "LogoFull.imageset"

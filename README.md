@@ -1,96 +1,204 @@
 # prdctv
 
-A SwiftUI app for macOS 14+ and iOS 17+ that replaces the need-to-do / want-to-do whiteboard. Tickets live on a board, and completed need points earn Want and Fun rewards. A desktop widget keeps the board visible.
+A SwiftUI task board for macOS 14+ and iOS 17+ that replaces the need to do and want to do whiteboard. Tickets move from Up Next to In Progress to Done. Finished Need tickets earn Want and Fun rewards, and widgets keep the board visible on the desktop and Home Screen. Tickets sync between devices through the user's private iCloud database.
+
+## Requirements
+
+- Xcode 26 or later, signed in with the Apple ID for team `TTM9BN6M53` (Xcode → Settings → Accounts)
+- XcodeGen (`brew install xcodegen`)
+- Python 3 with Pillow, for `make icons` and `make screenshots`
 
 ## Build and run
 
-Run `make` to list the shortcuts:
+Run `make` to list every command.
 
 | Command | What it does |
 |---|---|
-| `make mac` | Build and launch the Mac app |
+| `make mac` | Build and launch the Mac app, then restart its widgets |
 | `make ios` | Build and launch in the iOS Simulator (`SIM="iPhone 17 Pro"` by default) |
-| `make device` | Build, install and launch on your connected iPhone (the first paired device, or `DEVICE=<id>`) |
-| `make mac-demo`, `make ios-demo`, `make device-demo` | The same, but with sample data in an in-memory store. Nothing is saved or synced. |
-| `make widgets` | Restart the Mac widgets so they load the latest build, and warn if a reload fails. `make mac` does this for you. |
-| `make test` | Run the unit tests (built unsigned into `build/test`, so it never replaces the signed app) |
+| `make device` | Build, install and launch on a connected iPhone (the first paired one, or `DEVICE=<id>`) |
+| `make mac-demo`, `make ios-demo`, `make device-demo` | The same with sample data in an in-memory store. Nothing is saved or synced. |
+| `make widgets` | Restart the Mac widgets so they load the latest build |
+| `make test` | Run the unit tests, built unsigned into `build/test` |
+| `make screenshots` | Capture App Store screenshots for iPhone, iPad and Mac |
+| `make mac-dist` | Build the signed Mac App Store package in `build/dist` for Transporter |
+| `make ios-xcode` | Open the project in Xcode to archive and upload the iOS app |
 | `make sims`, `make devices` | List the simulators and devices you can target |
-| `make icons` | Regenerate the app icons and logo mark from `scripts/make_icons.py` |
+| `make icons` | Regenerate the app icons and logo from `scripts/make_icons.py` |
 | `make clean` | Delete the `build/` folder |
 
-Every command regenerates `TicketBoard.xcodeproj` from `project.yml` with XcodeGen (`brew install xcodegen`) when the spec or file list changed. Edit `project.yml`, not the project file. To work in Xcode, run `make project` and then open the project.
+Every command regenerates `prdctv.xcodeproj` from `project.yml` when the spec or file list changed. Edit `project.yml`, never the project file. To work in Xcode, run `make project` and open the project.
 
-### Name and icons
+## Identifiers
 
-- The app is called **prdctv** (`prdctv.app`). Xcode targets, schemes, Swift types and bundle IDs keep their original `TicketBoard` names, because the bundle IDs, App Group and iCloud container tie the app to its existing data.
-- `scripts/make_icons.py` redraws the logo from its measured geometry. It writes the macOS icon sizes, the iOS icon with dark and tinted variants, `LogoMark` (the square mark, used in the menu bar and quick-add panel), and `LogoFull` (the mark plus the "prdctv" wordmark, used as the title on the Mac window and the iPhone board). It needs Pillow.
-- Colors: the logo file is in Display P3, where the green is `#9FD77F`. The icons are saved as sRGB `#8ED973`, which is the same color. The mark is `#E8E8E8`.
-- The wordmark is set in Bauhaus 93, which comes with Microsoft Office. The script converts it to vector outlines with `scripts/wordmark_outline.swift`, so the app contains artwork, not the font. Regenerating needs the font installed, or `LOGO_FONT=/path/to/Bauhaus93.ttf`.
+| What | ID |
+|---|---|
+| App (Mac and iOS) | `com.jonathanlee.prdctv` |
+| Widget | `com.jonathanlee.prdctv.widget` |
+| App Group on Mac | `TTM9BN6M53.com.jonathanlee.prdctv` |
+| App Group on iOS | `group.com.jonathanlee.prdctv` |
+| iCloud container | `iCloud.com.jonathanlee.prdctv` |
+| Link scheme | `prdctv://` |
 
-### Signing and sync
+Signing is automatic. The `make` commands pass `-allowProvisioningUpdates`, so new devices, IDs and capabilities are registered with Apple for you. If an ID ever changes, update `project.yml` and `prdctv/Shared/AppGroup.swift` together. After 1.0 ships the bundle ID and iCloud container can never change.
 
-- Team `TTM9BN6M53` with automatic signing. The `make` commands pass `-allowProvisioningUpdates`, so new devices and capabilities get registered for you.
-- **App Groups** (app ↔ widget): `TTM9BN6M53.com.jonathanlee.TicketBoard` on macOS and `group.com.jonathanlee.TicketBoard` on iOS.
-- **iCloud:** both apps sync the container `iCloud.com.jonathanlee.TicketBoard` (private database, CloudKit development environment). Widgets don't sync on their own. They share the local store, and the app uploads their changes the next time it runs.
-- If you change an ID, update `project.yml` and `TicketBoard/Shared/AppGroup.swift` together.
-- The reward ratios are stored per device and don't sync.
+Targets are `prdctv` (Mac app), `prdctviOS`, `prdctvWidget`, `prdctvWidgetiOS` and `prdctvTests`, with schemes `prdctv` and `prdctviOS`. The widget kind stays `TicketBoardWidget`, the app's original name, because placed widgets are stored under it.
+
+## iCloud sync
+
+The app and its widget share one local SwiftData store through the App Group. Only the app syncs, using CloudKit's private database. The widget writes to the local store, and the app uploads those changes the next time it runs.
+
+CloudKit has two separate environments.
+
+- **Development** is used by every `make` build. Its schema updates itself whenever the app saves a new kind of record.
+- **Production** is used by App Store and TestFlight builds. Its schema only changes when you deploy it.
+
+Before every release that adds or changes a model property, deploy the schema.
+
+1. Run the app from a `make` build and save a ticket, so the Development schema includes every current field.
+2. Open the [CloudKit Console](https://icloud.developer.apple.com), choose `iCloud.com.jonathanlee.prdctv`, and open Schema.
+3. Choose Deploy Schema Changes and confirm the deploy to Production.
+
+Skipping this breaks sync for every customer on the new version. Production schemas only accept additions, so never rename or remove a stored property on `Ticket` or `Redemption`. Add a new one instead.
+
+`--demo` stores are in memory and never sync.
+
+## Releasing
+
+`release/` holds the Mac export settings (`ExportOptions.plist`), the store listing (`AppStore.md`) and the privacy policy (`privacy-policy.md`).
+
+### Before the first release
+
+1. In App Store Connect, create one app record with both iOS and macOS selected, bundle ID `com.jonathanlee.prdctv` and SKU `prdctv`. The widget ships inside the app and needs no record.
+2. Paste the listing text from `release/AppStore.md`.
+3. Publish `docs/` with GitHub Pages (repository Settings → Pages → deploy from the main branch, folder `/docs`), after replacing `support@example.com` in `docs/index.html` with a real address. Enter the site root as the Support URL and `privacy/` as the Privacy Policy URL.
+
+### Each release
+
+1. Raise `MARKETING_VERSION` in `project.yml` for a new version (for example `1.1`).
+2. Deploy the iCloud schema if any model changed (see iCloud sync).
+3. Run `make test`.
+4. Upload the Mac build.
+   1. Run `make mac-dist`. It archives a Release build and writes `build/dist/prdctv.pkg`. The app is signed with Apple Distribution, the package with the 3rd Party Mac Developer Installer certificate, and the build uses the Production iCloud environment. Before saying the package is ready it runs `scripts/check_mac_package.sh`, which fails if the installer signature or any app icon size up to 1024 pixels is missing. The build number comes from the clock, so every package gets a new one.
+   2. Open Transporter, sign in with the Apple ID for the team, drag in `build/dist/prdctv.pkg` and choose Deliver.
+5. Upload the iOS build.
+   1. Run `make ios-xcode` to open the project in Xcode.
+   2. Choose the `prdctviOS` scheme and Any iOS Device as the destination, then Product → Archive.
+   3. In the Organizer, choose Distribute App, then App Store Connect, and upload. Leave Manage Version and Build Number checked, since the project's own build number stays at 1.
+6. Wait for both builds to finish processing in App Store Connect. They then show up in TestFlight for testing on your own devices.
+7. Run `make screenshots` if the look changed, and upload the images from `build/screenshots`. Each folder matches an App Store Connect slot.
+
+   | Folder | Size | Slot |
+   |---|---|---|
+   | `iphone-6.9` | 1320×2868 | 6.9 inch iPhone |
+   | `iphone-6.5` | 1284×2778 | 6.5 inch iPhone |
+   | `ipad-13` | 2064×2752 | 13 inch iPad |
+   | `mac` | 2560×1600 | Mac |
+
+8. Select the new builds on the version page in App Store Connect and submit for review.
+
+`make screenshots` quits and reopens the Mac app while it runs, and uses light mode and sample data.
+
+## Mac widget troubleshooting
+
+- A rebuilt widget keeps running its old code until its process restarts. `make mac` restarts it, or run `make widgets`.
+- Any other copy of `prdctv.app` that macOS knows about can take over the widget, and it then fails to load. Release archives, the unsigned test build and apps in the Trash have all done this. `make widgets` unregisters every copy except `build/Build/Products/Debug/prdctv.app`. Empty the Trash if an old copy is in it.
+- To see why a widget won't update, read its log with `/usr/bin/log show --last 10m --predicate 'process == "prdctvWidget"'`. Use the full path, since zsh has its own `log` command.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `TicketBoard/Shared/` | Models, `RewardEngine`, `TicketOps`, store, intents, and theme. Compiled into both the app and the widget. |
-| `TicketBoard/Board/` | Board, columns, ticket card, editor, and history |
-| `TicketBoard/Rewards/` | Reward meter and redemption sheet |
-| `TicketBoard/QuickAdd/` | Parser, floating `NSPanel`, and quick-add view |
-| `TicketBoard/Stats/` | Charts and streaks |
-| `TicketBoard/Calendar/` | Month calendar of tickets by due date |
-| `TicketBoard/Import/` | Whiteboard photo OCR import |
-| `TicketBoard/App/` | Mac app entry point, menu bar, and settings |
-| `TicketBoard/iOS/` | iPhone/iPad app: tabbed board, quick-add sheet, and settings |
-| `TicketWidget/` | Widget code, built as a Mac extension and as an iOS extension (`TicketWidgetiOS/` holds the iOS plist) |
-| `TicketBoardTests/` | Reward engine and parser tests |
+| `prdctv/Shared/` | Models, reward math, `TicketOps`, store, tags, theme and intents. Compiled into the apps and the widget. |
+| `prdctv/Board/` | Board, columns, ticket card, editor, history, lanes, tag settings and appearance |
+| `prdctv/Rewards/` | Reward meter and redemption sheet |
+| `prdctv/QuickAdd/` | Quick add parser, floating panel and view |
+| `prdctv/Calendar/` | Month calendar of tickets by due date |
+| `prdctv/Stats/` | Charts and streaks |
+| `prdctv/Import/` | Whiteboard photo import, read on the device with Vision |
+| `prdctv/App/` | Mac app, menu bar item and settings |
+| `prdctv/iOS/` | iPhone and iPad app with tabs, quick add sheet and settings |
+| `prdctvWidget/` | Widget code for both platforms (`prdctvWidgetiOS/` holds the iOS plist and entitlements) |
+| `prdctvTests/` | Tests for rewards, tags, the quick add parser, the calendar grid and undo |
+| `release/` | Export settings, App Store listing and privacy policy |
+| `docs/` | Support and privacy pages for GitHub Pages |
+| `scripts/` | Icon, wordmark and screenshot scripts |
 
-## Keyboard
+## Keyboard on Mac
 
 | Shortcut | Action |
 |---|---|
-| ⌥Space (global, configurable) | Quick add |
-| `N` / ⌘N | New ticket |
+| ⌥Space (global, set in Settings) | Quick add from any app |
+| ⌘K | Quick add |
+| `N` or ⌘N | New ticket |
 | Arrow keys | Move the selection |
-| Space | Advance the selected ticket one column |
+| Space | Move the selected ticket to the next column |
 | Return | Edit the selected ticket |
-| `1`–`5` | Set points to 1, 2, 3, 5, or 8 |
+| Escape | Clear the selection |
+| `1` to `5` | Set points to 1, 2, 3, 5 or 8 (with points on) |
 | ⌘⌫ | Delete the selected ticket |
-| ⌘⇧W / ⌘⇧F | Redeem a Want / Fun reward |
+| ⌘1 and ⌘2 | Show the board or the calendar |
+| ⌘←, ⌘→ and ⌘T | Previous month, next month and today in the calendar |
 | ⌘⇧S | Open Stats |
-| ⌘1 / ⌘2 | Switch the main window between Board and Calendar |
-| ⌘← / ⌘→, ⌘T | Calendar: previous or next month, jump to today |
+| ⌘⇧W and ⌘⇧F | Redeem a Want or Fun reward (with rewards on) |
 | ⌘⇧I | Import a whiteboard photo |
 
-Quick-add syntax: `w: rewatch Arrival 2 #movies !sat`. The prefix is `n:`, `w:`, or `f:`. A trailing number sets points on the 1/2/3/5/8 scale. `#tag` adds a tag. `!today`, `!tmr`, `!fri`, `!3d`, `!10/3`, and `!2026-10-03` set the due date.
+Quick add syntax is `w: rewatch a movie 2 #movies !sat`. The prefix `n:`, `w:` or `f:` picks the category and Need is the default. A trailing 1, 2, 3, 5 or 8 sets the points. `#tag` adds a tag. `!today`, `!tmr`, `!fri`, `!3d`, `!10/3` and `!2026-10-03` set the due date.
 
-## Rules and decisions
+## Product rules
 
-- Rewards are computed, never stored: `available = floor(needPointsDone / ratio) - redeemed`. The ratios default to 4 for Want and 7 for Fun and can be changed in Settings.
-- Want and Fun counters are independent.
-- Rewards can be turned off in Settings → Rewards (on by default). Off hides the meter, the Redeem commands, reward stats, and Want and Fun tickets, which are kept and come back when rewards are turned on. New tickets are always Need, and the small widget lists Up Next instead of the meter.
-- Settings → Widget → Rewards in the large widget hides the meter on the large size only.
-- Points use the Fibonacci scale: 1, 2, 3, 5, 8.
-- Points can be turned off in Settings → Board (on by default). Off hides point values everywhere, the 1–5 keys do nothing, quick add keeps a trailing number in the title, and each finished Need ticket counts as 1 toward rewards and stats. Stored point values are kept for when points come back on.
-- A Want or Fun ticket stays locked until a reward is spent on it. Moving it into In Progress or Done asks you to confirm first. Deleting an unlocked ticket that isn't done refunds its reward.
-- Tags mark a class or topic. Each tag keeps one color everywhere, picked from its name until you choose one in Settings → Tags. Tag colors are stored per device. The widget shows a ticket's first tag, and the editor suggests tags already in use.
-- The board can show one tag at a time (the Tag menu), and Lanes groups each column by category or by tag. On iPhone both are in the filter menu. With tag lanes, Plain Tag Titles shows headings as bold text, and cards leave out the tag their heading already shows.
-- Settings → Widget → List by tag lists open tickets (In Progress, then Up Next) under bold tag titles instead of by column. Show Miscellaneous adds untagged tickets at the end. The extra-large widget spreads tags across three columns, and a tag that doesn't fit shows its first tickets.
-- The widget shows only open tickets, never Done ones, and no category icons.
-- The board has three columns: Up Next, In Progress, and Done. Older versions had a Backlog column; tickets left there move to the end of Up Next on first launch.
-- The calendar shows tickets on their due dates. Pick a day to see its tickets or add one due that day. Drag a ticket to another day to reschedule it, or drag it in from the Unscheduled list; the + button schedules on the selected day. On iPhone it's the Calendar tab.
-- **Look:** corners use three tight radii (2, 4 and 6 pt, in `Radius` in `Shared/Theme.swift`). The default palette is shades of the logo green, darkened where needed so text stays readable in light and dark mode.
-- Settings → Categories: Need, Want and Fun each get a color (system color picker) and an icon (a grid of 36 symbols), with a reset to the defaults (`#458F32`, `#709929`, `#2A8463`). Open screens redraw when these change, and the widget reloads.
-- Settings → Colors: Up Next, In Progress, Done, Calendar and Accent (buttons, switches, selection, links) are green by default. Every color setting, here and under Categories, works the same way: picking a color applies it immediately, and ↺ returns to the default. Colors are stored per device and also tint the widget's column headings.
-- Appearance is System by default, or Light or Dark (Settings → General on Mac, Settings → Appearance on iPhone). It's stored per device. Widgets always follow the system, since macOS and iOS draw them.
-- Setting keys must not contain dots (e.g. `colorUpNext`, `categoryNeedColor`). SwiftUI watches settings with key-value observing, which treats a dot as a path separator, so a dotted key never tells other views it changed. `LegacySettingsMigration` moves values saved under the old dotted names.
-- `--demo` stores never sync. Before this was fixed, one Mac demo run on 2026-09-26 uploaded its sample records to iCloud; `LeakedDemoCleanup` in `Shared/DemoData.swift` removes exactly those records on launch and can be deleted once every device has run it.
-- The Done column shows the current week, and older tickets move to History. Settings has a toggle to keep them all in Done.
-- The Mac board and the iPhone board share views and rules: the ticket card, the editor, rewards, stats, and the unlock dialogs in `Board/BoardSupport.swift`.
-- On iPhone, a segmented control switches between columns. Swipe right to advance a ticket, swipe left to delete it, and long-press for move, points, and edit. Tickets can't be reordered within a column on iPhone.
+### Board
+
+- Three columns, Up Next, In Progress and Done. Done shows the current week and older tickets move to History, unless Settings keeps them all in Done.
+- The Tag menu shows one tag at a time. Lanes groups each column by category or by tag, and on iPhone both are in the filter menu.
+- A card leaves out whatever its lane heading already says. Tag lanes hide tags and category lanes hide the Need, Want or Fun label, with a locked reward's lock moving beside the title. Changing lanes rebuilds the cards.
+- On iPhone a segmented control switches columns. Swipe right to advance, swipe left to delete and long press for more. Tickets can't be reordered within a column on iPhone.
+- The calendar shows tickets on their due dates. Drag a ticket to another day, or in from Unscheduled, to reschedule it.
+
+### Rewards and points
+
+- Rewards are computed, never stored. `available = floor(needPointsDone / ratio) - redeemed`, with ratios of 4 for Want and 7 for Fun by default. Want and Fun count independently from the same Need points.
+- Points use the scale 1, 2, 3, 5 and 8.
+- A Want or Fun ticket stays locked until a reward is spent on it. Moving it to In Progress or Done asks first. Deleting an unlocked ticket that isn't done refunds the reward.
+- Rewards can be turned off in Settings. That hides the meter, the Redeem commands, reward stats and Want and Fun tickets, which come back unchanged when rewards are turned on. New tickets are always Need while rewards are off.
+- Points can be turned off in Settings. That hides point values, and each finished Need ticket then counts as 1 toward rewards and stats. Switching changes the current balance, which can drop below zero. Stored point values are kept.
+
+### Tags
+
+- Tags are free text and keep the case they were typed in, so class codes like `Chem 101` read naturally. Tags that differ only in case are treated as one.
+- Each tag has one color everywhere. It comes from the tag's name until one is chosen in Settings → Tags.
+- The editor suggests tags already in use.
+
+### Widgets
+
+- Sizes are small (reward meter, or Up Next when rewards are off), medium (Need tickets in Up Next), large (meter, In Progress and Up Next) and extra large (meter and two columns).
+- The widget shows only open tickets and never shows category icons. Rows show their first tag.
+- Settings → Widget has List by tag, which lists open tickets under bold tag titles, Show miscellaneous for untagged tickets, and whether the large size shows the reward meter. These apply to every prdctv widget.
+- Widgets have no Edit Widget options on purpose. That kind of widget never received its settings in development builds.
+
+### Look and settings
+
+- Corners use three radii, 2, 4 and 6 points (`Radius` in `Shared/Theme.swift`). The default palette is shades of the logo green.
+- Settings covers category colors and icons, column and accent colors, tag colors, rewards, points, widgets, the quick add shortcut, launch at login and appearance (System, Light or Dark). Appearance and colors are stored per device.
+- Setting keys must not contain dots. SwiftUI watches settings with key value observing, which reads a dot as a path, so a dotted key never tells other views it changed.
+
+### Logo
+
+- `scripts/make_icons.py` redraws the logo and writes every icon size, the iOS dark and tinted variants, `LogoMark` and `LogoFull`.
+- The logo green is `#9FD77F` in Display P3, saved in the icons as the matching sRGB `#8ED973`. The mark is `#E8E8E8`.
+- The wordmark is set in Bauhaus 93 and converted to outlines by `scripts/wordmark_outline.swift`, so the app ships artwork, not the font. Regenerating needs the font installed, or `LOGO_FONT=/path/to/Bauhaus93.ttf`.
+
+## Debug launch options
+
+Development builds accept these options, for example `open build/Build/Products/Debug/prdctv.app --args --demo --mode=calendar`.
+
+| Option | Effect |
+|---|---|
+| `--demo` | Sample data in memory, never saved or synced |
+| `--mode=board` or `--mode=calendar` | Mac view at launch |
+| `--lanes=none`, `category` or `tag` | Lanes for this launch only |
+| `--appearance=light` or `dark` | Appearance for this launch only |
+| `--window-size=1280x800` | Mac window size |
+| `--tab calendar` | iPhone tab at launch |
+
+On Mac, join each value with `=`. A value passed as a separate word makes macOS treat the launch as opening a file, and the app then opens no window.
