@@ -44,12 +44,21 @@ enum TicketTags {
         allTags(in: tagLists).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
     }
 
-    /// Groups items by their first tag, alphabetical with untagged last, keeping order inside each group.
-    static func lanes<Item>(_ items: [Item], tags: (Item) -> [String]) -> [(tag: String?, items: [Item])] {
+    /// Groups items by their first tag, ordered by `order`, with untagged last.
+    static func lanes<Item>(_ items: [Item], tags: (Item) -> [String], dueDate: (Item) -> Date? = { _ in nil },
+                            order: TagLaneOrder = TagLaneOrder()) -> [(tag: String?, items: [Item])] {
         let groups = Dictionary(grouping: items) { tags($0).first?.lowercased() }
-        var lanes: [(tag: String?, items: [Item])] = sortedTags(in: items.compactMap { tags($0).first.map { [$0] } })
-            .map { (tag: $0, items: groups[$0.lowercased()]!) }
-        if let untagged = groups[nil] { lanes.append((tag: nil, items: untagged)) }
+        func sortedItems(_ list: [Item]) -> [Item] {
+            guard order.tasks == .dueDate else { return list }
+            // Soonest first, undated last, ties keep board order.
+            return list.enumerated()
+                .sorted { (dueDate($0.element) ?? .distantFuture, $0.offset) < (dueDate($1.element) ?? .distantFuture, $1.offset) }
+                .map(\.element)
+        }
+        func soonest(_ key: String) -> Date { groups[key]!.compactMap(dueDate).min() ?? .distantFuture }
+        let names = order.sorted(sortedTags(in: items.compactMap { tags($0).first.map { [$0] } }), soonest: soonest)
+        var lanes: [(tag: String?, items: [Item])] = names.map { (tag: $0, items: sortedItems(groups[$0.lowercased()]!)) }
+        if let untagged = groups[nil] { lanes.append((tag: nil, items: sortedItems(untagged))) }
         return lanes
     }
 
@@ -80,12 +89,22 @@ enum TicketTags {
         return tags.contains { $0.caseInsensitiveCompare(tag) == .orderedSame }
     }
 
+    /// Settings keys for tag lane order, stored where the widget can read them.
+    static let tagOrderKey = "tagOrder"
+    static let tagPriorityKey = "tagPriority"
+    static let tagTaskOrderKey = "tagTaskOrder"
+
     /// Settings key for showing tag lane headings as plain bold text instead of colored chips.
     static let plainLaneTitlesKey = "tagLanePlainTitles"
 
     /// Settings keys for the widget's List by Tag layout, set in the app's Settings and read by the widget.
     static let widgetListByTagKey = "widgetListByTag"
     static let widgetShowsMiscellaneousKey = "widgetShowsMiscellaneous"
+    /// Widget rows show due dates. Off by default.
+    static let widgetShowsDueDatesKey = "widgetShowsDueDates"
+
+    /// Tasks take their first tag's color, or standard green without a tag. On by default.
+    static let colorTasksByTagKey = "colorTasksByTag"
 
     /// Settings key for chosen tag colors, stored as one "tag\t#RRGGBB" line per tag.
     static let colorsKey = "tagColors"
@@ -114,5 +133,59 @@ enum TicketTags {
             hash = hash &* 16_777_619
         }
         return Int(hash % UInt32(count))
+    }
+}
+
+/// How tag lanes are ordered on the board and in the widget, and how tasks are ordered inside them.
+struct TagLaneOrder: Equatable {
+    enum Tags: String { case custom, dueDate }
+    enum Tasks: String { case board, dueDate }
+
+    var tags: Tags = .custom
+    var tasks: Tasks = .board
+    /// Lowercased tags in the user's priority order. Tags not listed come after, alphabetical.
+    var priority: [String] = []
+
+    init(tags: Tags = .custom, tasks: Tasks = .board, priority: [String] = []) {
+        self.tags = tags
+        self.tasks = tasks
+        self.priority = priority
+    }
+
+    init(tagsRaw: String, tasksRaw: String, priorityRaw: String) {
+        self.init(tags: Tags(rawValue: tagsRaw) ?? .custom, tasks: Tasks(rawValue: tasksRaw) ?? .board,
+                  priority: Self.decodePriority(priorityRaw))
+    }
+
+    static func load(_ defaults: UserDefaults = AppGroup.defaults) -> TagLaneOrder {
+        TagLaneOrder(tagsRaw: defaults.string(forKey: TicketTags.tagOrderKey) ?? "",
+                     tasksRaw: defaults.string(forKey: TicketTags.tagTaskOrderKey) ?? "",
+                     priorityRaw: defaults.string(forKey: TicketTags.tagPriorityKey) ?? "")
+    }
+
+    /// One lowercased tag per line.
+    static func decodePriority(_ raw: String) -> [String] {
+        raw.split(separator: "\n").map { $0.lowercased() }
+    }
+
+    static func encodePriority(_ tags: [String]) -> String {
+        tags.map { $0.lowercased() }.joined(separator: "\n")
+    }
+
+    /// Tags in priority order, unranked ones after in alphabetical order.
+    func byPriority(_ names: [String]) -> [String] {
+        let rank = Dictionary(priority.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
+        return names.sorted {
+            let a = rank[$0.lowercased()] ?? .max, b = rank[$1.lowercased()] ?? .max
+            return a != b ? a < b : $0.localizedStandardCompare($1) == .orderedAscending
+        }
+    }
+
+    /// Orders lane names. `soonest` gives a tag's earliest due date, keyed by lowercased tag.
+    func sorted(_ names: [String], soonest: (String) -> Date) -> [String] {
+        let custom = byPriority(names)
+        guard tags == .dueDate else { return custom }
+        let position = Dictionary(custom.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
+        return custom.sorted { (soonest($0.lowercased()), position[$0]!) < (soonest($1.lowercased()), position[$1]!) }
     }
 }

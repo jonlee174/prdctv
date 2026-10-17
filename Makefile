@@ -1,7 +1,7 @@
 # Build-and-run shortcuts. `make` with no target lists them.
 #
 #   make mac               build and launch the Mac app
-#   make ios               build and launch in the iOS Simulator (SIM="iPhone 17 Pro")
+#   make ios               run in Xcode on the iOS Simulator (SIM="iPhone 17 Pro")
 #   make device            build, install and launch on a connected iPhone (DEVICE=<id>)
 #   add -demo to any of those for sample data in a throwaway store, e.g. `make ios-demo`
 
@@ -26,7 +26,7 @@ SHELL       := /bin/bash
 .SHELLFLAGS := -o pipefail -c
 
 .DEFAULT_GOAL := help
-.PHONY: icons help project widgets mac mac-demo mac-build mac-dist ios-xcode screenshots ios ios-demo ios-build device device-demo device-build \
+.PHONY: icons help project widgets widgets-store restart-widgets mac mac-demo mac-build mac-dist ios-xcode screenshots store-art ios ios-demo ios-build device device-demo device-build \
         test sims devices clean
 
 help:
@@ -34,15 +34,17 @@ help:
 	@echo ""
 	@echo "  make mac            Build and launch the Mac app"
 	@echo "  make mac-demo       ...with sample data (in-memory, nothing saved)"
-	@echo "  make ios            Build and launch in the Simulator ($(SIM))"
+	@echo "  make ios            Run in Xcode on the $(SIM) simulator"
 	@echo "  make ios-demo       ...with sample data"
 	@echo "  make device         Build, install and launch on your iPhone"
 	@echo "  make device-demo    ...with sample data"
-	@echo "  make widgets        Restart the Mac widgets so they load the latest build"
+	@echo "  make widgets        Make the Mac widget use the development build and restart it"
+	@echo "  make widgets-store  Give the Mac widget back to the App Store copy"
 	@echo "  make test           Run unit tests"
 	@echo "  make mac-dist       Build the signed Mac App Store package for Transporter (build/dist)"
 	@echo "  make ios-xcode      Open the project in Xcode to archive and upload the iOS app"
 	@echo "  make screenshots    Capture App Store screenshots for iPhone, iPad and Mac (build/screenshots)"
+	@echo "  make store-art      Make the App Store header and search results art (build/store-art)"
 	@echo "  make sims           List simulators (use SIM=\"<name>\")"
 	@echo "  make devices        List connected devices (use DEVICE=<identifier>)"
 	@echo "  make project        Regenerate the Xcode project from project.yml"
@@ -69,11 +71,31 @@ mac-demo: mac-build
 	@$(MAKE) --no-print-directory widgets
 
 # A running widget process keeps its old code, so restart it and chronod, which launchd brings back.
+STORE_APP := /Applications/prdctv.app
+
+# Makes the development build own the Mac widget. Every other copy with the same app ID is set aside,
+# including the App Store copy in /Applications. `make widgets-store` switches back.
 widgets:
-	@# Only the development app may own the widget. Archive, test and trashed copies take it over otherwise.
-	@for app in $$(find $(CURDIR)/$(DERIVED) ~/.Trash -name prdctv.app -prune 2>/dev/null | grep -v '^$(CURDIR)/$(MAC_APP)$$' | grep -v iphone); do \
+	@for app in $$(find $(CURDIR)/$(DERIVED) ~/Library/Developer/Xcode/DerivedData ~/.Trash -name prdctv.app -prune 2>/dev/null \
+		| grep -v '^$(CURDIR)/$(MAC_APP)$$' | grep -v iphone) $(STORE_APP); do \
+		[ -e "$$app/Contents/PlugIns" ] && for ext in "$$app"/Contents/PlugIns/*.appex; do pluginkit -r "$$ext" 2>/dev/null; done; \
 		$(LSREGISTER) -u "$$app" 2>/dev/null || true; done
 	@$(LSREGISTER) -f -R $(MAC_APP)
+	@pluginkit -a $(MAC_APP)/Contents/PlugIns/prdctvWidget.appex
+	@$(MAKE) --no-print-directory restart-widgets
+	@echo "Widgets now come from the development build. Run make widgets-store to go back to the App Store copy."
+
+# Gives the widget back to the App Store copy in /Applications.
+widgets-store:
+	@[ -d $(STORE_APP) ] || (echo "No App Store copy at $(STORE_APP)" && exit 1)
+	@pluginkit -r $(MAC_APP)/Contents/PlugIns/prdctvWidget.appex 2>/dev/null || true
+	@$(LSREGISTER) -u $(CURDIR)/$(MAC_APP) 2>/dev/null || true
+	@$(LSREGISTER) -f -R $(STORE_APP)
+	@pluginkit -a $(STORE_APP)/Contents/PlugIns/prdctvWidget.appex
+	@$(MAKE) --no-print-directory restart-widgets
+	@echo "Widgets now come from the App Store copy."
+
+restart-widgets:
 	@pkill -f 'prdctvWidget.appex/Contents/MacOS/prdctvWidget' || true
 	@killall chronod 2>/dev/null || true
 	@echo "Widgets restarted"
@@ -86,18 +108,14 @@ widgets:
 ios-build: project
 	$(XCODEBUILD) -scheme prdctviOS -destination 'platform=iOS Simulator,name=$(SIM)' build
 
-define launch_sim
-	@xcrun simctl boot "$(SIM)" 2>/dev/null || true
-	@open -a Simulator
-	xcrun simctl install "$(SIM)" $(SIM_APP)
-	xcrun simctl launch --terminate-running-process "$(SIM)" $(BUNDLE_ID) $(1)
-endef
 
-ios: ios-build
-	$(call launch_sim,)
+# Xcode 27 has no separate Simulator app, so Xcode runs the app to show the simulator.
+# The first run asks to allow controlling Xcode (System Settings → Privacy & Security → Automation).
+ios: project
+	@osascript scripts/run_in_xcode.applescript "$(CURDIR)/$(PROJECT)" prdctviOS "$(SIM)"
 
-ios-demo: ios-build
-	$(call launch_sim,--demo)
+ios-demo: project
+	@osascript scripts/run_in_xcode.applescript "$(CURDIR)/$(PROJECT)" prdctviOS "$(SIM)" --demo
 
 # MARK: iOS device
 
@@ -141,6 +159,10 @@ ios-xcode: project
 
 screenshots: project
 	scripts/screenshots.sh
+
+# Product page header (3840x1646) and search results art (3840x2560) from fresh iPhone screenshots.
+store-art: ios-build
+	@scripts/store_art.sh
 
 # MARK: Other
 

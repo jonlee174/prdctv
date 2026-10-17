@@ -35,6 +35,8 @@ Tags
 • Tag tasks by class, project or topic, such as Chemistry
 • Each tag keeps one color, which you can change
 • Show one tag at a time, or group every column by tag
+• Order tags by your own priority or by the soonest due date, and sort tasks inside a tag by due date
+• Color each task by its tag
 
 Rewards
 • Choose how many need points earn a Want or Fun reward
@@ -44,6 +46,7 @@ Widgets
 • See your board and reward meter on the desktop or Home Screen
 • Check off tasks from the widget
 • List tasks under their tags, with untagged tasks at the end
+• Show due dates, with the weekday for the coming week
 
 Quick add
 • Type a task in one line with points, tags and a due date, such as "read chapter 4 3 #history !fri"
@@ -55,6 +58,16 @@ Make it yours
 • Use light mode, dark mode or your system setting
 
 Your tasks sync between your Mac, iPhone and iPad through your own iCloud account. prdctv has no accounts, ads or tracking.
+
+## What's New in 1.1 (4000)
+
+• Order tag lanes your way. Set a priority with the arrows in Settings, or put the tag with the soonest due task first.
+• Sort the tasks inside each tag by due date.
+• Tasks now take the color of their first tag, and green without one. Turn this off in Settings to use category colors.
+• The widget can show due dates, with the weekday for the coming week and the date after that.
+• The extra large widget lists tags in two columns.
+• Due dates are picked by month and day and land on the next time that date comes around.
+• With Want and Fun turned off, cards no longer show the Need label, and cards without a date keep the same height as the rest.
 
 ## Keywords (100)
 

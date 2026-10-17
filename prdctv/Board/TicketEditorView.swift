@@ -14,7 +14,10 @@ struct TicketEditorView: View {
     @State private var category = Category.need
     @State private var points = 1
     @State private var hasDue = false
-    @State private var dueDate = Calendar.current.startOfDay(for: Date())
+    @State private var dueMonth = Calendar.current.component(.month, from: Date())
+    @State private var dueDay = Calendar.current.component(.day, from: Date())
+    /// The date the ticket opened with, kept while its month and day are unchanged so overdue dates don't jump a year.
+    @State private var originalDue: Date?
     @State private var tags: [String] = []
     @State private var tagText = ""
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
@@ -47,7 +50,17 @@ struct TicketEditorView: View {
 
                 Toggle("Due date", isOn: $hasDue)
                 if hasDue {
-                    DatePicker("Due", selection: $dueDate, displayedComponents: .date)
+                    // No year to pick. The date is the next time this month and day comes around.
+                    Picker("Month", selection: $dueMonth) {
+                        ForEach(1...12, id: \.self) { Text(Calendar.current.monthSymbols[$0 - 1]).tag($0) }
+                    }
+                    Picker("Day", selection: $dueDay) {
+                        ForEach(1...DueDates.maxDay(inMonth: dueMonth), id: \.self) { Text("\($0)").tag($0) }
+                    }
+                    if let due = resolvedDue {
+                        Text("Due \(dueText(due))")
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 TagField(tags: $tags, text: $tagText, known: knownTags)
@@ -75,6 +88,7 @@ struct TicketEditorView: View {
         }
         .macFrame(width: 440)
         .onAppear(perform: load)
+        .onChange(of: dueMonth) { dueDay = min(dueDay, DueDates.maxDay(inMonth: dueMonth)) }
     }
 
     private var knownTags: [String] {
@@ -86,10 +100,34 @@ struct TicketEditorView: View {
         return false
     }
 
+    private func setDue(_ date: Date) {
+        let day = Calendar.current.startOfDay(for: date)
+        originalDue = day
+        dueMonth = Calendar.current.component(.month, from: day)
+        dueDay = Calendar.current.component(.day, from: day)
+    }
+
+    /// The original date while the month and day match it, otherwise the next time they come around.
+    private var resolvedDue: Date? {
+        let calendar = Calendar.current
+        if let originalDue, calendar.component(.month, from: originalDue) == dueMonth,
+           calendar.component(.day, from: originalDue) == dueDay {
+            return originalDue
+        }
+        return DueDates.nextOccurrence(month: dueMonth, day: dueDay)
+    }
+
+    /// Weekday and date, with the year only when it isn't this year.
+    private func dueText(_ date: Date) -> String {
+        let sameYear = Calendar.current.isDate(date, equalTo: Date(), toGranularity: .year)
+        return sameYear ? date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
+            : date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day().year())
+    }
+
     private func load() {
         if case .new(_, let due?) = target {
             hasDue = true
-            dueDate = Calendar.current.startOfDay(for: due)
+            setDue(due)
         }
         if case .existing(let ticket) = target {
             title = ticket.title
@@ -97,7 +135,7 @@ struct TicketEditorView: View {
             category = ticket.category
             points = ticket.points
             hasDue = ticket.dueDate != nil
-            dueDate = ticket.dueDate ?? dueDate
+            if let due = ticket.dueDate { setDue(due) }
             tags = ticket.tags
         }
         titleFocused = true
@@ -106,7 +144,7 @@ struct TicketEditorView: View {
     private func save() {
         let tags = TicketTags.canonical(self.tags + tagText.split(separator: ",").map(String.init), known: knownTags)
         let cleanTitle = title.trimmingCharacters(in: .whitespaces)
-        let due = hasDue ? dueDate : nil
+        let due = hasDue ? resolvedDue : nil
 
         switch target {
         case .new(let status, _):
@@ -192,6 +230,8 @@ struct HistoryView: View {
     @Query(filter: #Predicate<Ticket> { $0.statusRaw == "done" }, sort: \Ticket.completedAt, order: .reverse)
     private var done: [Ticket]
     @AppStorage(RewardSettings.pointsEnabledKey, store: AppGroup.defaults) private var pointsEnabled = true
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
+    var coloring = TaskColoring()
 
     private var weeks: [(start: Date, tickets: [Ticket])] {
         let cal = Calendar.current
@@ -223,9 +263,9 @@ struct HistoryView: View {
                         Section {
                             ForEach(week.tickets) { ticket in
                                 HStack {
-                                    Image(systemName: ticket.category.symbol)
-                                        .foregroundStyle(ticket.category.color)
-                                        .font(.caption)
+                                    Image(systemName: rewardsEnabled ? ticket.category.symbol : "circle.fill")
+                                        .foregroundStyle(coloring.color(category: ticket.category, tags: ticket.tags))
+                                        .font(rewardsEnabled ? .caption : .system(size: 6))
                                     Text(ticket.title)
                                     Spacer()
                                     if pointsEnabled {

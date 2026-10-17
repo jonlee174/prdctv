@@ -10,6 +10,7 @@ struct TicketSnapshot: Identifiable, Hashable {
     let points: Int
     let locked: Bool
     var tags: [String] = []
+    var dueDate: Date?
 }
 
 struct BoardEntry: TimelineEntry {
@@ -20,6 +21,7 @@ struct BoardEntry: TimelineEntry {
     /// From the app's Settings, shared by every prdctv widget.
     var listByTag = false
     var showsMiscellaneous = true
+    var tagOrder = TagLaneOrder()
     var rewardsEnabled = true
     var pointsEnabled = true
     /// Whether the large widget shows the reward meter.
@@ -31,7 +33,8 @@ struct BoardEntry: TimelineEntry {
 
     /// Open tickets under their first tag, In Progress before Up Next inside each tag.
     var tagLanes: [(tag: String?, items: [TicketSnapshot])] {
-        TicketTags.lanes(inProgress + upNext, tags: \.tags).filter { $0.tag != nil || showsMiscellaneous }
+        TicketTags.lanes(inProgress + upNext, tags: \.tags, dueDate: \.dueDate, order: tagOrder)
+            .filter { $0.tag != nil || showsMiscellaneous }
     }
 
 }
@@ -45,8 +48,11 @@ struct BoardProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<BoardEntry>) -> Void) {
-        // App and intent writes reload immediately; this is just a safety refresh.
-        let next = Calendar.current.date(byAdding: .hour, value: 1, to: Date())!
+        // App and intent writes reload immediately. This refresh also rolls weekday labels over at midnight.
+        let calendar = Calendar.current
+        let hourLater = calendar.date(byAdding: .hour, value: 1, to: Date())!
+        let midnight = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date()))!
+        let next = min(hourLater, midnight)
         completion(Timeline(entries: [Self.load()], policy: .after(next)))
     }
 
@@ -60,7 +66,8 @@ struct BoardProvider: TimelineProvider {
         func snapshots(_ status: Status) -> [TicketSnapshot] {
             tickets.filter { $0.status == status && (rewardsEnabled || !$0.category.isReward) }.map {
                 TicketSnapshot(id: $0.id, title: $0.title, category: $0.category,
-                               points: $0.points, locked: $0.isLocked(redemptions: redemptions), tags: $0.tags)
+                               points: $0.points, locked: $0.isLocked(redemptions: redemptions), tags: $0.tags,
+                               dueDate: $0.dueDate)
             }
         }
 
@@ -71,6 +78,7 @@ struct BoardProvider: TimelineProvider {
             inProgress: snapshots(.inProgress),
             listByTag: AppGroup.defaults.bool(forKey: TicketTags.widgetListByTagKey),
             showsMiscellaneous: AppGroup.defaults.object(forKey: TicketTags.widgetShowsMiscellaneousKey) as? Bool ?? true,
+            tagOrder: TagLaneOrder.load(),
             rewardsEnabled: rewardsEnabled,
             pointsEnabled: RewardSettings.pointsEnabled(),
             showsLargeMeterSetting: AppGroup.defaults.object(forKey: RewardSettings.largeWidgetShowsMeterKey) as? Bool ?? true
@@ -80,15 +88,16 @@ struct BoardProvider: TimelineProvider {
 
 extension BoardEntry {
     static let sample: BoardEntry = {
-        func t(_ title: String, _ cat: Category, _ pts: Int, locked: Bool = false, tags: [String] = []) -> TicketSnapshot {
-            TicketSnapshot(id: UUID(), title: title, category: cat, points: pts, locked: locked, tags: tags)
+        func t(_ title: String, _ cat: Category, _ pts: Int, locked: Bool = false, tags: [String] = [], dueIn: Int? = nil) -> TicketSnapshot {
+            let due = dueIn.flatMap { Calendar.current.date(byAdding: .day, value: $0, to: Calendar.current.startOfDay(for: Date())) }
+            return TicketSnapshot(id: UUID(), title: title, category: cat, points: pts, locked: locked, tags: tags, dueDate: due)
         }
         return BoardEntry(
             date: Date(),
             engine: RewardEngine(needPointsDone: 11, redeemedWant: 1, redeemedFun: 0),
-            upNext: [t("Study for chemistry quiz", .need, 3, tags: ["Chemistry"]), t("Call the dentist", .need, 1),
+            upNext: [t("Study for chemistry quiz", .need, 3, tags: ["Chemistry"], dueIn: 1), t("Call the dentist", .need, 1, dueIn: -1),
                      t("Renew passport", .need, 2, tags: ["errand"]), t("Rewatch a favorite movie", .want, 2, locked: true)],
-            inProgress: [t("Algebra worksheet", .need, 8, tags: ["Algebra"]), t("Board game night", .fun, 1)]
+            inProgress: [t("Algebra worksheet", .need, 8, tags: ["Algebra"], dueIn: 12), t("Board game night", .fun, 1)]
         )
     }()
 }

@@ -15,12 +15,14 @@ Run `make` to list every command.
 | Command | What it does |
 |---|---|
 | `make mac` | Build and launch the Mac app, then restart its widgets |
-| `make ios` | Build and launch in the iOS Simulator (`SIM="iPhone 17 Pro"` by default) |
+| `make ios` | Run in Xcode on the iOS Simulator (`SIM="iPhone 17 Pro"` by default). Xcode builds, shows the simulator and launches the app. |
 | `make device` | Build, install and launch on a connected iPhone (the first paired one, or `DEVICE=<id>`) |
 | `make mac-demo`, `make ios-demo`, `make device-demo` | The same with sample data in an in-memory store. Nothing is saved or synced. |
-| `make widgets` | Restart the Mac widgets so they load the latest build |
+| `make widgets` | Make the Mac widget use the development build and restart it. `make mac` does this for you. |
+| `make widgets-store` | Give the Mac widget back to the App Store copy in `/Applications` |
 | `make test` | Run the unit tests, built unsigned into `build/test` |
 | `make screenshots` | Capture App Store screenshots for iPhone, iPad and Mac |
+| `make store-art` | Make the App Store product page header (3840×1646) and search results art (3840×2560) in `build/store-art` from fresh iPhone screenshots |
 | `make mac-dist` | Build the signed Mac App Store package in `build/dist` for Transporter |
 | `make ios-xcode` | Open the project in Xcode to archive and upload the iOS app |
 | `make sims`, `make devices` | List the simulators and devices you can target |
@@ -153,6 +155,7 @@ Quick add syntax is `w: rewatch a movie 2 #movies !sat`. The prefix `n:`, `w:` o
 - The Tag menu shows one tag at a time. Lanes groups each column by category or by tag, and on iPhone both are in the filter menu.
 - A card leaves out whatever its lane heading already says. Tag lanes hide tags and category lanes hide the Need, Want or Fun label, with a locked reward's lock moving beside the title. Changing lanes rebuilds the cards.
 - On iPhone a segmented control switches columns. Swipe right to advance, swipe left to delete and long press for more. Tickets can't be reordered within a column on iPhone.
+- Due dates are picked by month and day with no year. The date is the next time that month and day comes around, today included, and Feb 29 waits for a leap year. Editing a ticket keeps its original date while the month and day are unchanged, so an overdue date doesn't jump a year. Quick add's `!10/3` uses the same rule.
 - The calendar shows tickets on their due dates. Drag a ticket to another day, or in from Unscheduled, to reschedule it.
 
 ### Rewards and points
@@ -160,20 +163,23 @@ Quick add syntax is `w: rewatch a movie 2 #movies !sat`. The prefix `n:`, `w:` o
 - Rewards are computed, never stored. `available = floor(needPointsDone / ratio) - redeemed`, with ratios of 4 for Want and 7 for Fun by default. Want and Fun count independently from the same Need points.
 - Points use the scale 1, 2, 3, 5 and 8.
 - A Want or Fun ticket stays locked until a reward is spent on it. Moving it to In Progress or Done asks first. Deleting an unlocked ticket that isn't done refunds the reward.
-- Rewards can be turned off in Settings. That hides the meter, the Redeem commands, reward stats and Want and Fun tickets, which come back unchanged when rewards are turned on. New tickets are always Need while rewards are off.
+- Rewards can be turned off in Settings. That hides the meter, the Redeem commands, reward stats and Want and Fun tickets, which come back unchanged when rewards are turned on. New tickets are always Need while rewards are off. Cards also drop the Need label, since every ticket is Need, and lists show a plain dot instead of the category shape.
 - Points can be turned off in Settings. That hides point values, and each finished Need ticket then counts as 1 toward rewards and stats. Switching changes the current balance, which can drop below zero. Stored point values are kept.
 
 ### Tags
 
 - Tags are free text and keep the case they were typed in, so class codes like `Chem 101` read naturally. Tags that differ only in case are treated as one.
 - Each tag has one color everywhere. It comes from the tag's name until one is chosen in Settings → Tags.
+- Color tasks by tag (Settings → Tags, on by default) draws each task in its first tag's color, or standard green (`#458F32`) without a tag. This covers the card stripe, the points and the calendar marks. Turned off, tasks use their category color.
+- Tag order (Settings → Tags) orders tag lanes on the board and List by tag in the widget. Custom follows the priority set with the arrows on each tag row, with unranked tags after in alphabetical order. Soonest due date puts the tag whose earliest open task is due first, with priority breaking ties. Tasks in a tag can keep the board order or go by soonest due date, undated last. Untagged tickets always come last.
 - The editor suggests tags already in use.
 
 ### Widgets
 
-- Sizes are small (reward meter, or Up Next when rewards are off), medium (Need tickets in Up Next), large (meter, In Progress and Up Next) and extra large (meter and two columns).
+- Sizes are small (reward meter, or Up Next when rewards are off), medium (Need tickets in Up Next), large (meter, In Progress and Up Next) and extra large (meter and two columns, also with List by tag).
 - The widget shows only open tickets and never shows category icons. Rows show their first tag.
 - Settings → Widget has List by tag, which lists open tickets under bold tag titles, Show miscellaneous for untagged tickets, and whether the large size shows the reward meter. These apply to every prdctv widget.
+- Settings → Widget → Due dates (off by default) adds "Due" and the date to widget rows, for example "Due Sun" or "Due Oct 28". Dates in the next 7 days show the weekday, later or overdue ones show a short date, and overdue ones are red. The date and points always show in full. The tag shows in full when there is room and otherwise takes up to half the space left, and the task name gets the rest and ends in "…". The widget refreshes at midnight so weekdays stay right.
 - Widgets have no Edit Widget options on purpose. That kind of widget never received its settings in development builds.
 
 ### Look and settings
@@ -199,6 +205,8 @@ Development builds accept these options, for example `open build/Build/Products/
 | `--lanes=none`, `category` or `tag` | Lanes for this launch only |
 | `--appearance=light` or `dark` | Appearance for this launch only |
 | `--window-size=1280x800` | Mac window size |
+| `--rewards=on` or `off` | Rewards on or off for this launch only, on Mac |
+| `--tag-order=custom` or `dueDate`, `--task-order=board` or `dueDate` | Tag lane order for this launch only, on Mac |
 | `--tab calendar` | iPhone tab at launch |
 
 On Mac, join each value with `=`. A value passed as a separate word makes macOS treat the launch as opening a file, and the app then opens no window.

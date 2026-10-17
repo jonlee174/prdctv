@@ -25,7 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 #if DEBUG
-/// Debug launch options for App Store screenshots, e.g. `--mode=calendar --lanes=tag --appearance=light`.
+/// Debug launch options for App Store screenshots, e.g. `--mode=calendar --lanes=tag --appearance=light --rewards=off`.
 /// Values are joined with "=" because a separate word launches the app as if opening a file, with no window.
 @MainActor
 enum ScreenshotSetup {
@@ -38,6 +38,9 @@ enum ScreenshotSetup {
         var overrides: [String: Any] = [:]
         if let lanes = value("lanes") { overrides[LaneGrouping.storageKey] = lanes }
         if let appearance = value("appearance") { overrides[AppAppearance.storageKey] = appearance }
+        if let rewards = value("rewards") { overrides[RewardSettings.enabledKey] = rewards != "off" }
+        if let tagOrder = value("tag-order") { overrides[TicketTags.tagOrderKey] = tagOrder }
+        if let taskOrder = value("task-order") { overrides[TicketTags.tagTaskOrderKey] = taskOrder }
         guard !overrides.isEmpty else { return }
         UserDefaults.standard.setVolatileDomain(overrides, forName: UserDefaults.argumentDomain)
     }

@@ -16,7 +16,7 @@ extension RewardEngine {
     }
 }
 
-/// A ticket styled like a physical stub: neutral card, thin category accent edge,
+/// A ticket styled like a physical stub: neutral card, thin accent edge in the task color,
 /// perforated divider, and the points badge on the stub. Without points it's a plain card.
 struct TicketCardView: View {
     let ticket: Ticket
@@ -27,6 +27,8 @@ struct TicketCardView: View {
     /// Off in category lanes, where the heading already names the category.
     var showsCategory: Bool
     @AppStorage(RewardSettings.pointsEnabledKey, store: AppGroup.defaults) private var pointsEnabled = true
+    @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
+    private var coloring = TaskColoring()
 
     private let stubWidth: CGFloat = 44
 
@@ -37,6 +39,11 @@ struct TicketCardView: View {
         self.showsTags = showsTags
         self.showsCategory = showsCategory
     }
+
+    /// With rewards off every ticket is Need, so the category row says nothing.
+    private var showsCategoryRow: Bool { showsCategory && rewardsEnabled }
+
+    private var taskColor: Color { coloring.color(category: ticket.category, tags: ticket.tags) }
 
     private var shape: AnyShape {
         pointsEnabled ? AnyShape(TicketShape(stubWidth: stubWidth)) : AnyShape(RoundedRectangle(cornerRadius: Radius.small))
@@ -63,7 +70,7 @@ struct TicketCardView: View {
         .background {
             ZStack(alignment: .leading) {
                 shape.fill(Color.cardBackground)
-                Rectangle().fill(ticket.category.color).frame(width: 4)
+                Rectangle().fill(taskColor).frame(width: 4)
             }
             .clipShape(shape)
         }
@@ -82,7 +89,7 @@ struct TicketCardView: View {
 
     private var content: some View {
         VStack(alignment: .leading, spacing: 5) {
-            if showsCategory {
+            if showsCategoryRow {
                 HStack(spacing: 5) {
                     Image(systemName: ticket.category.symbol)
                         .font(.system(size: 7))
@@ -97,15 +104,18 @@ struct TicketCardView: View {
                 }
             }
 
-            HStack(alignment: .firstTextBaseline, spacing: 5) {
-                // Without the category row, a locked reward keeps its lock beside the title.
-                if !showsCategory, ticket.category.isReward, lock != .open {
-                    lockIcon
+            if !showsCategoryRow, !hasMeta {
+                // A title only card is as tall as one with a meta line, with the title centered.
+                ZStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("X").font(.system(size: 13, weight: .medium))
+                        Label("X", systemImage: "calendar").font(.system(size: 10))
+                    }
+                    .hidden()
+                    titleRow
                 }
-                Text(ticket.title)
-                    .font(.system(size: 13, weight: .medium))
-                    .lineLimit(3)
-                    .strikethrough(ticket.status == .done, color: .secondary)
+            } else {
+                titleRow
             }
 
             if hasMeta {
@@ -128,6 +138,19 @@ struct TicketCardView: View {
         }
     }
 
+    private var titleRow: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 5) {
+            // Without the category row, a locked reward keeps its lock beside the title.
+            if !showsCategoryRow, ticket.category.isReward, lock != .open {
+                lockIcon
+            }
+            Text(ticket.title)
+                .font(.system(size: 13, weight: .medium))
+                .lineLimit(3)
+                .strikethrough(ticket.status == .done, color: .secondary)
+        }
+    }
+
     private var lockIcon: some View {
         Image(systemName: lock == .open ? "lock.open.fill" : "lock.fill")
             .font(.system(size: 9))
@@ -139,7 +162,7 @@ struct TicketCardView: View {
         VStack(spacing: 0) {
             Text("\(ticket.points)")
                 .font(.system(size: 17, weight: .bold, design: .rounded).monospacedDigit())
-                .foregroundStyle(ticket.category == .need ? ticket.category.color : .primary)
+                .foregroundStyle(ticket.category == .need ? taskColor : .primary)
             Text(ticket.points == 1 ? "pt" : "pts")
                 .font(.system(size: 8, weight: .medium))
                 .foregroundStyle(.secondary)
@@ -160,7 +183,7 @@ struct TicketCardView: View {
     }
 
     private var accessibilityText: String {
-        var parts = ["\(ticket.category.label) ticket", ticket.title]
+        var parts = [rewardsEnabled ? "\(ticket.category.label) ticket" : "Ticket", ticket.title]
         if pointsEnabled { parts.append("\(ticket.points) points") }
         parts += ticket.tags.map { "tag \($0)" }
         switch lock {

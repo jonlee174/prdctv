@@ -15,6 +15,20 @@ extension TicketTags {
     }
 }
 
+/// The color a task is drawn in. Its first tag's color, standard green without a tag, or its category color.
+struct TaskColoring: DynamicProperty {
+    @AppStorage(TicketTags.colorTasksByTagKey, store: AppGroup.defaults) private var byTag = true
+    @AppStorage(TicketTags.colorsKey, store: AppGroup.defaults) private var colorsRaw = ""
+
+    /// Standard green, the default Need color, for tasks without a tag.
+    static let untagged = Color(hex: Category.need.defaultColorHex)!
+
+    func color(category: Category, tags: [String]) -> Color {
+        guard byTag else { return category.color }
+        return tags.first.map { TicketTags.color(for: $0, colorsRaw: colorsRaw) } ?? Self.untagged
+    }
+}
+
 /// A tag drawn as a small tinted label so a class keeps one color everywhere.
 struct TagChip: View {
     let tag: String

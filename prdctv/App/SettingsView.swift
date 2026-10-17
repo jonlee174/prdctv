@@ -67,7 +67,7 @@ struct SettingsView: View {
             } header: {
                 Text("Tags")
             } footer: {
-                Text("Each tag gets a color from its name. Click a swatch to choose another, and ↺ puts back the default.")
+                Text("Color tasks by tag gives each task its first tag's color, or green without a tag. Tag order sets how tag lanes and List by tag are ordered. Custom follows the arrows, and Soonest due date puts the tag with the next due task first. Each tag gets a color from its name. Click a swatch to choose another, and ↺ puts back the default.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -77,7 +77,7 @@ struct SettingsView: View {
             } header: {
                 Text("Widget")
             } footer: {
-                Text("List by tag shows open tickets under bold tag titles instead of by column. Applies to every prdctv widget.")
+                Text("Due dates show the weekday for the coming week and the date after that. List by tag shows open tickets under bold tag titles instead of by column. Applies to every prdctv widget.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -10,6 +10,7 @@ struct BoardView: View {
     @Query(sort: \Redemption.redeemedAt) private var redemptions: [Redemption]
 
     var rewardSettings = StoredRewardSettings()
+    var storedTagOrder = StoredTagLaneOrder()
     @AppStorage(LaneGrouping.storageKey) private var grouping = LaneGrouping.none
     @AppStorage("doneShowsAll") private var doneShowsAll = false
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
@@ -72,6 +73,7 @@ struct BoardView: View {
             status: status,
             tickets: visible(status),
             grouping: grouping,
+            tagOrder: storedTagOrder.value,
             tint: theme.column(status),
             selectedID: app.selectedTicketID,
             lockState: lockState,
@@ -122,7 +124,7 @@ struct BoardView: View {
 
     /// Tickets in on-screen order per column, after lanes regroup them.
     private var grid: [[Ticket]] {
-        Status.allCases.map { grouping.lanes(visible($0)).flatMap(\.tickets) }
+        Status.allCases.map { grouping.lanes(visible($0), tagOrder: storedTagOrder.value).flatMap(\.tickets) }
     }
 
     /// The category filter, minus Want and Fun while rewards are off.

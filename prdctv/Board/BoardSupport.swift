@@ -103,8 +103,8 @@ enum LaneGrouping: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Splits tickets into lanes, keeping their order inside each lane.
-    func lanes(_ tickets: [Ticket]) -> [Lane] {
+    /// Splits tickets into lanes. Tag lanes follow `tagOrder`, other lanes keep the board order.
+    func lanes(_ tickets: [Ticket], tagOrder: TagLaneOrder = TagLaneOrder()) -> [Lane] {
         switch self {
         case .none:
             return [Lane(heading: .none, tickets: tickets)]
@@ -115,7 +115,7 @@ enum LaneGrouping: String, CaseIterable, Identifiable {
             }
         case .tag:
             // A ticket with several tags goes in its first tag's lane, like the widget.
-            return TicketTags.lanes(tickets, tags: \.tags).map { lane in
+            return TicketTags.lanes(tickets, tags: \.tags, dueDate: \.dueDate, order: tagOrder).map { lane in
                 Lane(heading: lane.tag.map { .tag($0) } ?? .untagged, tickets: lane.items)
             }
         }
@@ -252,4 +252,13 @@ struct TagFilterPicker: View {
         .disabled(tags.isEmpty)
         .help("Show only tickets with one tag")
     }
+}
+
+/// The tag lane order from Settings, read live so lanes reorder when it changes.
+struct StoredTagLaneOrder: DynamicProperty {
+    @AppStorage(TicketTags.tagOrderKey, store: AppGroup.defaults) private var tagsRaw = TagLaneOrder.Tags.custom.rawValue
+    @AppStorage(TicketTags.tagTaskOrderKey, store: AppGroup.defaults) private var tasksRaw = TagLaneOrder.Tasks.board.rawValue
+    @AppStorage(TicketTags.tagPriorityKey, store: AppGroup.defaults) private var priorityRaw = ""
+
+    var value: TagLaneOrder { TagLaneOrder(tagsRaw: tagsRaw, tasksRaw: tasksRaw, priorityRaw: priorityRaw) }
 }

@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 struct TagTests {
@@ -65,5 +66,43 @@ struct TagTests {
 
     @Test func quickAddKeepsTagCase() {
         #expect(QuickAddParser().parse("worksheet 3 #ALG2 #alg2").tags == ["ALG2"])
+    }
+
+    // Items are (tags, days until due) pairs for the lane order tests.
+    typealias Item = (tags: [String], due: Int?)
+    let base = Date(timeIntervalSinceReferenceDate: 0)
+    func lanes(_ items: [Item], _ order: TagLaneOrder) -> [(tag: String?, items: [Int])] {
+        let indexed = Array(items.indices)
+        return TicketTags.lanes(indexed, tags: { items[$0].tags },
+                                dueDate: { items[$0].due.map { self.base.addingTimeInterval(Double($0) * 86_400) } },
+                                order: order)
+            .map { (tag: $0.tag, items: $0.items) }
+    }
+    let sample: [Item] = [(["quiz"], 5), (["Art"], nil), ([], 1), (["biology"], 2), (["quiz"], 1), (["Art"], 9)]
+
+    @Test func customOrderFollowsPriorityThenAlphabetical() {
+        let order = TagLaneOrder(priority: ["quiz"])
+        #expect(lanes(sample, order).map(\.tag) == ["quiz", "Art", "biology", nil])
+        #expect(lanes(sample, TagLaneOrder()).map(\.tag) == ["Art", "biology", "quiz", nil])
+    }
+
+    @Test func dueDateOrderPutsTheSoonestTagFirst() {
+        let order = TagLaneOrder(tags: .dueDate)
+        // quiz has a task due in 1 day, biology in 2, Art in 9.
+        #expect(lanes(sample, order).map(\.tag) == ["quiz", "biology", "Art", nil])
+    }
+
+    @Test func tasksByDueDateKeepBoardOrderForTies() {
+        let order = TagLaneOrder(tasks: .dueDate)
+        let result = lanes(sample, order)
+        #expect(result.first { $0.tag == "quiz" }?.items == [4, 0])
+        #expect(result.first { $0.tag == "Art" }?.items == [5, 1])
+        #expect(lanes(sample, TagLaneOrder()).first { $0.tag == "quiz" }?.items == [0, 4])
+    }
+
+    @Test func priorityRoundTrips() {
+        let raw = TagLaneOrder.encodePriority(["Quiz", "Art History"])
+        #expect(TagLaneOrder.decodePriority(raw) == ["quiz", "art history"])
+        #expect(TagLaneOrder(tagsRaw: "bogus", tasksRaw: "", priorityRaw: "").tags == .custom)
     }
 }

@@ -15,7 +15,7 @@ struct PhoneQuickAddSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 12) {
-                TextField("finish writeup 5 · w: movie 2", text: $text)
+                TextField("write book report 5 · w: movie 2", text: $text)
                     .font(.title3)
                     .focused($focused)
                     .submitLabel(.next)

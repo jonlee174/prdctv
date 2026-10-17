@@ -39,6 +39,7 @@ struct MenuBarContent: View {
     private var allUpNext: [Ticket]
     private var live = LiveEngine()
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
+    var coloring = TaskColoring()
 
     private var upNext: [Ticket] {
         rewardsEnabled ? allUpNext : allUpNext.filter { !$0.category.isReward }
@@ -90,9 +91,9 @@ struct MenuBarContent: View {
                         .frame(width: 18)
                         .help("Complete")
                     }
-                    Image(systemName: ticket.category.symbol)
-                        .font(.system(size: 7))
-                        .foregroundStyle(ticket.category.color)
+                    Image(systemName: rewardsEnabled ? ticket.category.symbol : "circle.fill")
+                        .font(.system(size: rewardsEnabled ? 7 : 5))
+                        .foregroundStyle(coloring.color(category: ticket.category, tags: ticket.tags))
                     Text(ticket.title).lineLimit(1)
                     Spacer()
                     if live.settings.countsPoints {

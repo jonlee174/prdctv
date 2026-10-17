@@ -55,7 +55,7 @@ struct BoardWidgetView: View {
         default: // .systemExtraLarge
             VStack(alignment: .leading, spacing: 12) {
                 if entry.rewardsEnabled { MeterBar(engine: entry.engine) }
-                TagColumns(lanes: entry.tagLanes, columns: 3, rows: entry.rewardsEnabled ? 12 : 14)
+                TagColumns(lanes: entry.tagLanes, columns: 2, rows: entry.rewardsEnabled ? 12 : 14)
             }
         }
     }
@@ -256,17 +256,22 @@ private struct TicketRow: View {
             }
 
             Link(destination: DeepLink.ticket(ticket.id).url) {
-                HStack(spacing: 5) {
+                RowLayout {
                     Text(ticket.title)
                         .font(.system(size: 12, weight: ticket.category == .need ? .medium : .regular))
                         .foregroundStyle(ticket.locked ? .secondary : .primary)
                         .lineLimit(1)
-                    Spacer(minLength: 4)
+                        .truncationMode(.tail)
+                        .layoutValue(key: RowPart.self, value: .title)
                     if showsTag, let tag = ticket.tags.first {
-                        // The title truncates before the tag, so the class stays readable.
                         TagChip(tag: tag, size: 9)
-                            .frame(maxWidth: 90, alignment: .trailing)
-                            .layoutPriority(1)
+                            .layoutValue(key: RowPart.self, value: .tag)
+                    }
+                    if AppGroup.defaults.bool(forKey: TicketTags.widgetShowsDueDatesKey), let due = ticket.dueDate {
+                        Text("Due \(DueLabel.text(for: due))")
+                            .font(.system(size: 11, weight: .semibold).monospacedDigit())
+                            .foregroundStyle(DueLabel.isOverdue(due) ? .red : .secondary)
+                            .lineLimit(1)
                     }
                     if RewardSettings.pointsEnabled() {
                         Text("\(ticket.points)")
@@ -276,6 +281,62 @@ private struct TicketRow: View {
                 }
             }
         }
+    }
+}
+
+/// What a view is in a widget row. Anything unmarked is a fixed part like the date or points.
+private enum RowPart: LayoutValueKey {
+    static let defaultValue = Kind.fixed
+    enum Kind { case title, tag, fixed }
+}
+
+/// A widget row. The date and points always get their full width, the tag gets up to half of what is left
+/// (more when the title is short), and the title gets the rest and ends in "…".
+private struct RowLayout: Layout {
+    var spacing: CGFloat = 5
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        let natural = sizes.reduce(0) { $0 + $1.width } + spacing * CGFloat(max(sizes.count - 1, 0))
+        return CGSize(width: proposal.width ?? natural, height: sizes.map(\.height).max() ?? 0)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        for (subview, frame) in zip(subviews, frames(width: bounds.width, subviews: subviews)) {
+            let y = bounds.minY + (bounds.height - frame.height) / 2
+            subview.place(at: CGPoint(x: bounds.minX + frame.minX, y: y), proposal: ProposedViewSize(frame.size))
+        }
+    }
+
+    /// Frames along the row, x from 0, in subview order.
+    private func frames(width: CGFloat, subviews: Subviews) -> [CGRect] {
+        let ideal = subviews.map { $0.sizeThatFits(.unspecified) }
+        let kinds = subviews.map { $0[RowPart.self] }
+        let fixedWidth = zip(kinds, ideal).filter { $0.0 == .fixed }.reduce(0) { $0 + $1.1.width + spacing }
+        let space = max(0, width - fixedWidth)
+        let titleIdeal = zip(kinds, ideal).first { $0.0 == .title }?.1.width ?? 0
+        let tagIdeal = zip(kinds, ideal).first { $0.0 == .tag }?.1.width
+        var tagWidth: CGFloat = 0
+        if let tagIdeal {
+            // Half the space, or whatever a short title leaves, whichever is more.
+            tagWidth = min(tagIdeal, max(space / 2, space - spacing - titleIdeal))
+        }
+        let titleWidth = max(0, space - (tagIdeal == nil ? 0 : tagWidth + spacing))
+
+        var frames: [CGRect] = []
+        // The tag and the fixed parts sit at the right edge, the title at the left.
+        var trailingX = width - fixedWidth + spacing - (tagIdeal == nil ? 0 : tagWidth + spacing)
+        for (kind, size) in zip(kinds, ideal) {
+            switch kind {
+            case .title:
+                frames.append(CGRect(x: 0, y: 0, width: titleWidth, height: size.height))
+            case .tag, .fixed:
+                let w = kind == .tag ? tagWidth : size.width
+                frames.append(CGRect(x: trailingX, y: 0, width: w, height: size.height))
+                trailingX += w + spacing
+            }
+        }
+        return frames
     }
 }
 

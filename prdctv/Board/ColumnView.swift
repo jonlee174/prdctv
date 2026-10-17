@@ -9,6 +9,7 @@ struct ColumnView: View {
     /// Already filtered and ordered for display.
     let tickets: [Ticket]
     let grouping: LaneGrouping
+    var tagOrder = TagLaneOrder()
     /// Optional user-chosen column color (Settings → Colors).
     var tint: Color?
     let selectedID: UUID?
@@ -29,7 +30,7 @@ struct ColumnView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 8) {
-                        ForEach(grouping.lanes(tickets)) { lane in
+                        ForEach(grouping.lanes(tickets, tagOrder: tagOrder)) { lane in
                             if grouping != .none {
                                 LaneHeadingView(heading: lane.heading).padding(.top, 4)
                             }
@@ -115,6 +116,7 @@ struct ColumnView: View {
 private struct CardRow: View {
     let ticket: Ticket
     let grouping: LaneGrouping
+    var tagOrder = TagLaneOrder()
     let lock: LockState
     let isSelected: Bool
     let onSelect: () -> Void

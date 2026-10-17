@@ -11,6 +11,7 @@ struct PhoneBoardView: View {
     @Query(sort: \Redemption.redeemedAt) private var redemptions: [Redemption]
 
     var rewardSettings = StoredRewardSettings()
+    var storedTagOrder = StoredTagLaneOrder()
     @AppStorage("doneShowsAll") private var doneShowsAll = false
     @AppStorage(LaneGrouping.storageKey) private var grouping = LaneGrouping.none
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
@@ -36,7 +37,7 @@ struct PhoneBoardView: View {
         NavigationStack {
             List {
                 Section {
-                    ForEach(grouping.lanes(visible(column))) { lane in
+                    ForEach(grouping.lanes(visible(column), tagOrder: storedTagOrder.value)) { lane in
                         if grouping != .none {
                             LaneHeadingView(heading: lane.heading)
                                 .padding(.top, 6)

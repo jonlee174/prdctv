@@ -15,6 +15,7 @@ struct TicketCalendarView: View {
     var rewardSettings = StoredRewardSettings()
     private var theme = ThemeColors()
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
+    var coloring = TaskColoring()
 
     @State private var grid = MonthGrid(containing: Date())
     @State private var selectedDay = Calendar.current.startOfDay(for: Date())
@@ -189,9 +190,10 @@ struct TicketCalendarView: View {
                 #endif
                 ForEach(unscheduled) { ticket in
                     HStack(spacing: 8) {
-                        Image(systemName: ticket.category.symbol)
-                            .font(.system(size: 8))
-                            .foregroundStyle(ticket.category.color)
+                        // With rewards off the category shape says nothing, so a plain dot shows the color.
+                        Image(systemName: rewardsEnabled ? ticket.category.symbol : "circle.fill")
+                            .font(.system(size: rewardsEnabled ? 8 : 6))
+                            .foregroundStyle(coloring.color(category: ticket.category, tags: ticket.tags))
                         Text(ticket.title).lineLimit(1)
                         Spacer()
                         Button { setDue(ticket, selectedDay) } label: { Image(systemName: "plus.circle") }
@@ -246,6 +248,7 @@ private struct DayCell: View {
     let onDrop: (UUID) -> Void
 
     @State private var isTargeted = false
+    var coloring = TaskColoring()
 
     private var overdue: Bool {
         !isToday && day < Calendar.current.startOfDay(for: Date()) && tickets.contains { $0.status != .done }
@@ -266,7 +269,7 @@ private struct DayCell: View {
                 HStack(spacing: 3) {
                     ForEach(tickets.prefix(3)) { ticket in
                         Circle()
-                            .fill(ticket.category.color.opacity(ticket.status == .done ? 0.35 : 1))
+                            .fill(coloring.color(category: ticket.category, tags: ticket.tags).opacity(ticket.status == .done ? 0.35 : 1))
                             .frame(width: 5, height: 5)
                     }
                 }
@@ -306,8 +309,9 @@ private struct DayCell: View {
 
     private func chip(_ ticket: Ticket) -> some View {
         let done = ticket.status == .done
+        let color = coloring.color(category: ticket.category, tags: ticket.tags)
         return HStack(spacing: 4) {
-            RoundedRectangle(cornerRadius: 1).fill(ticket.category.color).frame(width: 3)
+            RoundedRectangle(cornerRadius: 1).fill(color).frame(width: 3)
             Text(ticket.title)
                 .font(.system(size: 11))
                 .lineLimit(1)
@@ -317,7 +321,7 @@ private struct DayCell: View {
         .padding(.vertical, 2)
         .padding(.trailing, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: Radius.tiny).fill(ticket.category.color.opacity(done ? 0.06 : 0.14)))
+        .background(RoundedRectangle(cornerRadius: Radius.tiny).fill(color.opacity(done ? 0.06 : 0.14)))
         .draggable(ticket.id.uuidString)
     }
 }

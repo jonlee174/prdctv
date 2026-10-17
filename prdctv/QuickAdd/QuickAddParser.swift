@@ -96,11 +96,7 @@ struct QuickAddParser {
 
         let parts = token.split(separator: "/").compactMap { Int($0) }
         if parts.count == 2, (1...12).contains(parts[0]), (1...31).contains(parts[1]) {
-            let year = calendar.component(.year, from: today)
-            var comps = DateComponents(year: year, month: parts[0], day: parts[1])
-            if let date = calendar.date(from: comps), date >= today { return date }
-            comps.year = year + 1 // already passed this year → next year
-            return calendar.date(from: comps)
+            return DueDates.nextOccurrence(month: parts[0], day: parts[1], from: now, calendar: calendar)
         }
         return nil
     }
