@@ -12,7 +12,7 @@ settings:
     DEVELOPMENT_TEAM: TTM9BN6M53
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.1"
+    MARKETING_VERSION: "1.3"
     CURRENT_PROJECT_VERSION: "1"
     ENABLE_HARDENED_RUNTIME: YES
     # Must match prdctv/Shared/AppGroup.swift.
@@ -192,6 +192,7 @@ targets:
       - path: prdctv/Shared/AppGroup.swift
       - path: prdctv/Shared/Tags.swift
       - path: prdctv/Shared/DueLabel.swift
+      - path: prdctv/Shared/Repeat.swift
       - path: prdctv/QuickAdd/QuickAddParser.swift
       - path: prdctv/Calendar/MonthGrid.swift
       - path: prdctv/Shared/UndoHistory.swift

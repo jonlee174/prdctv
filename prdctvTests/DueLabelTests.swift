@@ -42,7 +42,6 @@ struct DueLabelTests {
         #expect(DueDates.nextOccurrence(month: 2, day: 29, from: now, calendar: calendar)
                 == calendar.date(from: DateComponents(year: 2028, month: 2, day: 29)))
         #expect(DueDates.nextOccurrence(month: 2, day: 30, from: now, calendar: calendar) == nil)
-        #expect(DueDates.maxDay(inMonth: 2) == 29 && DueDates.maxDay(inMonth: 4) == 30 && DueDates.maxDay(inMonth: 12) == 31)
     }
 
     @Test func overdueShowsTheDate() {

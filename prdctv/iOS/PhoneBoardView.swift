@@ -122,6 +122,7 @@ struct PhoneBoardView: View {
                 model.openTicketID = nil
             }
         }
+        .celebratesCompletions()
     }
 
     private func row(_ ticket: Ticket) -> some View {

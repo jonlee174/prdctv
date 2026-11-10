@@ -49,11 +49,7 @@ enum TicketTags {
                             order: TagLaneOrder = TagLaneOrder()) -> [(tag: String?, items: [Item])] {
         let groups = Dictionary(grouping: items) { tags($0).first?.lowercased() }
         func sortedItems(_ list: [Item]) -> [Item] {
-            guard order.tasks == .dueDate else { return list }
-            // Soonest first, undated last, ties keep board order.
-            return list.enumerated()
-                .sorted { (dueDate($0.element) ?? .distantFuture, $0.offset) < (dueDate($1.element) ?? .distantFuture, $1.offset) }
-                .map(\.element)
+            order.tasks == .dueDate ? byDueDate(list, dueDate: dueDate) : list
         }
         func soonest(_ key: String) -> Date { groups[key]!.compactMap(dueDate).min() ?? .distantFuture }
         let names = order.sorted(sortedTags(in: items.compactMap { tags($0).first.map { [$0] } }), soonest: soonest)
@@ -62,22 +58,30 @@ enum TicketTags {
         return lanes
     }
 
-    /// Fits lanes into columns of `rows` lines each, a heading taking one line and a cut lane keeping its first items.
-    static func pack<Item>(_ lanes: [(tag: String?, items: [Item])], columns: Int, rows: Int) -> [[(tag: String?, items: [Item])]] {
+    /// Soonest due first, undated last, ties keep their order.
+    static func byDueDate<Item>(_ items: [Item], dueDate: (Item) -> Date?) -> [Item] {
+        items.enumerated()
+            .sorted { (dueDate($0.element) ?? .distantFuture, $0.offset) < (dueDate($1.element) ?? .distantFuture, $1.offset) }
+            .map(\.element)
+    }
+
+    /// Fits lanes into columns of `rows` lines each, a heading taking `headingLines` lines and a cut lane keeping its first items.
+    static func pack<Item>(_ lanes: [(tag: String?, items: [Item])], columns: Int, rows: Int,
+                           headingLines: Int = 1) -> [[(tag: String?, items: [Item])]] {
         var packed: [[(tag: String?, items: [Item])]] = []
         var current: [(tag: String?, items: [Item])] = []
         var left = rows
         for lane in lanes {
             // Start a new column rather than cut a lane, while columns remain.
-            if 1 + lane.items.count > left, !current.isEmpty, packed.count + 1 < columns {
+            if headingLines + lane.items.count > left, !current.isEmpty, packed.count + 1 < columns {
                 packed.append(current)
                 current = []
                 left = rows
             }
-            guard left >= 2 else { break }
-            let shown = min(lane.items.count, left - 1)
+            guard left >= headingLines + 1 else { break }
+            let shown = min(lane.items.count, left - headingLines)
             current.append((tag: lane.tag, items: Array(lane.items.prefix(shown))))
-            left -= 1 + shown
+            left -= headingLines + shown
         }
         if !current.isEmpty { packed.append(current) }
         return packed
@@ -97,8 +101,14 @@ enum TicketTags {
     /// Settings key for showing tag lane headings as plain bold text instead of colored chips.
     static let plainLaneTitlesKey = "tagLanePlainTitles"
 
-    /// Settings keys for the widget's List by Tag layout, set in the app's Settings and read by the widget.
+    /// Settings keys for the widget's layouts, set in the app's Settings and read by the widget.
+    static let widgetLayoutKey = "widgetLayout"
+    /// Older on or off switch for the tag layout, read when `widgetLayout` was never set.
     static let widgetListByTagKey = "widgetListByTag"
+    /// By status layout shows In Progress and Up Next titles. On by default.
+    static let widgetStatusTitlesKey = "widgetStatusTitles"
+    /// By status layout shows tags in rows. On by default.
+    static let widgetStatusShowsTagsKey = "widgetStatusShowsTags"
     static let widgetShowsMiscellaneousKey = "widgetShowsMiscellaneous"
     /// Widget rows show due dates. Off by default.
     static let widgetShowsDueDatesKey = "widgetShowsDueDates"
@@ -187,5 +197,22 @@ struct TagLaneOrder: Equatable {
         guard tags == .dueDate else { return custom }
         let position = Dictionary(custom.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
         return custom.sorted { (soonest($0.lowercased()), position[$0]!) < (soonest($1.lowercased()), position[$1]!) }
+    }
+}
+
+/// How the medium, large and extra large widgets list tickets.
+enum WidgetLayout: String, CaseIterable {
+    /// Up Next and In Progress lists, the original layout.
+    case columns
+    /// Open tickets under bold tag titles.
+    case tags
+    /// Open tickets under In Progress and Up Next titles, each sorted by due date.
+    case status
+
+    static func load(_ defaults: UserDefaults = AppGroup.defaults) -> WidgetLayout {
+        if let raw = defaults.string(forKey: TicketTags.widgetLayoutKey), let layout = WidgetLayout(rawValue: raw) {
+            return layout
+        }
+        return defaults.bool(forKey: TicketTags.widgetListByTagKey) ? .tags : .columns
     }
 }

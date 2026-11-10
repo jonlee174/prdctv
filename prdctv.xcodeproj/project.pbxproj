@@ -19,6 +19,7 @@
 		1759261C3B53621DA10E0983 /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A48EFF5ED4D9F0269ECB0D4 /* TicketIntents.swift */; };
 		1AB3C2784837B1D3783A9F71 /* DueLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C23AD7873D1A1B12334F5B /* DueLabel.swift */; };
 		203CDDFAF6A5678173A98ED4 /* BoardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F860E731BD02DDEE7AB2F4 /* BoardWidget.swift */; };
+		213E5A0F4A5EC5329F6AC7B1 /* Confetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1AA372B62F2C028D7DFE59 /* Confetti.swift */; };
 		216CC6D48C4DD2F74BFA8E50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 353537C2D7526CD6F826A7F7 /* Assets.xcassets */; };
 		24E0339D6F24D60133BFC346 /* RewardMeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806E19FA6ED65B0F231FBC03 /* RewardMeterView.swift */; };
 		28DDD5E4B52A66A16633090D /* QuickAddPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4E06D4000C9C5FB7D5867D /* QuickAddPanel.swift */; };
@@ -44,6 +45,7 @@
 		5445CA41D3694C05AF3FC0DF /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AFD72AE1D8254DB8E182F2 /* RewardSettings.swift */; };
 		56E48E7C60244DDEC0135ED3 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3436AB9D278F3DB5690FCB8 /* SharedStore.swift */; };
 		58F2AEE9C73964F7D894978A /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7A994ACF0810D92F85F5851 /* BoardView.swift */; };
+		5AEC0190E904CF144941707D /* Repeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0348AF946A07D7095FD0 /* Repeat.swift */; };
 		5B054986A43099F033CB206A /* MonthGridTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FEF6C2F964F169F5AC1A17 /* MonthGridTests.swift */; };
 		5FB8442E8B92C838DB789FC5 /* PrdctvApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AC298BDC1FAB16E624F7E6 /* PrdctvApp.swift */; };
 		5FC1A993A58C43158435FD52 /* RewardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AFD72AE1D8254DB8E182F2 /* RewardSettings.swift */; };
@@ -64,6 +66,7 @@
 		84FCABC623C168333BE66B70 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3062EFF8703212C0E2EF0E2 /* Theme.swift */; };
 		873D57967A5F9479F47EA2F2 /* WhiteboardImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F533A9A0ADCF0D1DAA3D9043 /* WhiteboardImportView.swift */; };
 		888DAEA48BFD2740F4C56799 /* DueLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C23AD7873D1A1B12334F5B /* DueLabel.swift */; };
+		8BC28BECF863725D82CA3CCA /* Repeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0348AF946A07D7095FD0 /* Repeat.swift */; };
 		91A083E3937179B241015CD2 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676EC7AFE144CB8BC086DBC1 /* DemoData.swift */; };
 		92529BAC0C31A18B9744A59E /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 286D78B19019890FB492C6E3 /* UndoHistory.swift */; };
 		9556D8594CA5EC65B04635AE /* DueLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C23AD7873D1A1B12334F5B /* DueLabel.swift */; };
@@ -77,6 +80,7 @@
 		A96E3BB9C5CF306AB38EADE6 /* QuickAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E3B511FB35C16FA794942B /* QuickAddView.swift */; };
 		A9FA744BD6C84671D20BD71E /* DueLabelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D2EB4A846DCBCBD4E5385A /* DueLabelTests.swift */; };
 		AB002DA1B49A332EA684304A /* TagChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775444426E75AA9AFDF7639D /* TagChip.swift */; };
+		ABC855B4832EB5CA44682C9F /* Repeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0348AF946A07D7095FD0 /* Repeat.swift */; };
 		AC7F8074B20DEAF05C1C43C4 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD96D005B82E87E2A2372B3 /* AppGroup.swift */; };
 		AEE9593E4BEF0773CF0CF339 /* BoardSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C1B82E594A8CA5144C187D /* BoardSupport.swift */; };
 		AEF87CC5F4B0CF44EA1E34D1 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B01F96B0B28416171B1FA7 /* StatsView.swift */; };
@@ -94,10 +98,13 @@
 		C25D355D380BE8E7A12955DA /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3436AB9D278F3DB5690FCB8 /* SharedStore.swift */; };
 		C99CF1E2ACCCDD77D3FF87DE /* MonthGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53415C049C15437F27E0E9CD /* MonthGrid.swift */; };
 		C9B7E4716DFD1A820CF92EBD /* PhoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F523D5CDE19E6155FA6D4227 /* PhoneApp.swift */; };
+		CAB0260B26AD380B9B3B2DB2 /* Confetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1AA372B62F2C028D7DFE59 /* Confetti.swift */; };
 		CFA47FE5CF761110BC0E0A18 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102950CB4EADAB61DF1097DB /* Models.swift */; };
 		D0AA07249D5E4A11BF046865 /* QuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E729C9D808AFF682D9AA3A70 /* QuickAddParser.swift */; };
+		D1B05AC4BB5D857C561CEA56 /* Repeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0348AF946A07D7095FD0 /* Repeat.swift */; };
 		D1EC9A146E528B3CF18350E9 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3436AB9D278F3DB5690FCB8 /* SharedStore.swift */; };
 		D2B65458E35E08C295640F2A /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FD3BA25468D224D9759459 /* Tags.swift */; };
+		D323C6CEA876ADC3804E05E9 /* RepeatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A0556E27084A4C9D3C4D6E /* RepeatTests.swift */; };
 		D675C2C3C1DD8A0A1430DDCB /* RedemptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AEE83680CC5167B16C0BD1 /* RedemptionSheet.swift */; };
 		D83A0A0502ABA26B6E9215F1 /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FD3BA25468D224D9759459 /* Tags.swift */; };
 		D9F4E4522BCCDA4C6A0FFE92 /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FD3BA25468D224D9759459 /* Tags.swift */; };
@@ -107,6 +114,7 @@
 		DE9594C3DC08473DAD96AD3B /* TicketEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43C1CE14FA51DD37195ED17 /* TicketEditorView.swift */; };
 		DF38D1A24DA2966D272625F9 /* TicketIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A48EFF5ED4D9F0269ECB0D4 /* TicketIntents.swift */; };
 		DF5CBA37BF1706B88E62EF7A /* UndoHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FD0E1E31316D74ACBA5DE80 /* UndoHistoryTests.swift */; };
+		E0385BB8E82EB820BE42E4C8 /* Repeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0348AF946A07D7095FD0 /* Repeat.swift */; };
 		E2D53ED621CDB7D9450FD21D /* PhoneBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908003B53A4C68C661FB48CC /* PhoneBoardView.swift */; };
 		E4B645B807B86350A71222CC /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102950CB4EADAB61DF1097DB /* Models.swift */; };
 		E5411322D1E24E0BE8E7316F /* MenuBarContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52822234ABEF8840FE0FB7FC /* MenuBarContent.swift */; };
@@ -170,6 +178,8 @@
 
 /* Begin PBXFileReference section */
 		077047E6F6B1E1EE75E86153 /* prdctviOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = prdctviOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		09AB0348AF946A07D7095FD0 /* Repeat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repeat.swift; sourceTree = "<group>"; };
+		0C1AA372B62F2C028D7DFE59 /* Confetti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Confetti.swift; sourceTree = "<group>"; };
 		102950CB4EADAB61DF1097DB /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		119B0DBCD1DB59370771D456 /* prdctvWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = prdctvWidget.entitlements; sourceTree = "<group>"; };
 		22A40137029B5FD5918E7931 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -191,6 +201,7 @@
 		50E3B511FB35C16FA794942B /* QuickAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddView.swift; sourceTree = "<group>"; };
 		51AEE83680CC5167B16C0BD1 /* RedemptionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedemptionSheet.swift; sourceTree = "<group>"; };
 		52822234ABEF8840FE0FB7FC /* MenuBarContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContent.swift; sourceTree = "<group>"; };
+		52A0556E27084A4C9D3C4D6E /* RepeatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatTests.swift; sourceTree = "<group>"; };
 		53415C049C15437F27E0E9CD /* MonthGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthGrid.swift; sourceTree = "<group>"; };
 		57F9358E360417519BE6C732 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5BAD0CF0A5EF4A4135206A53 /* PhoneQuickAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneQuickAddSheet.swift; sourceTree = "<group>"; };
@@ -262,6 +273,7 @@
 				676EC7AFE144CB8BC086DBC1 /* DemoData.swift */,
 				45C23AD7873D1A1B12334F5B /* DueLabel.swift */,
 				102950CB4EADAB61DF1097DB /* Models.swift */,
+				09AB0348AF946A07D7095FD0 /* Repeat.swift */,
 				2F01D6AFDB60D10EDE0B9F25 /* RewardEngine.swift */,
 				71AFD72AE1D8254DB8E182F2 /* RewardSettings.swift */,
 				E3436AB9D278F3DB5690FCB8 /* SharedStore.swift */,
@@ -312,6 +324,7 @@
 				27C1B82E594A8CA5144C187D /* BoardSupport.swift */,
 				D7A994ACF0810D92F85F5851 /* BoardView.swift */,
 				40CDDE32E60327427F4A9513 /* ColumnView.swift */,
+				0C1AA372B62F2C028D7DFE59 /* Confetti.swift */,
 				EC535190F169E06C7AD90FAA /* TagSettings.swift */,
 				FF824C153702F7D5AD956643 /* TicketCardView.swift */,
 				D43C1CE14FA51DD37195ED17 /* TicketEditorView.swift */,
@@ -403,6 +416,7 @@
 				42D2EB4A846DCBCBD4E5385A /* DueLabelTests.swift */,
 				92FEF6C2F964F169F5AC1A17 /* MonthGridTests.swift */,
 				ABBFF479B7863B4DEC3144FB /* QuickAddParserTests.swift */,
+				52A0556E27084A4C9D3C4D6E /* RepeatTests.swift */,
 				E434F5EA9CA77CB3F29A88EF /* RewardEngineTests.swift */,
 				DA3AB22A7FEE24A398C06CD2 /* TagTests.swift */,
 				6FD0E1E31316D74ACBA5DE80 /* UndoHistoryTests.swift */,
@@ -624,6 +638,8 @@
 				5B054986A43099F033CB206A /* MonthGridTests.swift in Sources */,
 				05E18FE1FAE498C39511ADA3 /* QuickAddParser.swift in Sources */,
 				C179F260115F3AC17A4FA785 /* QuickAddParserTests.swift in Sources */,
+				8BC28BECF863725D82CA3CCA /* Repeat.swift in Sources */,
+				D323C6CEA876ADC3804E05E9 /* RepeatTests.swift in Sources */,
 				325E0C0FC6C1A69A300C1B58 /* RewardEngine.swift in Sources */,
 				6C4DD157F9846D55F74E523A /* RewardEngineTests.swift in Sources */,
 				5FC1A993A58C43158435FD52 /* RewardSettings.swift in Sources */,
@@ -644,6 +660,7 @@
 				C150382BCBE107A29914A3A6 /* DemoData.swift in Sources */,
 				9556D8594CA5EC65B04635AE /* DueLabel.swift in Sources */,
 				077DDB025FCD4C865FF3188E /* Models.swift in Sources */,
+				E0385BB8E82EB820BE42E4C8 /* Repeat.swift in Sources */,
 				4045138CAF042CEB896ABC9C /* RewardEngine.swift in Sources */,
 				A949075FE32936B58FD2168D /* RewardSettings.swift in Sources */,
 				56E48E7C60244DDEC0135ED3 /* SharedStore.swift in Sources */,
@@ -666,6 +683,7 @@
 				FD0DAD0CC98AD97A7DFFBDDA /* DemoData.swift in Sources */,
 				1AB3C2784837B1D3783A9F71 /* DueLabel.swift in Sources */,
 				B179D58E6C27757D1F104CFB /* Models.swift in Sources */,
+				D1B05AC4BB5D857C561CEA56 /* Repeat.swift in Sources */,
 				40EFE4D9B56ABE1AA488CFA0 /* RewardEngine.swift in Sources */,
 				30D52499C6D7C6EC37B9B01F /* RewardSettings.swift in Sources */,
 				D1EC9A146E528B3CF18350E9 /* SharedStore.swift in Sources */,
@@ -688,6 +706,7 @@
 				AEE9593E4BEF0773CF0CF339 /* BoardSupport.swift in Sources */,
 				58F2AEE9C73964F7D894978A /* BoardView.swift in Sources */,
 				0428BCF0B6A40629B048285F /* ColumnView.swift in Sources */,
+				213E5A0F4A5EC5329F6AC7B1 /* Confetti.swift in Sources */,
 				73695FEDE5D554B4F8924312 /* DemoData.swift in Sources */,
 				50B83CF29A9E3557C4233EA0 /* DueLabel.swift in Sources */,
 				E5411322D1E24E0BE8E7316F /* MenuBarContent.swift in Sources */,
@@ -698,6 +717,7 @@
 				D0AA07249D5E4A11BF046865 /* QuickAddParser.swift in Sources */,
 				A96E3BB9C5CF306AB38EADE6 /* QuickAddView.swift in Sources */,
 				988F8EE44E92E2E5E2460DD3 /* RedemptionSheet.swift in Sources */,
+				5AEC0190E904CF144941707D /* Repeat.swift in Sources */,
 				79CF6924D097F6F905777B18 /* RewardEngine.swift in Sources */,
 				24E0339D6F24D60133BFC346 /* RewardMeterView.swift in Sources */,
 				FB1A766B1A4FDF1DC4B36F86 /* RewardSettings.swift in Sources */,
@@ -725,6 +745,7 @@
 				AC7F8074B20DEAF05C1C43C4 /* AppGroup.swift in Sources */,
 				07FEC1F01266D8280FD0C7CA /* Appearance.swift in Sources */,
 				BC63EAF23248485AA9DF1445 /* BoardSupport.swift in Sources */,
+				CAB0260B26AD380B9B3B2DB2 /* Confetti.swift in Sources */,
 				91A083E3937179B241015CD2 /* DemoData.swift in Sources */,
 				888DAEA48BFD2740F4C56799 /* DueLabel.swift in Sources */,
 				E4B645B807B86350A71222CC /* Models.swift in Sources */,
@@ -736,6 +757,7 @@
 				654F5D2407A12D69142D7F65 /* QuickAddParser.swift in Sources */,
 				3498C79E70A8E9670E2117F2 /* QuickAddView.swift in Sources */,
 				D675C2C3C1DD8A0A1430DDCB /* RedemptionSheet.swift in Sources */,
+				ABC855B4832EB5CA44682C9F /* Repeat.swift in Sources */,
 				523D6DBE8476925C7C4AA3FC /* RewardEngine.swift in Sources */,
 				504A31E9F06A3EC01DBBDD5B /* RewardMeterView.swift in Sources */,
 				5445CA41D3694C05AF3FC0DF /* RewardSettings.swift in Sources */,
@@ -901,7 +923,7 @@
 				IOS_APP_GROUP_ID = group.com.jonathanlee.prdctv;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -971,7 +993,7 @@
 				IOS_APP_GROUP_ID = group.com.jonathanlee.prdctv;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

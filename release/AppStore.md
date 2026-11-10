@@ -29,6 +29,7 @@ Board
 • Group each column by category or by tag
 • Points on a 1, 2, 3, 5, 8 scale, or turn points off and count tasks
 • Due dates, notes and a month calendar you can drag tasks across
+• Repeating tasks, daily, weekly, monthly or every few days, weeks or months
 • History of past weeks and stats with streaks
 
 Tags
@@ -46,6 +47,7 @@ Widgets
 • See your board and reward meter on the desktop or Home Screen
 • Check off tasks from the widget
 • List tasks under their tags, with untagged tasks at the end
+• Or list them under In Progress and Up Next, sorted by due date
 • Show due dates, with the weekday for the coming week
 
 Quick add
@@ -58,6 +60,18 @@ Make it yours
 • Use light mode, dark mode or your system setting
 
 Your tasks sync between your Mac, iPhone and iPad through your own iCloud account. prdctv has no accounts, ads or tracking.
+
+## What's New in 1.3 (4000)
+
+• Repeat tasks daily, weekly, monthly or on a custom schedule.
+• Confetti when you finish a task, which can be turned off in Settings.
+• Pick due dates from a calendar.
+• New app icon.
+
+## What's New in 1.2 (4000)
+
+• The widget has a new By status layout. Open tasks are listed under In Progress and Up Next, each sorted by due date, with each task's tag beside it.
+• Choose the widget's layout in Settings under Widget. Columns, By tag and By status are available, and the In Progress and Up Next titles and the tags can each be turned off.
 
 ## What's New in 1.1 (4000)
 

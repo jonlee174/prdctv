@@ -57,7 +57,7 @@ CloudKit has two separate environments.
 
 Before every release that adds or changes a model property, deploy the schema.
 
-1. Run the app from a `make` build and save a ticket, so the Development schema includes every current field.
+1. Run the app from a `make` build and save a ticket that uses the new field (for repeats, set Repeat to anything but Never), so the Development schema includes every current field.
 2. Open the [CloudKit Console](https://icloud.developer.apple.com), choose `iCloud.com.jonathanlee.prdctv`, and open Schema.
 3. Choose Deploy Schema Changes and confirm the deploy to Production.
 
@@ -84,9 +84,9 @@ Skipping this breaks sync for every customer on the new version. Production sche
    1. Run `make mac-dist`. It archives a Release build and writes `build/dist/prdctv.pkg`. The app is signed with Apple Distribution, the package with the 3rd Party Mac Developer Installer certificate, and the build uses the Production iCloud environment. Before saying the package is ready it runs `scripts/check_mac_package.sh`, which fails if the installer signature or any app icon size up to 1024 pixels is missing. The build number comes from the clock, so every package gets a new one.
    2. Open Transporter, sign in with the Apple ID for the team, drag in `build/dist/prdctv.pkg` and choose Deliver.
 5. Upload the iOS build.
-   1. Run `make ios-xcode` to open the project in Xcode.
-   2. Choose the `prdctviOS` scheme and Any iOS Device as the destination, then Product → Archive.
-   3. In the Organizer, choose Distribute App, then App Store Connect, and upload. Leave Manage Version and Build Number checked, since the project's own build number stays at 1.
+   1. Run `make ios-archive`. It archives a Release build with a build number from the clock into Xcode's archive folder. Product → Archive would use the project's build number 1, which App Store Connect rejects once a build with it exists.
+   2. In Xcode open Window → Organizer (in the menu bar at the top of the screen) and select the new archive under prdctviOS.
+   3. Choose Distribute App, then App Store Connect, and upload.
 6. Wait for both builds to finish processing in App Store Connect. They then show up in TestFlight for testing on your own devices.
 7. Run `make screenshots` if the look changed, and upload the images from `build/screenshots`. Each folder matches an App Store Connect slot.
 
@@ -155,7 +155,10 @@ Quick add syntax is `w: rewatch a movie 2 #movies !sat`. The prefix `n:`, `w:` o
 - The Tag menu shows one tag at a time. Lanes groups each column by category or by tag, and on iPhone both are in the filter menu.
 - A card leaves out whatever its lane heading already says. Tag lanes hide tags and category lanes hide the Need, Want or Fun label, with a locked reward's lock moving beside the title. Changing lanes rebuilds the cards.
 - On iPhone a segmented control switches columns. Swipe right to advance, swipe left to delete and long press for more. Tickets can't be reordered within a column on iPhone.
-- Due dates are picked by month and day with no year. The date is the next time that month and day comes around, today included, and Feb 29 waits for a leap year. Editing a ticket keeps its original date while the month and day are unchanged, so an overdue date doesn't jump a year. Quick add's `!10/3` uses the same rule.
+- The editor's due date is a button showing the weekday, month and day without a year, and it opens a calendar. Picking a day closes the calendar.
+- Quick add's `!10/3` takes a month and day with no year. The date is the next time that month and day comes around, today included, and Feb 29 waits for a leap year.
+- Repeat (in the editor, Never by default) can be Daily, Weekly, Monthly or Custom, which is every 1 to 99 days, weeks or months. When the ticket is done, a copy goes to the end of Up Next with the same title, notes, category, points, tags and repeat. The copy is due one interval after the old due date, or after the day it was finished when there was no date. A copy finished late skips ahead to the first date after the finish day, and a monthly date on the 31st lands on the last day of shorter months. The finished ticket stops repeating, so reopening and finishing it again adds no second copy. Cards show the repeat, such as "Weekly".
+- Finishing a ticket drops pink and green confetti over the board. Settings → Board turns it off per device.
 - The calendar shows tickets on their due dates. Drag a ticket to another day, or in from Unscheduled, to reschedule it.
 
 ### Rewards and points
@@ -178,20 +181,21 @@ Quick add syntax is `w: rewatch a movie 2 #movies !sat`. The prefix `n:`, `w:` o
 
 - Sizes are small (reward meter, or Up Next when rewards are off), medium (Need tickets in Up Next), large (meter, In Progress and Up Next) and extra large (meter and two columns, also with List by tag).
 - The widget shows only open tickets and never shows category icons. Rows show their first tag.
-- Settings → Widget has List by tag, which lists open tickets under bold tag titles, Show miscellaneous for untagged tickets, and whether the large size shows the reward meter. These apply to every prdctv widget.
+- Settings → Widget → Layout picks how the medium, large and extra large widgets list tickets. Columns is the original Up Next and In Progress lists. By tag lists open tickets under bold tag titles, with Show miscellaneous for untagged tickets. By status lists them under In Progress and Up Next titles, each sorted by due date with undated tickets last, and shows each row's first tag. Status titles and Tags in rows turn those off. The large widget's reward meter can be hidden too. These apply to every prdctv widget, and an older List by tag setting carries over as By tag.
 - Settings → Widget → Due dates (off by default) adds "Due" and the date to widget rows, for example "Due Sun" or "Due Oct 28". Dates in the next 7 days show the weekday, later or overdue ones show a short date, and overdue ones are red. The date and points always show in full. The tag shows in full when there is room and otherwise takes up to half the space left, and the task name gets the rest and ends in "…". The widget refreshes at midnight so weekdays stay right.
 - Widgets have no Edit Widget options on purpose. That kind of widget never received its settings in development builds.
 
 ### Look and settings
 
 - Corners use three radii, 2, 4 and 6 points (`Radius` in `Shared/Theme.swift`). The default palette is shades of the logo green.
-- Settings covers category colors and icons, column and accent colors, tag colors, rewards, points, widgets, the quick add shortcut, launch at login and appearance (System, Light or Dark). Appearance and colors are stored per device.
+- Settings covers category colors and icons, column and accent colors, tag colors, rewards, points, confetti, widgets, the quick add shortcut, launch at login and appearance (System, Light or Dark). Appearance and colors are stored per device.
 - Setting keys must not contain dots. SwiftUI watches settings with key value observing, which reads a dot as a path, so a dotted key never tells other views it changed.
 
 ### Logo
 
 - `scripts/make_icons.py` redraws the logo and writes every icon size, the iOS dark and tinted variants, `LogoMark` and `LogoFull`.
 - The logo green is `#9FD77F` in Display P3, saved in the icons as the matching sRGB `#8ED973`. The mark is `#E8E8E8`.
+- The app icon background is a diagonal gradient from pink `#E0569B` at the top left to the logo green at the bottom right, blended in linear light so the middle doesn't turn brown. The iOS dark icon fills the mark with it. The logo mark and full logo stay one color.
 - The wordmark is set in Bauhaus 93 and converted to outlines by `scripts/wordmark_outline.swift`, so the app ships artwork, not the font. Regenerating needs the font installed, or `LOGO_FONT=/path/to/Bauhaus93.ttf`.
 
 ## Debug launch options

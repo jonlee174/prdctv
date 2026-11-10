@@ -34,28 +34,35 @@ struct BoardWidgetView: View {
     }
 
     var body: some View {
-        if entry.listByTag, family != .systemSmall {
-            tagLayout
-        } else {
+        switch entry.layout {
+        case .tags where family != .systemSmall:
+            // Untagged tickets list under Miscellaneous.
+            listLayout(entry.tagLanes.map { (tag: $0.tag ?? "Miscellaneous", items: $0.items) }, titled: true, showsTags: false)
+        case .status where family != .systemSmall:
+            listLayout(entry.statusSections, titled: entry.statusTitles, showsTags: entry.statusShowsTags)
+        default:
             columnLayout
         }
     }
 
-    /// Bold tag titles with their open tickets underneath, the reward meter on the larger sizes.
-    @ViewBuilder private var tagLayout: some View {
+    /// Sections of open tickets under bold titles, the reward meter on the larger sizes.
+    @ViewBuilder private func listLayout(_ sections: [(tag: String?, items: [TicketSnapshot])],
+                                         titled: Bool, showsTags: Bool) -> some View {
         switch family {
         case .systemMedium:
-            TagColumns(lanes: entry.tagLanes, columns: 1, rows: 6)
+            SectionColumns(sections: sections, titled: titled, showsTags: showsTags, columns: 1, rows: 6)
         case .systemLarge:
             VStack(alignment: .leading, spacing: 10) {
                 if entry.largeShowsMeter { MeterBar(engine: entry.engine) }
                 // The meter takes about two rows, so they go to tickets when it's hidden.
-                TagColumns(lanes: entry.tagLanes, columns: 1, rows: entry.largeShowsMeter ? 12 : 14)
+                SectionColumns(sections: sections, titled: titled, showsTags: showsTags,
+                               columns: 1, rows: entry.largeShowsMeter ? 12 : 14)
             }
         default: // .systemExtraLarge
             VStack(alignment: .leading, spacing: 12) {
                 if entry.rewardsEnabled { MeterBar(engine: entry.engine) }
-                TagColumns(lanes: entry.tagLanes, columns: 2, rows: entry.rewardsEnabled ? 12 : 14)
+                SectionColumns(sections: sections, titled: titled, showsTags: showsTags,
+                               columns: 2, rows: entry.rewardsEnabled ? 12 : 14)
             }
         }
     }
@@ -196,29 +203,34 @@ private struct TicketList: View {
     }
 }
 
-/// Tag lanes packed into side by side columns, each a bold title over its tickets.
-private struct TagColumns: View {
-    let lanes: [(tag: String?, items: [TicketSnapshot])]
+/// Sections packed into side by side columns, each under a bold title unless titles are off.
+private struct SectionColumns: View {
+    /// Each section's title is in `tag`, and is ignored when `titled` is off.
+    let sections: [(tag: String?, items: [TicketSnapshot])]
+    let titled: Bool
+    let showsTags: Bool
     let columns: Int
     /// Lines per column, a title counting as one.
     let rows: Int
 
     var body: some View {
-        let packed = TicketTags.pack(lanes, columns: columns, rows: rows)
+        let packed = TicketTags.pack(sections, columns: columns, rows: rows, headingLines: titled ? 1 : 0)
         HStack(alignment: .top, spacing: 14) {
             if packed.isEmpty {
                 Text("Nothing to do").font(.caption).foregroundStyle(.tertiary)
             }
             ForEach(packed.indices, id: \.self) { index in
                 VStack(alignment: .leading, spacing: 5) {
-                    ForEach(packed[index], id: \.tag) { lane in
-                        Text(lane.tag ?? "Miscellaneous")
-                            .font(.system(size: 12, weight: .bold))
-                            .lineLimit(1)
-                            .padding(.top, lane.tag == packed[index].first?.tag ? 0 : 3)
-                        ForEach(lane.items) { ticket in
-                            TicketRow(ticket: ticket, showsTag: false)
-                                .padding(.leading, 6)
+                    ForEach(Array(packed[index].enumerated()), id: \.offset) { position, section in
+                        if titled, let title = section.tag {
+                            Text(title)
+                                .font(.system(size: 12, weight: .bold))
+                                .lineLimit(1)
+                                .padding(.top, position == 0 ? 0 : 3)
+                        }
+                        ForEach(section.items) { ticket in
+                            TicketRow(ticket: ticket, showsTag: showsTags)
+                                .padding(.leading, titled ? 6 : 0)
                         }
                     }
                 }
@@ -349,7 +361,7 @@ private struct RowLayout: Layout {
 #Preview("By tag", as: .systemLarge) {
     BoardWidget()
 } timeline: {
-    { var entry = BoardEntry.sample; entry.listByTag = true; return entry }()
+    { var entry = BoardEntry.sample; entry.layout = .tags; return entry }()
 }
 
 #Preview(as: .systemExtraLarge) {

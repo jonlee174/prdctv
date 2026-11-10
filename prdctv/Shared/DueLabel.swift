@@ -23,7 +23,7 @@ enum DueLabel {
     }
 }
 
-/// Due dates picked by month and day, without a year.
+/// Due dates typed as a month and day in quick add, without a year.
 enum DueDates {
     /// The next date with this month and day, today included, skipping years where it doesn't exist (Feb 29).
     static func nextOccurrence(month: Int, day: Int, from now: Date = Date(), calendar: Calendar = .current) -> Date? {
@@ -36,14 +36,5 @@ enum DueDates {
             if date >= today { return date }
         }
         return nil
-    }
-
-    /// Days offered for a month, with Feb 29 allowed since some year has it.
-    static func maxDay(inMonth month: Int) -> Int {
-        switch month {
-        case 2: 29
-        case 4, 6, 9, 11: 30
-        default: 31
-        }
     }
 }

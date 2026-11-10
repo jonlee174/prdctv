@@ -26,7 +26,7 @@ SHELL       := /bin/bash
 .SHELLFLAGS := -o pipefail -c
 
 .DEFAULT_GOAL := help
-.PHONY: icons help project widgets widgets-store restart-widgets mac mac-demo mac-build mac-dist ios-xcode screenshots store-art ios ios-demo ios-build device device-demo device-build \
+.PHONY: icons help project widgets widgets-store restart-widgets mac mac-demo mac-build mac-dist ios-archive ios-xcode screenshots store-art ios ios-demo ios-build device device-demo device-build \
         test sims devices clean
 
 help:
@@ -42,7 +42,8 @@ help:
 	@echo "  make widgets-store  Give the Mac widget back to the App Store copy"
 	@echo "  make test           Run unit tests"
 	@echo "  make mac-dist       Build the signed Mac App Store package for Transporter (build/dist)"
-	@echo "  make ios-xcode      Open the project in Xcode to archive and upload the iOS app"
+	@echo "  make ios-archive    Archive the iOS app with a new build number for the Xcode Organizer"
+	@echo "  make ios-xcode      Open the project in Xcode"
 	@echo "  make screenshots    Capture App Store screenshots for iPhone, iPad and Mac (build/screenshots)"
 	@echo "  make store-art      Make the App Store header and search results art (build/store-art)"
 	@echo "  make sims           List simulators (use SIM=\"<name>\")"
@@ -55,19 +56,25 @@ help:
 project:
 	@xcodegen generate --use-cache --quiet
 
+# Quits a running prdctv, waits for it to exit, then opens $(1) with launch options $(2).
+# Opening while the old copy is still quitting fails with LaunchServices error -600.
+define launch_mac
+	@pkill -x prdctv || true
+	@for i in $$(seq 50); do pgrep -x prdctv >/dev/null || break; sleep 0.1; done
+	@open $(1) $(2) || { sleep 1; open $(1) $(2); }
+endef
+
 # MARK: Mac
 
 mac-build: project
 	$(XCODEBUILD) -scheme prdctv -destination 'platform=macOS,arch=arm64' build
 
 mac: mac-build
-	@pkill -x prdctv || true
-	open $(MAC_APP)
+	$(call launch_mac,$(MAC_APP),)
 	@$(MAKE) --no-print-directory widgets
 
 mac-demo: mac-build
-	@pkill -x prdctv || true
-	open $(MAC_APP) --args --demo
+	$(call launch_mac,$(MAC_APP),--args --demo)
 	@$(MAKE) --no-print-directory widgets
 
 # A running widget process keeps its old code, so restart it and chronod, which launchd brings back.
@@ -153,7 +160,14 @@ mac-dist: project
 	@scripts/check_mac_package.sh $(DIST)/prdctv.pkg
 	@echo "Ready for Transporter: $(DIST)/prdctv.pkg (version $$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' $(ARCHIVES)/prdctv-mac.xcarchive/Products/Applications/prdctv.app/Contents/Info.plist), build $(BUILD_NUMBER))"
 
-# Opens the project in Xcode to archive and upload the iOS app from the Organizer.
+# Archives into the Organizer's folder for a manual upload. Product → Archive would reuse build number 1.
+IOS_ARCHIVE := $(HOME)/Library/Developer/Xcode/Archives/$(shell date +%F)/prdctviOS-$(BUILD_NUMBER).xcarchive
+ios-archive: project
+	xcodebuild -project $(PROJECT) -configuration Release -allowProvisioningUpdates -quiet \
+		CURRENT_PROJECT_VERSION=$(BUILD_NUMBER) archive \
+		-scheme prdctviOS -destination 'generic/platform=iOS' -archivePath "$(IOS_ARCHIVE)"
+	@echo "Archived version $$(/usr/libexec/PlistBuddy -c 'Print :ApplicationProperties:CFBundleShortVersionString' "$(IOS_ARCHIVE)/Info.plist"), build $(BUILD_NUMBER). Upload it from the Xcode Organizer."
+
 ios-xcode: project
 	open $(PROJECT)
 

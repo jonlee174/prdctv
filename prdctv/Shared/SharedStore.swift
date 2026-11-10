@@ -92,6 +92,11 @@ final class StoreController {
     }
 }
 
+extension Notification.Name {
+    /// Posted by `TicketOps.move` when a ticket moves into Done.
+    static let ticketCompleted = Notification.Name("ticketCompleted")
+}
+
 /// Ticket mutations shared by the app, menu bar, quick add, and widget intents,
 /// so ordering and reward rules live in one place.
 @MainActor
@@ -128,6 +133,7 @@ enum TicketOps {
         dueDate: Date? = nil,
         tags: [String] = [],
         notes: String = "",
+        repeatRule: RepeatRule? = nil,
         context: ModelContext
     ) -> Ticket {
         let last = tickets(in: status, context: context).last?.sortIndex ?? 0
@@ -138,6 +144,7 @@ enum TicketOps {
             status: status, sortIndex: last + 1, dueDate: dueDate,
             tags: TicketTags.canonical(tags, known: allTags(context: context))
         )
+        ticket.repeatRule = repeatRule
         context.insert(ticket)
         save(context)
         return ticket
@@ -146,6 +153,7 @@ enum TicketOps {
     /// Moves a ticket to `status`, placed before `before` (or at the end of the column).
     /// Callers are responsible for the reward unlock check (see `needsUnlock`).
     static func move(_ ticket: Ticket, to status: Status, before: Ticket? = nil, context: ModelContext) {
+        let finished = status == .done && ticket.status != .done
         let column = tickets(in: status, context: context).filter { $0.id != ticket.id }
         if let before, let index = column.firstIndex(where: { $0.id == before.id }) {
             let upper = column[index].sortIndex
@@ -155,7 +163,14 @@ enum TicketOps {
             ticket.sortIndex = (column.last?.sortIndex ?? 0) + 1
         }
         ticket.status = status
+        if finished, ticket.repeatRule != nil {
+            // The copy carries the repeat on, so finishing this one again after a reopen adds no second copy.
+            let last = tickets(in: .upNext, context: context).last?.sortIndex ?? 0
+            if let copy = ticket.repeatCopy(sortIndex: last + 1) { context.insert(copy) }
+            ticket.repeatRule = nil
+        }
         save(context)
+        if finished { NotificationCenter.default.post(name: .ticketCompleted, object: nil) }
     }
 
     /// Whether moving `ticket` to `status` requires spending a reward first.

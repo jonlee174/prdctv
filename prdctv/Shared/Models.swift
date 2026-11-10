@@ -102,6 +102,9 @@ final class Ticket {
     var completedAt: Date?
     var dueDate: Date?
     var tags: [String] = []
+    /// Repeat count, 0 when the ticket doesn't repeat. When done, a copy goes to Up Next.
+    var repeatEvery: Int = 0
+    var repeatUnitRaw: String = RepeatUnit.day.rawValue
 
     init(
         title: String,
@@ -124,6 +127,24 @@ final class Ticket {
         self.completedAt = status == .done ? Date() : nil
         self.dueDate = dueDate
         self.tags = tags
+    }
+
+    var repeatRule: RepeatRule? {
+        get { repeatEvery > 0 ? RepeatRule(every: repeatEvery, unit: RepeatUnit(rawValue: repeatUnitRaw) ?? .day) : nil }
+        set {
+            repeatEvery = newValue.map { max($0.every, 1) } ?? 0
+            repeatUnitRaw = (newValue?.unit ?? .day).rawValue
+        }
+    }
+
+    /// The Up Next copy made when a repeating ticket is done, due one interval later.
+    func repeatCopy(sortIndex: Double, finishedAt finished: Date = Date(), calendar: Calendar = .current) -> Ticket? {
+        guard let rule = repeatRule else { return nil }
+        let copy = Ticket(title: title, notes: notes, category: category, points: points, status: .upNext,
+                          sortIndex: sortIndex, dueDate: rule.nextDue(after: dueDate, finishedAt: finished, calendar: calendar),
+                          tags: tags)
+        copy.repeatRule = rule
+        return copy
     }
 
     var category: Category {

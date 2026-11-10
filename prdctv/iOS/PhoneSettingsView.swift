@@ -5,6 +5,7 @@ struct PhoneSettingsView: View {
     @AppStorage(RewardSettings.wantRatioKey, store: AppGroup.defaults) private var wantRatio = RewardSettings.defaultWantRatio
     @AppStorage(RewardSettings.funRatioKey, store: AppGroup.defaults) private var funRatio = RewardSettings.defaultFunRatio
     @AppStorage("doneShowsAll") private var doneShowsAll = false
+    @AppStorage(Confetti.enabledKey) private var confetti = true
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
     @AppStorage(RewardSettings.pointsEnabledKey, store: AppGroup.defaults) private var pointsEnabled = true
 
@@ -30,6 +31,7 @@ struct PhoneSettingsView: View {
                 Section {
                     Toggle("Points", isOn: $pointsEnabled)
                     Toggle("Keep all completed tickets in Done", isOn: $doneShowsAll)
+                    Toggle("Confetti when a ticket is done", isOn: $confetti)
                 } header: {
                     Text("Board")
                 } footer: {
@@ -65,7 +67,7 @@ struct PhoneSettingsView: View {
                 } header: {
                     Text("Widget")
                 } footer: {
-                    Text("Due dates show the weekday for the coming week and the date after that. List by tag shows open tickets under bold tag titles instead of by column. Applies to every prdctv widget.")
+                    Text("Due dates show the weekday for the coming week and the date after that. By tag lists open tickets under bold tag titles. By status lists them under In Progress and Up Next, each sorted by due date. Applies to every prdctv widget.")
                 }
 
                 Section("Appearance") {

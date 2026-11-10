@@ -14,10 +14,11 @@ struct TicketEditorView: View {
     @State private var category = Category.need
     @State private var points = 1
     @State private var hasDue = false
-    @State private var dueMonth = Calendar.current.component(.month, from: Date())
-    @State private var dueDay = Calendar.current.component(.day, from: Date())
-    /// The date the ticket opened with, kept while its month and day are unchanged so overdue dates don't jump a year.
-    @State private var originalDue: Date?
+    @State private var due = Calendar.current.startOfDay(for: Date())
+    @State private var showsCalendar = false
+    @State private var repeatChoice = RepeatChoice.never
+    @State private var customEvery = 2
+    @State private var customUnit = RepeatUnit.week
     @State private var tags: [String] = []
     @State private var tagText = ""
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
@@ -50,17 +51,29 @@ struct TicketEditorView: View {
 
                 Toggle("Due date", isOn: $hasDue)
                 if hasDue {
-                    // No year to pick. The date is the next time this month and day comes around.
-                    Picker("Month", selection: $dueMonth) {
-                        ForEach(1...12, id: \.self) { Text(Calendar.current.monthSymbols[$0 - 1]).tag($0) }
+                    // The button shows the date without a year, and the calendar opens from it.
+                    LabeledContent("Date") {
+                        Button(dueText(due)) { withAnimation { showsCalendar.toggle() } }
+                        #if os(macOS)
+                            .popover(isPresented: $showsCalendar) { calendar.padding() }
+                        #endif
                     }
-                    Picker("Day", selection: $dueDay) {
-                        ForEach(1...DueDates.maxDay(inMonth: dueMonth), id: \.self) { Text("\($0)").tag($0) }
+                    #if os(iOS)
+                    // A popover squeezes the calendar into a narrow column on iPhone and iPad, so it opens in the form.
+                    if showsCalendar { calendar }
+                    #endif
+                }
+
+                Picker("Repeat", selection: $repeatChoice) {
+                    ForEach(RepeatChoice.allCases) { Text($0.label).tag($0) }
+                }
+                if repeatChoice == .custom {
+                    Stepper("Every \(customEvery) \(customUnit.name(count: customEvery))", value: $customEvery, in: 1...99)
+                    Picker("Unit", selection: $customUnit) {
+                        ForEach(RepeatUnit.allCases) { Text($0.name(count: 2).capitalized).tag($0) }
                     }
-                    if let due = resolvedDue {
-                        Text("Due \(dueText(due))")
-                            .foregroundStyle(.secondary)
-                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
 
                 TagField(tags: $tags, text: $tagText, known: knownTags)
@@ -88,7 +101,8 @@ struct TicketEditorView: View {
         }
         .macFrame(width: 440)
         .onAppear(perform: load)
-        .onChange(of: dueMonth) { dueDay = min(dueDay, DueDates.maxDay(inMonth: dueMonth)) }
+        // Picking a day closes the calendar. Changing the month doesn't.
+        .onChange(of: due) { withAnimation { showsCalendar = false } }
     }
 
     private var knownTags: [String] {
@@ -100,34 +114,25 @@ struct TicketEditorView: View {
         return false
     }
 
-    private func setDue(_ date: Date) {
-        let day = Calendar.current.startOfDay(for: date)
-        originalDue = day
-        dueMonth = Calendar.current.component(.month, from: day)
-        dueDay = Calendar.current.component(.day, from: day)
+    private var repeatRule: RepeatRule? {
+        repeatChoice == .custom ? RepeatRule(every: customEvery, unit: customUnit) : repeatChoice.rule
     }
 
-    /// The original date while the month and day match it, otherwise the next time they come around.
-    private var resolvedDue: Date? {
-        let calendar = Calendar.current
-        if let originalDue, calendar.component(.month, from: originalDue) == dueMonth,
-           calendar.component(.day, from: originalDue) == dueDay {
-            return originalDue
-        }
-        return DueDates.nextOccurrence(month: dueMonth, day: dueDay)
+    private var calendar: some View {
+        DatePicker("Due", selection: $due, displayedComponents: .date)
+            .datePickerStyle(.graphical)
+            .labelsHidden()
     }
 
-    /// Weekday and date, with the year only when it isn't this year.
+    /// Weekday, month and day, never the year.
     private func dueText(_ date: Date) -> String {
-        let sameYear = Calendar.current.isDate(date, equalTo: Date(), toGranularity: .year)
-        return sameYear ? date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
-            : date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day().year())
+        date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
     }
 
     private func load() {
         if case .new(_, let due?) = target {
             hasDue = true
-            setDue(due)
+            self.due = Calendar.current.startOfDay(for: due)
         }
         if case .existing(let ticket) = target {
             title = ticket.title
@@ -135,7 +140,12 @@ struct TicketEditorView: View {
             category = ticket.category
             points = ticket.points
             hasDue = ticket.dueDate != nil
-            if let due = ticket.dueDate { setDue(due) }
+            if let due = ticket.dueDate { self.due = Calendar.current.startOfDay(for: due) }
+            if let rule = ticket.repeatRule {
+                repeatChoice = RepeatChoice(rule)
+                customEvery = rule.every
+                customUnit = rule.unit
+            }
             tags = ticket.tags
         }
         titleFocused = true
@@ -144,14 +154,14 @@ struct TicketEditorView: View {
     private func save() {
         let tags = TicketTags.canonical(self.tags + tagText.split(separator: ",").map(String.init), known: knownTags)
         let cleanTitle = title.trimmingCharacters(in: .whitespaces)
-        let due = hasDue ? resolvedDue : nil
+        let due = hasDue ? Calendar.current.startOfDay(for: self.due) : nil
 
         switch target {
         case .new(let status, _):
             // Reward tickets can't be created already started; they begin in Up Next at most.
             let start: Status = category.isReward && status.requiresUnlock ? .upNext : status
             TicketOps.add(title: cleanTitle, category: category, points: points, status: start,
-                          dueDate: due, tags: tags, notes: notes, context: context)
+                          dueDate: due, tags: tags, notes: notes, repeatRule: repeatRule, context: context)
         case .existing(let ticket):
             ticket.title = cleanTitle
             ticket.notes = notes
@@ -159,9 +169,32 @@ struct TicketEditorView: View {
             ticket.points = points
             ticket.dueDate = due
             ticket.tags = tags
+            ticket.repeatRule = repeatRule
             TicketOps.save(context)
         }
         dismiss()
+    }
+}
+
+/// The editor's repeat menu. Custom covers any count and unit.
+private enum RepeatChoice: String, CaseIterable, Identifiable {
+    case never, daily, weekly, monthly, custom
+
+    var id: String { rawValue }
+
+    var label: String { rawValue == "never" ? "Never" : rawValue.capitalized }
+
+    var rule: RepeatRule? {
+        switch self {
+        case .never, .custom: nil
+        case .daily: .daily
+        case .weekly: .weekly
+        case .monthly: .monthly
+        }
+    }
+
+    init(_ rule: RepeatRule) {
+        self = Self.allCases.first { $0.rule == rule } ?? .custom
     }
 }
 

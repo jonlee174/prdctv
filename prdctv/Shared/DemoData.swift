@@ -25,6 +25,7 @@ enum DemoData {
             if let days = dueIn[row.0] {
                 t.dueDate = cal.date(byAdding: .day, value: days, to: cal.startOfDay(for: Date()))
             }
+            if row.0 == "Algebra worksheet" { t.repeatRule = .weekly }
             context.insert(t)
         }
 

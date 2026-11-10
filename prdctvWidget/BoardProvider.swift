@@ -19,7 +19,9 @@ struct BoardEntry: TimelineEntry {
     let upNext: [TicketSnapshot]
     let inProgress: [TicketSnapshot]
     /// From the app's Settings, shared by every prdctv widget.
-    var listByTag = false
+    var layout = WidgetLayout.columns
+    var statusTitles = true
+    var statusShowsTags = true
     var showsMiscellaneous = true
     var tagOrder = TagLaneOrder()
     var rewardsEnabled = true
@@ -32,6 +34,13 @@ struct BoardEntry: TimelineEntry {
     var upNextNeed: [TicketSnapshot] { upNext.filter { $0.category == .need } }
 
     /// Open tickets under their first tag, In Progress before Up Next inside each tag.
+    /// In Progress then Up Next, each soonest due first. Without titles the sections still keep that order.
+    var statusSections: [(tag: String?, items: [TicketSnapshot])] {
+        [("In Progress", inProgress), ("Up Next", upNext)]
+            .map { (tag: $0.0, items: TicketTags.byDueDate($0.1, dueDate: \.dueDate)) }
+            .filter { !$0.items.isEmpty }
+    }
+
     var tagLanes: [(tag: String?, items: [TicketSnapshot])] {
         TicketTags.lanes(inProgress + upNext, tags: \.tags, dueDate: \.dueDate, order: tagOrder)
             .filter { $0.tag != nil || showsMiscellaneous }
@@ -76,7 +85,9 @@ struct BoardProvider: TimelineProvider {
             engine: RewardEngine(tickets: tickets, redemptions: redemptions, settings: .load()),
             upNext: snapshots(.upNext),
             inProgress: snapshots(.inProgress),
-            listByTag: AppGroup.defaults.bool(forKey: TicketTags.widgetListByTagKey),
+            layout: WidgetLayout.load(),
+            statusTitles: AppGroup.defaults.object(forKey: TicketTags.widgetStatusTitlesKey) as? Bool ?? true,
+            statusShowsTags: AppGroup.defaults.object(forKey: TicketTags.widgetStatusShowsTagsKey) as? Bool ?? true,
             showsMiscellaneous: AppGroup.defaults.object(forKey: TicketTags.widgetShowsMiscellaneousKey) as? Bool ?? true,
             tagOrder: TagLaneOrder.load(),
             rewardsEnabled: rewardsEnabled,

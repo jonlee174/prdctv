@@ -105,4 +105,26 @@ struct TagTests {
         #expect(TagLaneOrder.decodePriority(raw) == ["quiz", "art history"])
         #expect(TagLaneOrder(tagsRaw: "bogus", tasksRaw: "", priorityRaw: "").tags == .custom)
     }
+
+    @Test func untitledSectionsTakeNoHeadingLine() {
+        let sections: [(tag: String?, items: [Int])] = [("In Progress", [1, 2]), ("Up Next", [3, 4, 5])]
+        #expect(TicketTags.pack(sections, columns: 1, rows: 4, headingLines: 0).first?.map(\.items) == [[1, 2], [3, 4]])
+        #expect(TicketTags.pack(sections, columns: 1, rows: 5).first?.map(\.items) == [[1, 2], [3]])
+    }
+
+    @Test func byDueDatePutsUndatedLastAndKeepsTies() {
+        let dates: [Int?] = [nil, 3, 1, 3, nil]
+        let sorted = TicketTags.byDueDate(Array(dates.indices)) { dates[$0].map { self.base.addingTimeInterval(Double($0)) } }
+        #expect(sorted == [2, 1, 3, 0, 4])
+    }
+
+    @Test func widgetLayoutFallsBackToTheOldSwitch() {
+        let defaults = UserDefaults(suiteName: "WidgetLayoutTest")!
+        defaults.removePersistentDomain(forName: "WidgetLayoutTest")
+        #expect(WidgetLayout.load(defaults) == .columns)
+        defaults.set(true, forKey: TicketTags.widgetListByTagKey)
+        #expect(WidgetLayout.load(defaults) == .tags)
+        defaults.set("status", forKey: TicketTags.widgetLayoutKey)
+        #expect(WidgetLayout.load(defaults) == .status)
+    }
 }

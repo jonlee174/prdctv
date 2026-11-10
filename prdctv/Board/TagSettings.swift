@@ -86,7 +86,10 @@ struct TagColorSettings: View {
 
 /// Widget layout switches, stored where the widget can read them.
 struct WidgetSettings: View {
-    @AppStorage(TicketTags.widgetListByTagKey, store: AppGroup.defaults) private var listByTag = false
+    // Falls back to the older List by tag switch until a layout is picked here.
+    @AppStorage(TicketTags.widgetLayoutKey, store: AppGroup.defaults) private var layoutRaw = WidgetLayout.load().rawValue
+    @AppStorage(TicketTags.widgetStatusTitlesKey, store: AppGroup.defaults) private var statusTitles = true
+    @AppStorage(TicketTags.widgetStatusShowsTagsKey, store: AppGroup.defaults) private var statusShowsTags = true
     @AppStorage(TicketTags.widgetShowsMiscellaneousKey, store: AppGroup.defaults) private var showsMiscellaneous = true
     @AppStorage(RewardSettings.largeWidgetShowsMeterKey, store: AppGroup.defaults) private var largeShowsMeter = true
     @AppStorage(RewardSettings.enabledKey, store: AppGroup.defaults) private var rewardsEnabled = true
@@ -96,12 +99,24 @@ struct WidgetSettings: View {
         Toggle("Due dates", isOn: $showsDueDates)
             .help("The weekday for the next week, the date after that")
             .onChange(of: showsDueDates) { SharedStore.reloadWidgets() }
-        Toggle("List by tag", isOn: $listByTag)
-            .onChange(of: listByTag) { SharedStore.reloadWidgets() }
+        Picker("Layout", selection: $layoutRaw) {
+            Text("Columns").tag(WidgetLayout.columns.rawValue)
+            Text("By tag").tag(WidgetLayout.tags.rawValue)
+            Text("By status").tag(WidgetLayout.status.rawValue)
+        }
+        .onChange(of: layoutRaw) { SharedStore.reloadWidgets() }
         Toggle("Show miscellaneous", isOn: $showsMiscellaneous)
-            .disabled(!listByTag)
+            .disabled(layoutRaw != WidgetLayout.tags.rawValue)
             .help("Untagged tickets, listed last")
             .onChange(of: showsMiscellaneous) { SharedStore.reloadWidgets() }
+        Toggle("Status titles", isOn: $statusTitles)
+            .disabled(layoutRaw != WidgetLayout.status.rawValue)
+            .help("In Progress and Up Next titles in the By status layout")
+            .onChange(of: statusTitles) { SharedStore.reloadWidgets() }
+        Toggle("Tags in rows", isOn: $statusShowsTags)
+            .disabled(layoutRaw != WidgetLayout.status.rawValue)
+            .help("Each row's first tag in the By status layout")
+            .onChange(of: statusShowsTags) { SharedStore.reloadWidgets() }
         Toggle("Rewards in the large widget", isOn: $largeShowsMeter)
             .disabled(!rewardsEnabled)
             .onChange(of: largeShowsMeter) { SharedStore.reloadWidgets() }

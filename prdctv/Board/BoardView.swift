@@ -51,6 +51,7 @@ struct BoardView: View {
             }
         }
         .background(Color(nsColor: .windowBackgroundColor))
+        .celebratesCompletions()
         .focusable()
         .focusEffectDisabled()
         .focused($boardFocused)

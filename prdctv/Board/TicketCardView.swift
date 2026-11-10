@@ -130,6 +130,9 @@ struct TicketCardView: View {
                     if !ticket.notes.isEmpty {
                         Image(systemName: "text.alignleft").foregroundStyle(.tertiary)
                     }
+                    if let rule = ticket.repeatRule {
+                        Label(rule.label, systemImage: "repeat").foregroundStyle(.secondary)
+                    }
                 }
                 .font(.system(size: 10))
                 .labelStyle(.titleAndIcon)
@@ -170,7 +173,7 @@ struct TicketCardView: View {
     }
 
     private var hasMeta: Bool {
-        ticket.dueDate != nil || !shownTags.isEmpty || !ticket.notes.isEmpty
+        ticket.dueDate != nil || !shownTags.isEmpty || !ticket.notes.isEmpty || ticket.repeatRule != nil
     }
 
     private var shownTags: [String] {
@@ -186,6 +189,7 @@ struct TicketCardView: View {
         var parts = [rewardsEnabled ? "\(ticket.category.label) ticket" : "Ticket", ticket.title]
         if pointsEnabled { parts.append("\(ticket.points) points") }
         parts += ticket.tags.map { "tag \($0)" }
+        if let rule = ticket.repeatRule { parts.append("repeats \(rule.label.lowercased())") }
         switch lock {
         case .locked: parts.append("locked")
         case .affordable: parts.append("locked, reward available")
