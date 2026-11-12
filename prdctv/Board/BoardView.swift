@@ -195,6 +195,8 @@ struct BoardView: View {
             if let next = ticket.status.next { requestMove(ticket, to: next) }
         case .move(let status):
             requestMove(ticket, to: status)
+        case .hold:
+            withAnimation { TicketOps.setHold(ticket, !ticket.onHold, context: context) }
         case .points(let value):
             ticket.points = value
             TicketOps.save(context)
@@ -239,6 +241,9 @@ struct BoardView: View {
         switch press.characters.lowercased() {
         case "n":
             editTarget = .new(.upNext)
+            return .handled
+        case "h":
+            if let selected, selected.status != .done { perform(.hold, on: selected) }
             return .handled
         case "1", "2", "3", "4", "5":
             guard rewardSettings.value.countsPoints, let selected, let n = Int(press.characters) else { return .ignored }

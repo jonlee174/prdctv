@@ -17,6 +17,7 @@ struct TicketEditorView: View {
     @State private var due = Calendar.current.startOfDay(for: Date())
     @State private var showsCalendar = false
     @State private var repeatChoice = RepeatChoice.never
+    @State private var onHold = false
     @State private var customEvery = 2
     @State private var customUnit = RepeatUnit.week
     @State private var tags: [String] = []
@@ -76,6 +77,10 @@ struct TicketEditorView: View {
                     .labelsHidden()
                 }
 
+                if !isDone {
+                    Toggle("On hold", isOn: $onHold)
+                }
+
                 TagField(tags: $tags, text: $tagText, known: knownTags)
 
                 TextField("Notes", text: $notes, axis: .vertical)
@@ -107,6 +112,11 @@ struct TicketEditorView: View {
 
     private var knownTags: [String] {
         TicketTags.allTags(in: allTickets.map(\.tags))
+    }
+
+    private var isDone: Bool {
+        if case .existing(let ticket) = target { return ticket.status == .done }
+        return false
     }
 
     private var isNew: Bool {
@@ -147,6 +157,7 @@ struct TicketEditorView: View {
                 customUnit = rule.unit
             }
             tags = ticket.tags
+            onHold = ticket.onHold
         }
         titleFocused = true
     }
@@ -161,7 +172,7 @@ struct TicketEditorView: View {
             // Reward tickets can't be created already started; they begin in Up Next at most.
             let start: Status = category.isReward && status.requiresUnlock ? .upNext : status
             TicketOps.add(title: cleanTitle, category: category, points: points, status: start,
-                          dueDate: due, tags: tags, notes: notes, repeatRule: repeatRule, context: context)
+                          dueDate: due, tags: tags, notes: notes, repeatRule: repeatRule, onHold: onHold, context: context)
         case .existing(let ticket):
             ticket.title = cleanTitle
             ticket.notes = notes
@@ -170,6 +181,7 @@ struct TicketEditorView: View {
             ticket.dueDate = due
             ticket.tags = tags
             ticket.repeatRule = repeatRule
+            ticket.onHold = onHold && ticket.status != .done
             TicketOps.save(context)
         }
         dismiss()

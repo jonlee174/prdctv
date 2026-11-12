@@ -26,6 +26,7 @@ enum DemoData {
                 t.dueDate = cal.date(byAdding: .day, value: days, to: cal.startOfDay(for: Date()))
             }
             if row.0 == "Algebra worksheet" { t.repeatRule = .weekly }
+            t.onHold = row.0 == "Renew passport"
             context.insert(t)
         }
 

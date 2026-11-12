@@ -42,7 +42,8 @@ struct MenuBarContent: View {
     var coloring = TaskColoring()
 
     private var upNext: [Ticket] {
-        rewardsEnabled ? allUpNext : allUpNext.filter { !$0.category.isReward }
+        // Like the widget, the menu bar leaves out tickets on hold.
+        allUpNext.filter { !$0.onHold && (rewardsEnabled || !$0.category.isReward) }
     }
 
     @State private var text = ""

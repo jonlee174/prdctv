@@ -105,6 +105,8 @@ final class Ticket {
     /// Repeat count, 0 when the ticket doesn't repeat. When done, a copy goes to Up Next.
     var repeatEvery: Int = 0
     var repeatUnitRaw: String = RepeatUnit.day.rawValue
+    /// Waiting on someone else. Shown on the board with a badge and left out of the widget.
+    var onHold: Bool = false
 
     init(
         title: String,

@@ -12,7 +12,7 @@ settings:
     DEVELOPMENT_TEAM: TTM9BN6M53
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.3"
+    MARKETING_VERSION: "1.4"
     CURRENT_PROJECT_VERSION: "1"
     ENABLE_HARDENED_RUNTIME: YES
     # Must match prdctv/Shared/AppGroup.swift.
@@ -39,6 +39,10 @@ targets:
       - path: prdctv/Import
       - path: prdctv/Shared
       - path: prdctv/Resources
+      # Icon Composer document, so macOS can draw a dark version of the gradient icon.
+      - path: prdctv/MacIcon/AppIconMac.icon
+        type: file
+        buildPhase: resources
     dependencies:
       - target: prdctvWidget
         embed: true
@@ -68,8 +72,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jonathanlee.prdctv
         PRODUCT_NAME: prdctv
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        # Every size in AppIcon.icns, since Transporter and the App Store read the 1024 pixel icon from it.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIconMac
+        # Every size in AppIconMac.icns, since Transporter and the App Store read the 1024 pixel icon from it.
         ASSETCATALOG_COMPILER_STANDALONE_ICON_BEHAVIOR: all
         ENABLE_APP_SANDBOX: YES
 

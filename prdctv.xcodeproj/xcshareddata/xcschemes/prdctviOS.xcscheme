@@ -2,10 +2,11 @@
 <Scheme
    LastUpgradeVersion = "1430"
    wasCreatedForAppExtension = "YES"
-   version = "2.0">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      runPostActionsOnFailure = "NO">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -16,7 +17,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BD9453276AA9591CB6E1ED01"
-               BuildableName = "prdctvWidget.appex"
+               BuildableName = "prdctvWidgetiOS.appex"
                BlueprintName = "prdctvWidgetiOS"
                ReferencedContainer = "container:prdctv.xcodeproj">
             </BuildableReference>
@@ -30,7 +31,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "EF64196FFB4138A98EEB463A"
-               BuildableName = "prdctv.app"
+               BuildableName = "prdctviOS.app"
                BlueprintName = "prdctviOS"
                ReferencedContainer = "container:prdctv.xcodeproj">
             </BuildableReference>
@@ -41,12 +42,13 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "NO">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BD9453276AA9591CB6E1ED01"
-            BuildableName = "prdctvWidget.appex"
+            BuildableName = "prdctvWidgetiOS.appex"
             BlueprintName = "prdctvWidgetiOS"
             ReferencedContainer = "container:prdctv.xcodeproj">
          </BuildableReference>
@@ -59,23 +61,24 @@
       selectedDebuggerIdentifier = ""
       selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
-      askForAppToLaunch = "Yes"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "2">
-      <RemoteRunnable
-         runnableDebuggingMode = "2"
-         BundleIdentifier = "com.apple.springboard">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BD9453276AA9591CB6E1ED01"
-            BuildableName = "prdctvWidget.appex"
+            BuildableName = "prdctvWidgetiOS.appex"
+            BlueprintName = "prdctvWidgetiOS"
             ReferencedContainer = "container:prdctv.xcodeproj">
          </BuildableReference>
-      </RemoteRunnable>
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -88,7 +91,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BD9453276AA9591CB6E1ED01"
-            BuildableName = "prdctvWidget.appex"
+            BuildableName = "prdctvWidgetiOS.appex"
             BlueprintName = "prdctvWidgetiOS"
             ReferencedContainer = "container:prdctv.xcodeproj">
          </BuildableReference>

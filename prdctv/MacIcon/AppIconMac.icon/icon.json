@@ -1,0 +1,53 @@
+{
+  "fill": {
+    "solid": "srgb:0.55686,0.85098,0.45098,1.00000"
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "image-name": "mark-gradient.png",
+          "name": "mark-gradient",
+          "hidden-specializations": [
+            {
+              "value": true
+            },
+            {
+              "appearance": "dark",
+              "value": false
+            }
+          ]
+        },
+        {
+          "image-name": "mark.png",
+          "name": "mark",
+          "hidden-specializations": [
+            {
+              "appearance": "dark",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "image-name": "background.png",
+          "name": "background",
+          "hidden-specializations": [
+            {
+              "appearance": "dark",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "supported-platforms": {
+    "squares": [
+      "macOS"
+    ]
+  }
+}

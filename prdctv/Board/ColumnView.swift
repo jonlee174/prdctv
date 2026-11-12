@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum CardAction {
-    case edit, advance, move(Status), points(Int), delete
+    case edit, advance, move(Status), hold, points(Int), delete
 }
 
 struct ColumnView: View {
@@ -154,6 +154,9 @@ private struct CardRow: View {
             ForEach(Status.allCases.filter { $0 != ticket.status }) { status in
                 Button(status.label) { onAction(.move(status)) }
             }
+        }
+        if ticket.status != .done {
+            Button(ticket.onHold ? "Take Off Hold" : "Put On Hold") { onAction(.hold) }
         }
         if RewardSettings.pointsEnabled() {
             Menu("Points") {

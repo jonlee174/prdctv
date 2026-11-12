@@ -41,6 +41,8 @@ ASSETS = Path("prdctv/Resources/Assets.xcassets")
 ICONSET = ASSETS / "AppIcon.appiconset"
 MARKSET = ASSETS / "LogoMark.imageset"
 FULLSET = ASSETS / "LogoFull.imageset"
+# The Mac icon is an Icon Composer document, the only way macOS 26 and later get a dark version of a gradient icon.
+MAC_ICON = Path("prdctv/MacIcon/AppIconMac.icon")
 
 
 def mark_mask(canvas: int, size: float, center=None) -> Image.Image:
@@ -149,8 +151,51 @@ def write_iconset(folder: Path, background=gradient) -> int:
     return len(images)
 
 
+def write_mac_icon_document(folder: Path) -> None:
+    """Light shows the gradient with the gray mark, dark shows the mark in the gradient on macOS's dark tile."""
+    assets = folder / "Assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    size = 1024
+    gradient(size).save(assets / "background.png", icc_profile=SRGB_ICC)
+    mark = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    mark.paste(Image.new("RGBA", (size, size), MARK + (255,)), mask=mark_mask(size, size * 0.50))
+    mark.save(assets / "mark.png", icc_profile=SRGB_ICC)
+    mark_gradient = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    mark_gradient.paste(gradient(size).convert("RGBA"), mask=mark_mask(size, size * 0.50))
+    mark_gradient.save(assets / "mark-gradient.png", icc_profile=SRGB_ICC)
+    # A gradient fill ignores its direction in this format, so the diagonal comes from the image layer instead.
+    green = ",".join(f"{c / 255:.5f}" for c in BG)
+    document = {
+        "fill": {"solid": f"srgb:{green},1.00000"},
+        "groups": [
+            {"layers": [
+                # A specialization list without an appearance sets the default, so this one shows only in dark.
+                {
+                    "image-name": "mark-gradient.png",
+                    "name": "mark-gradient",
+                    "hidden-specializations": [{"value": True}, {"appearance": "dark", "value": False}],
+                },
+                {
+                    "image-name": "mark.png",
+                    "name": "mark",
+                    "hidden-specializations": [{"appearance": "dark", "value": True}],
+                },
+            ]},
+            {"layers": [{
+                "image-name": "background.png",
+                "name": "background",
+                "hidden-specializations": [{"appearance": "dark", "value": True}],
+            }]},
+        ],
+        "supported-platforms": {"squares": ["macOS"]},
+    }
+    (folder / "icon.json").write_text(json.dumps(document, indent=2) + "\n")
+
+
 def main() -> None:
     images = [None] * write_iconset(ICONSET)
+    write_mac_icon_document(MAC_ICON)
+    print(f"Wrote the Mac icon document to {MAC_ICON}")
 
     # Template vector mark: tinted by the system (menu bar) or by foregroundStyle in the app.
     x0, y0, x1, y1 = HOLE

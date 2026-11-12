@@ -120,6 +120,11 @@ struct TicketCardView: View {
 
             if hasMeta {
                 FlowLayout(spacing: 6) {
+                    if ticket.onHold {
+                        Label("On hold", systemImage: "pause.circle.fill")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.orange)
+                    }
                     ForEach(shownTags, id: \.self) { tag in
                         TagChip(tag: tag)
                     }
@@ -173,7 +178,7 @@ struct TicketCardView: View {
     }
 
     private var hasMeta: Bool {
-        ticket.dueDate != nil || !shownTags.isEmpty || !ticket.notes.isEmpty || ticket.repeatRule != nil
+        ticket.dueDate != nil || !shownTags.isEmpty || !ticket.notes.isEmpty || ticket.repeatRule != nil || ticket.onHold
     }
 
     private var shownTags: [String] {
@@ -187,6 +192,7 @@ struct TicketCardView: View {
 
     private var accessibilityText: String {
         var parts = [rewardsEnabled ? "\(ticket.category.label) ticket" : "Ticket", ticket.title]
+        if ticket.onHold { parts.append("on hold") }
         if pointsEnabled { parts.append("\(ticket.points) points") }
         parts += ticket.tags.map { "tag \($0)" }
         if let rule = ticket.repeatRule { parts.append("repeats \(rule.label.lowercased())") }

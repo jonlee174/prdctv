@@ -134,6 +134,7 @@ enum TicketOps {
         tags: [String] = [],
         notes: String = "",
         repeatRule: RepeatRule? = nil,
+        onHold: Bool = false,
         context: ModelContext
     ) -> Ticket {
         let last = tickets(in: status, context: context).last?.sortIndex ?? 0
@@ -145,6 +146,7 @@ enum TicketOps {
             tags: TicketTags.canonical(tags, known: allTags(context: context))
         )
         ticket.repeatRule = repeatRule
+        ticket.onHold = onHold && status != .done
         context.insert(ticket)
         save(context)
         return ticket
@@ -163,6 +165,7 @@ enum TicketOps {
             ticket.sortIndex = (column.last?.sortIndex ?? 0) + 1
         }
         ticket.status = status
+        if finished { ticket.onHold = false }
         if finished, ticket.repeatRule != nil {
             // The copy carries the repeat on, so finishing this one again after a reopen adds no second copy.
             let last = tickets(in: .upNext, context: context).last?.sortIndex ?? 0
@@ -171,6 +174,12 @@ enum TicketOps {
         }
         save(context)
         if finished { NotificationCenter.default.post(name: .ticketCompleted, object: nil) }
+    }
+
+    /// Puts a ticket on hold or takes it off. Done tickets can't be on hold.
+    static func setHold(_ ticket: Ticket, _ onHold: Bool, context: ModelContext) {
+        ticket.onHold = onHold && ticket.status != .done
+        save(context)
     }
 
     /// Whether moving `ticket` to `status` requires spending a reward first.

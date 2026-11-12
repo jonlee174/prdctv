@@ -14,18 +14,18 @@ struct PhoneSettingsView: View {
             Form {
                 Section {
                     Toggle("Want and Fun rewards", isOn: $rewardsEnabled)
-                    Stepper(value: $wantRatio, in: 1...50) {
-                        LabeledContent(pointsEnabled ? "Need points per Want" : "Need tickets per Want", value: "\(wantRatio)")
+                    if rewardsEnabled {
+                        Stepper(value: $wantRatio, in: 1...50) {
+                            LabeledContent(pointsEnabled ? "Need points per Want" : "Need tickets per Want", value: "\(wantRatio)")
+                        }
+                        Stepper(value: $funRatio, in: 1...50) {
+                            LabeledContent(pointsEnabled ? "Need points per Fun" : "Need tickets per Fun", value: "\(funRatio)")
+                        }
                     }
-                    .disabled(!rewardsEnabled)
-                    Stepper(value: $funRatio, in: 1...50) {
-                        LabeledContent(pointsEnabled ? "Need points per Fun" : "Need tickets per Fun", value: "\(funRatio)")
-                    }
-                    .disabled(!rewardsEnabled)
                 } header: {
                     Text("Rewards")
                 } footer: {
-                    Text("When off, the reward meter and Want and Fun tickets are hidden but kept. Want and Fun counters are independent. Balances are recomputed from history, so changes apply retroactively. Ratios are set per device.")
+                    Text("Turning rewards off hides Want and Fun tickets without deleting them.")
                 }
 
                 Section {
@@ -35,15 +35,13 @@ struct PhoneSettingsView: View {
                 } header: {
                     Text("Board")
                 } footer: {
-                    Text("With Points off, each finished Need ticket counts as 1 toward rewards and point values are hidden but kept. With Keep all off, Done shows this week and older tickets move to History.")
+                    Text("Without points, each finished Need ticket counts as 1. Older tickets move to History unless Keep all is on.")
                 }
 
-                Section {
-                    CategoryStyleSettings()
-                } header: {
-                    Text("Categories")
-                } footer: {
-                    Text("Pick an icon and color for Need, Want and Fun tickets.")
+                if rewardsEnabled {
+                    Section("Categories") {
+                        CategoryStyleSettings()
+                    }
                 }
 
                 Section {
@@ -51,7 +49,7 @@ struct PhoneSettingsView: View {
                 } header: {
                     Text("Colors")
                 } footer: {
-                    Text("Greens from the logo by default. Tap a swatch to pick any color (Spectrum is the color wheel); it applies right away. ↺ puts back the default.")
+                    Text("Tap a swatch to change a color, and ↺ to restore the default.")
                 }
 
                 Section {
@@ -59,7 +57,7 @@ struct PhoneSettingsView: View {
                 } header: {
                     Text("Tags")
                 } footer: {
-                    Text("Color tasks by tag gives each task its first tag's color, or green without a tag. Tag order sets how tag lanes and List by tag are ordered. Custom follows the arrows, and Soonest due date puts the tag with the next due task first. Each tag gets a color from its name. Tap a swatch to choose another, and ↺ puts back the default.")
+                    Text("Custom order follows the arrows beside each tag.")
                 }
 
                 Section {
@@ -67,7 +65,7 @@ struct PhoneSettingsView: View {
                 } header: {
                     Text("Widget")
                 } footer: {
-                    Text("Due dates show the weekday for the coming week and the date after that. By tag lists open tickets under bold tag titles. By status lists them under In Progress and Up Next, each sorted by due date. Applies to every prdctv widget.")
+                    Text("Applies to every prdctv widget.")
                 }
 
                 Section("Appearance") {
@@ -76,9 +74,9 @@ struct PhoneSettingsView: View {
 
                 Section("Sync") {
                     if model.store.isDemo {
-                        Label("Demo mode: sample data, not saved or synced", systemImage: "theatermasks")
+                        Label("Demo mode, so nothing is saved or synced", systemImage: "theatermasks")
                     } else {
-                        Label("Tickets and rewards sync with your Mac through iCloud", systemImage: "icloud")
+                        Label("Syncs through iCloud", systemImage: "icloud")
                     }
                 }
             }

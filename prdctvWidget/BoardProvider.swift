@@ -73,7 +73,8 @@ struct BoardProvider: TimelineProvider {
 
         let rewardsEnabled = RewardSettings.isEnabled()
         func snapshots(_ status: Status) -> [TicketSnapshot] {
-            tickets.filter { $0.status == status && (rewardsEnabled || !$0.category.isReward) }.map {
+            // Tickets on hold stay off the widget.
+            tickets.filter { $0.status == status && !$0.onHold && (rewardsEnabled || !$0.category.isReward) }.map {
                 TicketSnapshot(id: $0.id, title: $0.title, category: $0.category,
                                points: $0.points, locked: $0.isLocked(redemptions: redemptions), tags: $0.tags,
                                dueDate: $0.dueDate)

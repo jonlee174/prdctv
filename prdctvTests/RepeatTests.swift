@@ -62,3 +62,16 @@ struct RepeatTests {
         #expect(RepeatRule(every: 2, unit: .month).label == "Every 2 months")
     }
 }
+
+struct HoldTests {
+    @Test func ticketsAreNotOnHoldByDefault() {
+        #expect(!Ticket(title: "Chemistry lab").onHold)
+    }
+
+    @Test func repeatCopyIsNotOnHold() throws {
+        let ticket = Ticket(title: "Algebra worksheet")
+        ticket.repeatRule = .weekly
+        ticket.onHold = true
+        #expect(try #require(ticket.repeatCopy(sortIndex: 1)).onHold == false)
+    }
+}

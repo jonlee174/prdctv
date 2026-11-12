@@ -157,6 +157,14 @@ struct PhoneBoardView: View {
                 } label: {
                     Label("Move To", systemImage: "arrow.right.square")
                 }
+                if ticket.status != .done {
+                    Button {
+                        withAnimation { TicketOps.setHold(ticket, !ticket.onHold, context: context) }
+                    } label: {
+                        Label(ticket.onHold ? "Take Off Hold" : "Put On Hold",
+                              systemImage: ticket.onHold ? "play.circle" : "pause.circle")
+                    }
+                }
                 if rewardSettings.value.countsPoints {
                     Menu {
                         ForEach(PointScale.values, id: \.self) { value in

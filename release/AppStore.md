@@ -30,6 +30,7 @@ Board
 • Points on a 1, 2, 3, 5, 8 scale, or turn points off and count tasks
 • Due dates, notes and a month calendar you can drag tasks across
 • Repeating tasks, daily, weekly, monthly or every few days, weeks or months
+• Put tasks on hold while you wait on someone else
 • History of past weeks and stats with streaks
 
 Tags
@@ -60,6 +61,12 @@ Make it yours
 • Use light mode, dark mode or your system setting
 
 Your tasks sync between your Mac, iPhone and iPad through your own iCloud account. prdctv has no accounts, ads or tracking.
+
+## What's New in 1.4 (4000)
+
+• Put a task on hold while you wait on someone else. It stays on the board and leaves the widget.
+• The Mac icon has a dark version.
+• Simpler Settings that only show what applies.
 
 ## What's New in 1.3 (4000)
 

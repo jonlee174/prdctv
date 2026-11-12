@@ -14,44 +14,36 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Rewards") {
+            Section {
                 Toggle("Want and Fun rewards", isOn: $rewardsEnabled)
-                Stepper(value: $wantRatio, in: 1...50) {
-                    LabeledContent(pointsEnabled ? "Need points per Want" : "Need tickets per Want", value: "\(wantRatio)")
+                if rewardsEnabled {
+                    Stepper(value: $wantRatio, in: 1...50) {
+                        LabeledContent(pointsEnabled ? "Need points per Want" : "Need tickets per Want", value: "\(wantRatio)")
+                    }
+                    Stepper(value: $funRatio, in: 1...50) {
+                        LabeledContent(pointsEnabled ? "Need points per Fun" : "Need tickets per Fun", value: "\(funRatio)")
+                    }
                 }
-                .disabled(!rewardsEnabled)
-                Stepper(value: $funRatio, in: 1...50) {
-                    LabeledContent(pointsEnabled ? "Need points per Fun" : "Need tickets per Fun", value: "\(funRatio)")
-                }
-                .disabled(!rewardsEnabled)
-                Text("When off, the reward meter and Want and Fun tickets are hidden. The tickets are kept and come back when you turn rewards on.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text("Want and Fun counters are independent: both accumulate from the same need points. Balances are recomputed from history, so changes apply retroactively.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("Board") {
-                Toggle("Points", isOn: $pointsEnabled)
-                Text("When off, point values are hidden and each finished Need ticket counts as 1 toward rewards. Point values are kept.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Toggle("Keep all completed tickets in Done", isOn: $doneShowsAll)
-                Text("When off, Done shows this week and older tickets move to History.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Toggle("Confetti when a ticket is done", isOn: $confetti)
+            } header: {
+                Text("Rewards")
+            } footer: {
+                caption("Turning rewards off hides Want and Fun tickets without deleting them.")
             }
 
             Section {
-                CategoryStyleSettings()
+                Toggle("Points", isOn: $pointsEnabled)
+                Toggle("Keep all completed tickets in Done", isOn: $doneShowsAll)
+                Toggle("Confetti when a ticket is done", isOn: $confetti)
             } header: {
-                Text("Categories")
+                Text("Board")
             } footer: {
-                Text("Pick an icon and color for Need, Want and Fun tickets.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                caption("Without points, each finished Need ticket counts as 1. Older tickets move to History unless Keep all is on.")
+            }
+
+            if rewardsEnabled {
+                Section("Categories") {
+                    CategoryStyleSettings()
+                }
             }
 
             Section {
@@ -59,9 +51,7 @@ struct SettingsView: View {
             } header: {
                 Text("Colors")
             } footer: {
-                Text("Greens from the logo by default. Click a swatch to choose any color from the color wheel; it applies right away. ↺ puts back the default. Column colors also tint the widget headings.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                caption("Click a swatch to change a color, and ↺ to restore the default.")
             }
 
             Section {
@@ -69,9 +59,7 @@ struct SettingsView: View {
             } header: {
                 Text("Tags")
             } footer: {
-                Text("Color tasks by tag gives each task its first tag's color, or green without a tag. Tag order sets how tag lanes and List by tag are ordered. Custom follows the arrows, and Soonest due date puts the tag with the next due task first. Each tag gets a color from its name. Click a swatch to choose another, and ↺ puts back the default.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                caption("Custom order follows the arrows beside each tag.")
             }
 
             Section {
@@ -79,13 +67,11 @@ struct SettingsView: View {
             } header: {
                 Text("Widget")
             } footer: {
-                Text("Due dates show the weekday for the coming week and the date after that. By tag lists open tickets under bold tag titles. By status lists them under In Progress and Up Next, each sorted by due date. Applies to every prdctv widget.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                caption("Applies to every prdctv widget.")
             }
 
             Section("Quick Add") {
-                KeyboardShortcuts.Recorder("Global shortcut:", name: .quickAdd)
+                KeyboardShortcuts.Recorder("Global shortcut", name: .quickAdd)
             }
 
             Section("General") {
@@ -103,6 +89,10 @@ struct SettingsView: View {
         .onChange(of: pointsEnabled) { SharedStore.reloadWidgets() }
         .onChange(of: wantRatio) { SharedStore.reloadWidgets() }
         .onChange(of: funRatio) { SharedStore.reloadWidgets() }
+    }
+
+    private func caption(_ text: String) -> some View {
+        Text(text).font(.caption).foregroundStyle(.secondary)
     }
 
     private func setLaunchAtLogin(_ enabled: Bool) {

@@ -97,7 +97,7 @@ struct WidgetSettings: View {
 
     var body: some View {
         Toggle("Due dates", isOn: $showsDueDates)
-            .help("The weekday for the next week, the date after that")
+            .help("The weekday within a week, otherwise the date")
             .onChange(of: showsDueDates) { SharedStore.reloadWidgets() }
         Picker("Layout", selection: $layoutRaw) {
             Text("Columns").tag(WidgetLayout.columns.rawValue)
@@ -105,20 +105,23 @@ struct WidgetSettings: View {
             Text("By status").tag(WidgetLayout.status.rawValue)
         }
         .onChange(of: layoutRaw) { SharedStore.reloadWidgets() }
-        Toggle("Show miscellaneous", isOn: $showsMiscellaneous)
-            .disabled(layoutRaw != WidgetLayout.tags.rawValue)
-            .help("Untagged tickets, listed last")
-            .onChange(of: showsMiscellaneous) { SharedStore.reloadWidgets() }
-        Toggle("Status titles", isOn: $statusTitles)
-            .disabled(layoutRaw != WidgetLayout.status.rawValue)
-            .help("In Progress and Up Next titles in the By status layout")
-            .onChange(of: statusTitles) { SharedStore.reloadWidgets() }
-        Toggle("Tags in rows", isOn: $statusShowsTags)
-            .disabled(layoutRaw != WidgetLayout.status.rawValue)
-            .help("Each row's first tag in the By status layout")
-            .onChange(of: statusShowsTags) { SharedStore.reloadWidgets() }
-        Toggle("Rewards in the large widget", isOn: $largeShowsMeter)
-            .disabled(!rewardsEnabled)
-            .onChange(of: largeShowsMeter) { SharedStore.reloadWidgets() }
+        // Only the switches that apply to the chosen layout and features are shown.
+        if layoutRaw == WidgetLayout.tags.rawValue {
+            Toggle("Show miscellaneous", isOn: $showsMiscellaneous)
+                .help("Untagged tickets, listed last")
+                .onChange(of: showsMiscellaneous) { SharedStore.reloadWidgets() }
+        }
+        if layoutRaw == WidgetLayout.status.rawValue {
+            Toggle("Status titles", isOn: $statusTitles)
+                .help("In Progress and Up Next titles")
+                .onChange(of: statusTitles) { SharedStore.reloadWidgets() }
+            Toggle("Tags in rows", isOn: $statusShowsTags)
+                .help("Each row's first tag")
+                .onChange(of: statusShowsTags) { SharedStore.reloadWidgets() }
+        }
+        if rewardsEnabled {
+            Toggle("Rewards in the large widget", isOn: $largeShowsMeter)
+                .onChange(of: largeShowsMeter) { SharedStore.reloadWidgets() }
+        }
     }
 }

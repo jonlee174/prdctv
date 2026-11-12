@@ -69,6 +69,7 @@
 		8BC28BECF863725D82CA3CCA /* Repeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09AB0348AF946A07D7095FD0 /* Repeat.swift */; };
 		91A083E3937179B241015CD2 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676EC7AFE144CB8BC086DBC1 /* DemoData.swift */; };
 		92529BAC0C31A18B9744A59E /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 286D78B19019890FB492C6E3 /* UndoHistory.swift */; };
+		938AF915A7D23BBA45589C1D /* AppIconMac.icon in Resources */ = {isa = PBXBuildFile; fileRef = FC09F2D99A0C2012CC6951E4 /* AppIconMac.icon */; };
 		9556D8594CA5EC65B04635AE /* DueLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C23AD7873D1A1B12334F5B /* DueLabel.swift */; };
 		988B667175B6EB9540896A08 /* UndoHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 286D78B19019890FB492C6E3 /* UndoHistory.swift */; };
 		988F8EE44E92E2E5E2460DD3 /* RedemptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AEE83680CC5167B16C0BD1 /* RedemptionSheet.swift */; };
@@ -238,6 +239,7 @@
 		F533A9A0ADCF0D1DAA3D9043 /* WhiteboardImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardImportView.swift; sourceTree = "<group>"; };
 		F7FD3BA25468D224D9759459 /* Tags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tags.swift; sourceTree = "<group>"; };
 		F81895ECD0034A298A063AB6 /* PhoneSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneSettingsView.swift; sourceTree = "<group>"; };
+		FC09F2D99A0C2012CC6951E4 /* AppIconMac.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AppIconMac.icon; sourceTree = "<group>"; };
 		FF824C153702F7D5AD956643 /* TicketCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -297,6 +299,14 @@
 				B5241815285A619177AC5126 /* PrivacyInfo.xcprivacy */,
 			);
 			path = prdctvWidget;
+			sourceTree = "<group>";
+		};
+		436CFC737DC3836765832EF1 /* MacIcon */ = {
+			isa = PBXGroup;
+			children = (
+				FC09F2D99A0C2012CC6951E4 /* AppIconMac.icon */,
+			);
+			path = MacIcon;
 			sourceTree = "<group>";
 		};
 		58CCCA62F0661A18B4661054 /* QuickAdd */ = {
@@ -379,6 +389,7 @@
 				B3CBE15780F216F9B803D0C3 /* Calendar */,
 				7B230F8B2BC6A0C291A0694F /* Import */,
 				0E04BA11FDDFC0C1A8BE6F7B /* iOS */,
+				436CFC737DC3836765832EF1 /* MacIcon */,
 				58CCCA62F0661A18B4661054 /* QuickAdd */,
 				A03D06070A1C82E71F54AD12 /* Resources */,
 				FF1DD893E4B0945CE2305EBF /* Rewards */,
@@ -610,6 +621,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				938AF915A7D23BBA45589C1D /* AppIconMac.icon in Resources */,
 				2C367BA87BA17A947B94F0D3 /* Assets.xcassets in Resources */,
 				34DB3D0B3F0A937E23A50440 /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -834,7 +846,7 @@
 		40F01760F951E9F252F5251E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconMac;
 				ASSETCATALOG_COMPILER_STANDALONE_ICON_BEHAVIOR = all;
 				CODE_SIGN_ENTITLEMENTS = prdctv/App/prdctv.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -853,7 +865,7 @@
 		6FC2413B607FC9EB5D3C53A1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconMac;
 				ASSETCATALOG_COMPILER_STANDALONE_ICON_BEHAVIOR = all;
 				CODE_SIGN_ENTITLEMENTS = prdctv/App/prdctv.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -923,7 +935,7 @@
 				IOS_APP_GROUP_ID = group.com.jonathanlee.prdctv;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -993,7 +1005,7 @@
 				IOS_APP_GROUP_ID = group.com.jonathanlee.prdctv;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
